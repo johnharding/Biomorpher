@@ -1,0 +1,19 @@
+﻿<Window x:Class="Biomorpher.DesignSpaceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:h="http://helix-toolkit.org/wpf"
+        Title="Biomorpher" Height="720" Width="1280"
+        xmlns:myControls="clr-namespace:Biomorpher"
+        >
+    <!--
+    <Grid>
+        <myControls:UserControl1 Margin="10,10,847,338"></myControls:UserControl1>
+        <myControls:UserControl1 Margin="425,10,434,338"></myControls:UserControl1>
+        <myControls:UserControl1 Margin="838,10,0,338"/>
+        <myControls:UserControl1 Margin="10,348,847,10"/>
+        <myControls:UserControl1 Margin="425,348,434,10"/>
+        <myControls:UserControl1 Margin="838,348,0,10"/>
+    </Grid>
+    -->
+   
+</Window>
