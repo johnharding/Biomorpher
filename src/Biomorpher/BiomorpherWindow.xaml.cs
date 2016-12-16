@@ -19,12 +19,12 @@ namespace Biomorpher
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class DesignSpaceWindow : Window
+    public partial class BiomorpherWindow : Window
     {
         Grid myGrid;
         List<UserControl1> myUserControls;
 
-        public DesignSpaceWindow(List<Mesh> myMeshes)
+        public BiomorpherWindow(List<Mesh> myMeshes)
         {
 
             this.InitializeComponent();
@@ -45,18 +45,14 @@ namespace Biomorpher
             MakeGrid(4, 3);
 
 
-            // Add the user controls
+            // Add the user controls (the sub-windows)
             for (int i = 0; i < myUserControls.Count; i++)
             {
                 Grid.SetColumn(myUserControls[i], i % 4);
                 Grid.SetRow(myUserControls[i], (int)(i / 4));
 
-                //Grid.SetColumn(myControl2, 2);
-                //Grid.SetRow(myControl2, 2);
-
                 myGrid.Children.Add(myUserControls[i]);
             }
-
 
             this.AddChild(myGrid);
         }
@@ -76,9 +72,6 @@ namespace Biomorpher
             myThickness.Right = 2;
             myThickness.Top = 2;
             this.BorderThickness = myThickness;
-            // Border myBorder = new Border();
-            // myBorder.BorderThickness
-
 
             // Define the Columns
             int COLNUM = 4;

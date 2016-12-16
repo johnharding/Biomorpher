@@ -10,16 +10,16 @@ using System.Windows.Forms;
 
 namespace Biomorpher
 {
-    public class DesignSpaceAttributes : GH_ComponentAttributes
+    public class BiomorpherAttributes : GH_ComponentAttributes
     {
 
-        public DesignSpaceComponent MyOwner
+        public BiomorpherComponent MyOwner
         {
             get;
             private set;
         }
 
-        public DesignSpaceAttributes(DesignSpaceComponent owner)
+        public BiomorpherAttributes(BiomorpherComponent owner)
             : base(owner)
         {
             this.MyOwner = owner;
@@ -62,11 +62,7 @@ namespace Biomorpher
                 // 1. Component Render
                 base.Render(canvas, graphics, channel);
 
-                // 2. Canvas Segmentation
-                //graphics.DrawLine(Pens.Black, 0, 0, 0, -100000);
-                //graphics.DrawLine(Pens.Black, 0, 0, -100000, 0);
-                //graphics.FillEllipse(Brushes.Black, -2, -2, 4, 4);
-
+                // 2. Show combinations
                 Font ubuntuFont = new Font("ubuntu", 8);
                 StringFormat format = new StringFormat();
                 format.Alignment = StringAlignment.Near;
@@ -75,37 +71,6 @@ namespace Biomorpher
 
                 graphics.DrawString(MyOwner.sliderValues.Count + " designs", ubuntuFont, Brushes.Black, (int)Bounds.Location.X, (int)Bounds.Location.Y - 8, format);
 
-                //GH_Palette palette = GH_Palette.Pink;
-
-                //Color myColor = Color.LightGray;
-
-                //switch (Owner.RuntimeMessageLevel)
-                //{
-                //    case GH_RuntimeMessageLevel.Warning:
-                //        myColor = Color.Orange;
-                //        break;
-
-                //    case GH_RuntimeMessageLevel.Error:
-                //        myColor = Color.Red;
-                //        break;
-                //}
-
-                //if (Owner.Hidden) myColor = Color.Gray;
-                //if (Owner.Locked) myColor = Color.DarkGray;
-
-                //Rectangle myRect = new Rectangle((int)Bounds.Location.X, (int)Bounds.Location.Y-20, (int)Bounds.Size.Width, 10);
-                //Pen myPen = new Pen(Brushes.Black, 1);
-                //graphics.DrawRectangle(myPen, myRect);
-                //GH_Capsule capsule = GH_Capsule.CreateCapsule(myRect, palette, 10, 0);
-
-                //capsule.Render(graphics, myColor);
-                //capsule.Dispose();
-                //capsule = null;
-                //base.RenderComponentCapsule(canvas, graphics, false, false, false, true, true, false);
-                //PointF iconLocation = new PointF(ContentBox.X-4, ContentBox.Y+70);
-                //graphics.DrawImage(Owner.Icon_24x24, iconLocation);
-                //
-                //format.Dispose();
 
             }
         }

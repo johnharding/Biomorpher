@@ -13,10 +13,10 @@ using Rhino.Geometry;
 
 namespace Biomorpher
 {
-    public class DesignSpaceComponent : GH_Component
+    public class BiomorpherComponent : GH_Component
     {
 
-        private DesignSpaceWindow myMainWindow;
+        private BiomorpherWindow myMainWindow;
         public bool GO = false;
         private int counter;
         private int popSize;
@@ -27,7 +27,7 @@ namespace Biomorpher
         /// <summary>
         /// Main constructor
         /// </summary>
-        public DesignSpaceComponent()
+        public BiomorpherComponent()
             : base("Biomorpher", "DS", "Displays multiple parameter instances in one place", "Extra", "Rosebud")
         {
         }
@@ -152,7 +152,7 @@ namespace Biomorpher
                 {
 
                     // Instantiate the window and export the geometry to WPF3D
-                    myMainWindow = new DesignSpaceWindow(GetPersMeshList());
+                    myMainWindow = new BiomorpherWindow(GetPersMeshList());
                     myMainWindow.Show();
 
                     GO = false;
@@ -198,7 +198,7 @@ namespace Biomorpher
 
         public override void CreateAttributes()
         {
-            m_attributes = new DesignSpaceAttributes(this);
+            m_attributes = new BiomorpherAttributes(this);
         }
 
 
