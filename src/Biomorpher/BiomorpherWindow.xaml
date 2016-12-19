@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:h="http://helix-toolkit.org/wpf"
         Title="Biomorpher" Height="720" Width="1280"
-        xmlns:myControls="clr-namespace:Biomorpher"
+        xmlns:myControls="clr-namespace:Biomorpher" Background="Red"
         >
     <!--
     <Grid>
