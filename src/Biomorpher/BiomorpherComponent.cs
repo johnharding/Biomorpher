@@ -193,7 +193,7 @@ namespace Biomorpher
 
         public override Guid ComponentGuid
         {
-            get { return new Guid("73F1D5F1-7208-4501-8C8C-66ED25BA5A1D"); }
+            get { return new Guid("87264CC5-8461-4003-8FF7-7584B13BAF06"); }
         }
 
         public override void CreateAttributes()

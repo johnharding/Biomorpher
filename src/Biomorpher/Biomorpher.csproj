@@ -119,6 +119,11 @@
     </Compile>
     <Compile Include="BiomorpherAttributes.cs" />
     <Compile Include="BiomorpherComponent.cs" />
+    <Compile Include="IGA\Chromosome.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IGA\PopStore.cs" />
+    <Compile Include="IGA\Population.cs" />
     <Compile Include="UserControl1.xaml.cs">
       <DependentUpon>UserControl1.xaml</DependentUpon>
     </Compile>
@@ -164,8 +169,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)DesignSpace.gha"
-Copy "$(TargetPath)" "C:\Users\je3-harding\AppData\Roaming\Grasshopper\Libraries\DesignSpace.gha"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)Biomorpher.gha"
+Copy "$(TargetPath)" "C:\Users\je3-harding\AppData\Roaming\Grasshopper\Libraries\Biomorpher.gha"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
