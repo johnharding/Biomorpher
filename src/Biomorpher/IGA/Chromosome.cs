@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Biomorpher.GA
+namespace Biomorpher.IGA
 {
     public class Chromosome
     {
@@ -58,6 +58,8 @@ namespace Biomorpher.GA
             if(tempRand < probability)
             {
                 int index = (int)(randMutate.NextDouble() * genes.Length);
+                double newgene = randMutate.NextDouble();
+                this.genes[index] = newgene;
             }
 
         }

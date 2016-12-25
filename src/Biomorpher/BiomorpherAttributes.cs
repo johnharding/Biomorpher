@@ -62,7 +62,13 @@ namespace Biomorpher
                 // 1. Component Render
                 base.Render(canvas, graphics, channel);
 
-                // 2. Show combinations
+                // 2. New upper tab
+                //Color myColor = Color.LightGray;
+                //Rectangle myRect = new Rectangle((int)Bounds.Location.X, (int)Bounds.Location.Y - 20, (int)Bounds.Size.Width, 10);
+                //Pen myPen = new Pen(Brushes.Black, 1);
+                //graphics.DrawRectangle(myPen, myRect);
+
+                // 3. Show combinations
                 Font ubuntuFont = new Font("ubuntu", 8);
                 StringFormat format = new StringFormat();
                 format.Alignment = StringAlignment.Near;
@@ -70,7 +76,6 @@ namespace Biomorpher
                 format.Trimming = StringTrimming.EllipsisCharacter;
 
                 graphics.DrawString(MyOwner.sliderValues.Count + " designs", ubuntuFont, Brushes.Black, (int)Bounds.Location.X, (int)Bounds.Location.Y - 8, format);
-
 
             }
         }

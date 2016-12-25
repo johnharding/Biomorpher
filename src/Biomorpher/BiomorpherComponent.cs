@@ -10,6 +10,7 @@ using Rhino;
 using System.Windows.Forms;
 using System.Drawing;
 using Rhino.Geometry;
+using Biomorpher.IGA;
 
 namespace Biomorpher
 {
@@ -21,27 +22,27 @@ namespace Biomorpher
         private int counter;
         private int popSize;
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
+
+        // Lists containing initial slider values and geometry
         public List<double> sliderValues = new List<double>();
-        private List<object> persGeo = new List<object>();
+        private List<object> inputGeometry = new List<object>();
 
         /// <summary>
         /// Main constructor
         /// </summary>
         public BiomorpherComponent()
-            : base("Biomorpher", "DS", "Displays multiple parameter instances in one place", "Extra", "Rosebud")
-        {
+            : base("Biomorpher", "Biomorpher", "Interactive Genetic Algorithms for Grasshopper", "Params", "Util")
+        {    
         }
 
         /// <summary>
-        /// Register component inputs
+        /// Register inputs
         /// </summary>
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-            pm.AddNumberParameter("Sliders", "S", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
-            //pm.AddGeometryParameter("Volatile Geometry", "vG", "(phenotype) Connect geometry that is dependent on sliders here", GH_ParamAccess.item);
-            pm.AddGeometryParameter("Geometry", "G", "(phenotype) Connect geometry here - currently only meshes", GH_ParamAccess.list);
-            pm.AddIntegerParameter("PopSize", "P", "Number of instances to display e.g. 12 = 4x3 viewports", GH_ParamAccess.item, 12);
+            pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
+            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here - currently only meshes", GH_ParamAccess.list);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
@@ -50,12 +51,11 @@ namespace Biomorpher
         }
 
         /// <summary>
-        /// Register component outputs
+        /// Register outputs
         /// </summary>
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddNumberParameter("ChosenOnes", "Ch", "Each list contains a collection of selected parameters", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -70,10 +70,11 @@ namespace Biomorpher
                 // Spring clean
                 counter = 0;
                 sliders.Clear();
-                persGeo.Clear();
+                inputGeometry.Clear();
                 sliderValues.Clear();
 
-                DA.GetData("PopSize", ref popSize);
+                // TODO: This should be based on number of chromosomes
+                popSize = 12;
 
                 // Collect the sliders up (just one at the moment)
                 foreach (IGH_Param param in this.Params.Input[0].Sources)
@@ -89,7 +90,6 @@ namespace Biomorpher
                 // Now set the value list
                 // TODO: Replace with a tree, not just the first slider!
                 // Thanks to Dimitrie A. Stefanescu for making Speckle open which has helped greatly here.
-
 
                 for (int i = 0; i < sliders.Count; i++)
                 {
@@ -143,7 +143,7 @@ namespace Biomorpher
                         }
                     }
 
-                    persGeo.Add(joinedMesh);
+                    inputGeometry.Add(joinedMesh);
                 }
 
 
@@ -152,7 +152,7 @@ namespace Biomorpher
                 {
 
                     // Instantiate the window and export the geometry to WPF3D
-                    myMainWindow = new BiomorpherWindow(GetPersMeshList());
+                    myMainWindow = new BiomorpherWindow(GetMeshList());
                     myMainWindow.Show();
 
                     GO = false;
@@ -166,19 +166,17 @@ namespace Biomorpher
 
             }
 
-            // We need some interaction with the form before sending out the chosen phenotypes.
-            DA.SetData(0, 444);
 
         }
 
         /// <summary>
-        /// Returns persisent meshes
+        /// Returns meshes for this instance
         /// </summary>
         /// <returns></returns>
-        public List<Mesh> GetPersMeshList()
+        public List<Mesh> GetMeshList()
         {
             List<Mesh> myMeshes = new List<Mesh>();
-            foreach (object myObject in persGeo)
+            foreach (object myObject in inputGeometry)
             {
                 if (myObject is Mesh)
                 {
@@ -206,7 +204,7 @@ namespace Biomorpher
         {
             get
             {
-                return GH_Exposure.primary;
+                return GH_Exposure.senary;
             }
         }
 
@@ -214,7 +212,7 @@ namespace Biomorpher
         {
             get
             {
-                return Properties.Resources.DoubleClickIcon;
+                return Properties.Resources.BiomorpherIcon_24;
             }
         }
 

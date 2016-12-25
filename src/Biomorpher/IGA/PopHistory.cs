@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Biomorpher.GA
+namespace Biomorpher.IGA
 {
     /// <summary>
     /// Historic record of populations
     /// </summary>
-    class PopStore
+    class PopHistory
     {
         /// <summary>
         /// number of historic populations
@@ -24,7 +24,7 @@ namespace Biomorpher.GA
         /// <summary>
         /// constructor
         /// </summary>
-        public PopStore()
+        public PopHistory()
         {
             historicpops = new List<Population>();
         }
