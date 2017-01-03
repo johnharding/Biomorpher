@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Biomorpher.IGA;
+using Biomorpher;
+using Grasshopper.Kernel;
 
 namespace Biomorpher
 {
@@ -23,88 +25,76 @@ namespace Biomorpher
     public partial class BiomorpherWindow : Window
     {
 
-        // Create a new population
-        Population population;
-        int popSize;
+        // Fields
+        private int generation;
+        private int popSize;
+        private Population population;
+        private PopHistory popHistory;
+        private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
+        private bool GO;
 
-        // Window controls
         Grid myGrid;
         List<UserControl1> myUserControls;
 
-        public BiomorpherWindow()
+        // Constructor
+        public BiomorpherWindow(BiomorpherComponent Owner)
         {
-
-            // The population number needs to come from a field.
-            popSize = 100;
+            // Get sliders
+            sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
+            Owner.GetSliders(sliders);
+            
+            // GA things
+            generation = 0;
+            popSize = 12; // TODO: The population number needs to come from the user
             population = new Population(popSize);
+            popHistory = new PopHistory();
 
+            // Get geometry for each chromosome in the initial population
+            for (int i = 0; i < population.chromosomes.Length; i++)
+            {
+                Owner.SetSliders(population.chromosomes[i], sliders);
+                Owner.ExpireSolution(true); // This may not work! We have to expire to get the geometry to update after altering sliders
+                Owner.GetGeometry(population.chromosomes[i]);
+            }
+
+            // Initial Window things
             InitializeComponent();
             Topmost = true;
-
             myUserControls = new List<UserControl1>();
+            
+            // 1. create the grid?
+            // 2. display initial population here
+            // 3. add user controls?
+            // 4. add them as children to this window?
 
-
-            //TODO: mymeshes used to come from the constructor. Now it should come from the chromosomes.
-            // We need to write a method here to call the getgeometry method somewhere in the BiomorpherComponent class.
-
-            if (myMeshes != null)
-            {
-                for (int i = 0; i < myMeshes.Count; i++)
-                {
-                    myUserControls.Add(new UserControl1(myMeshes[i]));
-                }
-            }
-
-            // Create the Grid
-            myGrid = new Grid();
-            MakeGrid(4, 3);
-
-
-            // Add the user controls (the sub-windows)
-            for (int i = 0; i < myUserControls.Count; i++)
-            {
-                Grid.SetColumn(myUserControls[i], i % 4);
-                Grid.SetRow(myUserControls[i], (int)(i / 4));
-
-                myGrid.Children.Add(myUserControls[i]);
-            }
-
-            this.AddChild(myGrid);
         }
 
 
-        void MakeGrid(int sizeX, int sizeY)
+        /// <summary>
+        /// When this gets called (probably via a button being triggered) we advance a generation 
+        /// </summary>
+        public void Run()
         {
-            myGrid.Width = 1270;
-            myGrid.Height = 684;
-            myGrid.HorizontalAlignment = HorizontalAlignment.Left;
-            myGrid.VerticalAlignment = VerticalAlignment.Top;
-            myGrid.ShowGridLines = true;
+            // 1. Create new populaltion using user selection
 
-            Thickness myThickness = new Thickness();
-            myThickness.Bottom = 2;
-            myThickness.Left = 2;
-            myThickness.Right = 2;
-            myThickness.Top = 2;
-            this.BorderThickness = myThickness;
+            // 2. Mutate population using user preferences
 
-            // Define the Columns
-            int COLNUM = 4;
-            List<ColumnDefinition> myCols = new List<ColumnDefinition>();
-            for (int i = 0; i < COLNUM; i++)
-                myCols.Add(new ColumnDefinition());
+            // 3. Set sliders and get geometry for each chromosome
 
-            for (int i = 0; i < COLNUM; i++)
-                myGrid.ColumnDefinitions.Add(myCols[i]);
+            // 4. Advance the generation counter and store the population historically.
+            popHistory.AddPop(population);
+            generation++;
+            
+            // 5. Visualise the current population
 
-            // Define the Rows
-            int ROWNUM = 3;
-            List<RowDefinition> myRows = new List<RowDefinition>();
-            for (int i = 0; i < ROWNUM; i++)
-                myRows.Add(new RowDefinition());
+        }
 
-            for (int i = 0; i < ROWNUM; i++)
-                myGrid.RowDefinitions.Add(myRows[i]);
+
+        public void Exit()
+        {
+            // Set sliders and get geometry for a chosen chromosome
+
+            // Close the window
         }
 
 

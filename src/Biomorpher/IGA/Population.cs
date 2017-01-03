@@ -12,7 +12,7 @@ namespace Biomorpher.IGA
         int generation;
         
         // the population of chromosomes
-        Chromosome[] chromosomes;
+        public Chromosome[] chromosomes {get; set;}
 
         // TODO: Store the geometry phenotype here
 
@@ -25,6 +25,20 @@ namespace Biomorpher.IGA
             chromosomes = new Chromosome[popSize];
             generation = 0;
             GenerateRandom();
+        }
+
+        /// <summary>
+        /// Creates a value copy of the population's chomosomes and genes
+        /// </summary>
+        /// <param name="pop"></param>
+        public Population(Population pop)
+        {
+            // same length
+            chromosomes = new Chromosome[pop.chromosomes.Length];
+
+            // clone the chromosomes
+            for(int i=0; i<chromosomes.Length; i++)
+                chromosomes[i] = pop.chromosomes[i].Clone();
         }
 
         public void GenerateRandom()

@@ -35,7 +35,7 @@ namespace Biomorpher.IGA
         /// <param name="pop"></param>
         public void AddPop(Population pop)
         {
-            historicpops.Add(pop);
+            historicpops.Add(new Population(pop));
         }
 
     }

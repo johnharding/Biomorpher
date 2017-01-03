@@ -19,8 +19,6 @@ namespace Biomorpher
 
         private BiomorpherWindow myMainWindow;
         public bool GO = false;
-        private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
-        private List<object> inputGeometry = new List<object>();
 
         /// <summary>
         /// Main constructor
@@ -38,11 +36,13 @@ namespace Biomorpher
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here - currently only meshes", GH_ParamAccess.list);
+            //TODO: Measures.. input 'performance measures' 
+            //TODO: Labels.. input string for external quantitative measures
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
-            //pm[1].Optional = true;
-
+            //pm[2].Optional = true;
+            //pm[3].Optional = true;
         }
 
         /// <summary>
@@ -60,34 +60,25 @@ namespace Biomorpher
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             // If we are currently static, then reset things and collect sliders
-            if (!GO)
+            if (GO)
             {
-                // Spring clean
-                sliders.Clear();
-                inputGeometry.Clear();
-
-                // Collect the sliders up
-                GetSliders();
-
-            }
-
-            else
-            {
-                // Instantiate the window and export the geometry to WPF3D
-                myMainWindow = new BiomorpherWindow();
+                // Instantiate the window
+                myMainWindow = new BiomorpherWindow(this);
                 myMainWindow.Show();
                 GO = false;
 
-                // Expire this component
-                this.ExpireSolution(true);
+                // Expire the solution
+                //this.ExpireSolution(true);
+                
+
             }
         }
 
-
+        
         /// <summary>
         /// Gets the current sliders in Input[0]
         /// </summary>
-        public void GetSliders()
+        public void GetSliders(List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
             foreach (IGH_Param param in this.Params.Input[0].Sources)
             {
@@ -99,19 +90,12 @@ namespace Biomorpher
             }
         }
 
-        /// <summary>
-        /// Clear the list of sliders
-        /// </summary>
-        public void ClearSliders()
-        {
-            sliders.Clear();
-        }
 
         /// <summary>
-        /// Sets the current slider values based on the chomrosome
+        /// Sets the current slider values for a geven input chromosome
         /// </summary>
         /// <param name="chromo"></param>
-        public void SetSliders(Chromosome chromo)
+        public void SetSliders(Chromosome chromo, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
             double[] genes = chromo.GetGenes();
  
@@ -125,16 +109,30 @@ namespace Biomorpher
             }
         }
 
-
-        public List<Mesh> GetGeometry(Chromosome chromo, IGH_DataAccess da)
+        /// <summary>
+        /// Updates the geometry for an input chromosome
+        /// </summary>
+        /// <param name="chromo"></param>
+        /// <param name="da"></param>
+        /// <returns></returns>
+        public void GetGeometry(Chromosome chromo)
         {
-            //TODO: Copy the geometry over to the input chromosome, rather than call is when the window is launched
 
             // Collect the object at the current instance
             List<object> localObjs = new List<object>();
-            da.GetDataList("Geometry", localObjs);
 
-            // Currently we only take meshes
+            // OK, so this needs a complete clean here. Need to avoid using DA though.
+            // da.GetDataList("Geometry", localObjs);
+            foreach (IGH_Param param in this.Params.Input[1].Sources)
+            {
+                object soupdragon = param as object;
+                if (soupdragon != null)
+                {
+                    localObjs.Add(soupdragon);
+                }
+            }
+
+            // Get only mesh geometry from the object list
             Mesh joinedMesh = new Mesh();
 
             for (int i = 0; i < localObjs.Count; i++)
@@ -150,19 +148,14 @@ namespace Biomorpher
                 }
             }
 
-            inputGeometry.Add(joinedMesh);
+            // TODO: Get other types of geometry
 
-            List<Mesh> myMeshes = new List<Mesh>();
-            foreach (object myObject in inputGeometry)
-            {
-                if (myObject is Mesh)
-                {
-                    Mesh myLocalMesh = (Mesh)myObject;
-                    myMeshes.Add(myLocalMesh);
-                }
-            }
+            // TODO: The allGeometry should not be of type Mesh.
+            List<Mesh> allGeometry = new List<Mesh>();
+            allGeometry.Add(joinedMesh);
 
-            return myMeshes;
+            // Set the phenotype within the chromosome class
+            chromo.SetPhenotype(allGeometry);
         }
 
 

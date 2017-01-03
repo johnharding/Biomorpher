@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Grasshopper.Kernel;
+using Rhino.Geometry;
 
 namespace Biomorpher.IGA
 {
@@ -11,7 +12,9 @@ namespace Biomorpher.IGA
     {
         private Random randGene;
         private Random randMutate;
-        private object phenotype;   // store the geometry here?
+        private List<Mesh> phenotype;       // TODO: should be more than meshes at some point
+        private List<double> performance;   // (optional) list of performance values
+        private List<string> criteria;      // (optional) labels for performance criteria
         
         // Normalised values used in the chromosome
         private double[] genes;
@@ -44,11 +47,17 @@ namespace Biomorpher.IGA
             return fitness;
         }
 
+        /// <summary>
+        /// Clones the chromosome TODO: needs to be more than just the genes we clone here!
+        /// </summary>
+        /// <returns></returns>
         public Chromosome Clone()
         {
             Chromosome clone = new Chromosome(this.genes.Length);
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             clone.fitness = this.fitness;
+
+            // need to also clone the phenotype geometry and optional performance criteria
 
             return clone;
         }
@@ -69,6 +78,16 @@ namespace Biomorpher.IGA
         public double[] GetGenes()
         {
             return genes;
+        }
+
+        public void SetPhenotype(List<Mesh> meshes)
+        {
+            // Reset the phenotype to some input meshes
+            // TODO: in the future this should be generic geometry including curves, etc.
+            //       the argument for this method will have to be updated also.
+            phenotype = new List<Mesh>(meshes);
+
+            // TODO: Update performance criteria in this method.
         }
 
     }
