@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Grasshopper.Kernel;
 
 namespace Biomorpher.IGA
 {
@@ -10,6 +11,7 @@ namespace Biomorpher.IGA
     {
         private Random randGene;
         private Random randMutate;
+        private object phenotype;   // store the geometry here?
         
         // Normalised values used in the chromosome
         private double[] genes;
@@ -28,7 +30,7 @@ namespace Biomorpher.IGA
             randMutate = new Random(42);
         }
 
-        void GenerateNew()
+        public void GenerateNew()
         {
             for (int i=0; i<genes.Length; i++)
             {
@@ -62,6 +64,11 @@ namespace Biomorpher.IGA
                 this.genes[index] = newgene;
             }
 
+        }
+
+        public double[] GetGenes()
+        {
+            return genes;
         }
 
     }

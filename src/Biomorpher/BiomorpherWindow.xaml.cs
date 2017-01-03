@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Biomorpher.IGA;
 
 namespace Biomorpher
 {
@@ -21,16 +22,30 @@ namespace Biomorpher
     /// </summary>
     public partial class BiomorpherWindow : Window
     {
+
+        // Create a new population
+        Population population;
+        int popSize;
+
+        // Window controls
         Grid myGrid;
         List<UserControl1> myUserControls;
 
-        public BiomorpherWindow(List<Mesh> myMeshes)
+        public BiomorpherWindow()
         {
 
-            this.InitializeComponent();
-            this.Topmost = true;
+            // The population number needs to come from a field.
+            popSize = 100;
+            population = new Population(popSize);
+
+            InitializeComponent();
+            Topmost = true;
 
             myUserControls = new List<UserControl1>();
+
+
+            //TODO: mymeshes used to come from the constructor. Now it should come from the chromosomes.
+            // We need to write a method here to call the getgeometry method somewhere in the BiomorpherComponent class.
 
             if (myMeshes != null)
             {

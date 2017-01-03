@@ -24,11 +24,13 @@ namespace Biomorpher.IGA
         {
             chromosomes = new Chromosome[popSize];
             generation = 0;
+            GenerateRandom();
         }
 
-        void GenerateRandom()
+        public void GenerateRandom()
         {
-
+            for (int i = 0; i < chromosomes.Length; i++)
+                chromosomes[i].GenerateNew();
         }
 
     }

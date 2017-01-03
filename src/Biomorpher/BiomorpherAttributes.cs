@@ -35,7 +35,7 @@ namespace Biomorpher
         {
             if ((ContentBox.Contains(e.CanvasLocation)))
             {
-                // Best to flip this to iron out any errors
+                // Best to flip this boolean to iron out any errors
                 MyOwner.GO = !MyOwner.GO;
 
                 MyOwner.ExpireSolution(true);
