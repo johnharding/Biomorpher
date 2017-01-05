@@ -29,16 +29,17 @@ namespace Biomorpher.IGA
             fitness = 0.0;
 
             // Let's work with a seed to start with
-            randGene = new Random(21);
-            randMutate = new Random(42);
+            
+            randMutate = new Random();
         }
 
-        public void GenerateNew()
+        public void GenerateRandomGenes(int seed)
         {
+            randGene = new Random(seed+10);
+
             for (int i=0; i<genes.Length; i++)
             {
                 genes[i] = randGene.NextDouble();
-
             }
         }
 

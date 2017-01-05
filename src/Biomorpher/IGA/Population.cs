@@ -20,11 +20,11 @@ namespace Biomorpher.IGA
         /// Construct a new population of chromosomes
         /// </summary>
         /// <param name="popSize"></param>
-        public Population(int popSize)
+        public Population(int popSize, int sliderCount)
         {
             chromosomes = new Chromosome[popSize];
             generation = 0;
-            GenerateRandom();
+            GenerateRandom(sliderCount);
         }
 
         /// <summary>
@@ -41,10 +41,17 @@ namespace Biomorpher.IGA
                 chromosomes[i] = pop.chromosomes[i].Clone();
         }
 
-        public void GenerateRandom()
+        /// <summary>
+        /// Generates a random population of new chromosomes. TODO: take away seed
+        /// </summary>
+        /// <param name="geneNumber"></param>
+        public void GenerateRandom(int geneNumber)
         {
             for (int i = 0; i < chromosomes.Length; i++)
-                chromosomes[i].GenerateNew();
+            {
+                chromosomes[i] = new Chromosome(geneNumber);
+                chromosomes[i].GenerateRandomGenes(i);
+            }
         }
 
     }

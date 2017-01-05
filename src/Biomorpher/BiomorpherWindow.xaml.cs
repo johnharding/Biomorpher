@@ -46,15 +46,20 @@ namespace Biomorpher
             // GA things
             generation = 0;
             popSize = 12; // TODO: The population number needs to come from the user
-            population = new Population(popSize);
+            population = new Population(popSize, sliders.Count);
             popHistory = new PopHistory();
 
+            
             // Get geometry for each chromosome in the initial population
             for (int i = 0; i < population.chromosomes.Length; i++)
             {
-                Owner.SetSliders(population.chromosomes[i], sliders);
-                Owner.ExpireSolution(true); // This may not work! We have to expire to get the geometry to update after altering sliders
-                Owner.GetGeometry(population.chromosomes[i]);
+                Owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
+                Owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
+                Owner.canvas.Document.Enabled = true;                   // Enable the solver again
+
+                Owner.ExpireSolution(true);                             // Now expire the main component and recompute
+                
+                Owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
             }
 
             // Initial Window things

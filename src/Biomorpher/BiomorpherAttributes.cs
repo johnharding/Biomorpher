@@ -12,6 +12,7 @@ namespace Biomorpher
 {
     public class BiomorpherAttributes : GH_ComponentAttributes
     {
+        private BiomorpherWindow myMainWindow;
 
         public BiomorpherComponent MyOwner
         {
@@ -36,9 +37,12 @@ namespace Biomorpher
             if ((ContentBox.Contains(e.CanvasLocation)))
             {
                 // Best to flip this boolean to iron out any errors
-                MyOwner.GO = true;
-                MyOwner.ExpireSolution(true);
+                //MyOwner.GO = true;
+                //MyOwner.ExpireSolution(true);
 
+                myMainWindow = new BiomorpherWindow(MyOwner);
+                myMainWindow.Show();
+                
 
                 return GH_ObjectResponse.Handled;
             }

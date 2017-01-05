@@ -17,8 +17,10 @@ namespace Biomorpher
     public class BiomorpherComponent : GH_Component
     {
 
-        private BiomorpherWindow myMainWindow;
+        public Grasshopper.GUI.Canvas.GH_Canvas canvas; 
         public bool GO = false;
+        private IGH_DataAccess deej;
+        private int solveinstanceCounter;
 
         /// <summary>
         /// Main constructor
@@ -26,6 +28,8 @@ namespace Biomorpher
         public BiomorpherComponent()
             : base("Biomorpher", "Biomorpher", "Interactive Genetic Algorithms for Grasshopper", "Params", "Util")
         {    
+            solveinstanceCounter = 0;
+            canvas = Instances.ActiveCanvas;
         }
 
         /// <summary>
@@ -51,6 +55,7 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
+            pm.AddIntegerParameter("SICount", "SICount", "solve instance counter", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -59,6 +64,13 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            if (solveinstanceCounter == 0)
+            {
+                deej = DA;
+            }
+
+            
+            /*
             // If we are currently static, then reset things and collect sliders
             if (GO)
             {
@@ -69,9 +81,13 @@ namespace Biomorpher
 
                 // Expire the solution
                 //this.ExpireSolution(true);
-                
-
             }
+            */
+
+            solveinstanceCounter++;
+
+            DA.SetData(0, solveinstanceCounter);
+
         }
 
         
@@ -122,16 +138,20 @@ namespace Biomorpher
             List<object> localObjs = new List<object>();
 
             // OK, so this needs a complete clean here. Need to avoid using DA though.
-            // da.GetDataList("Geometry", localObjs);
-            foreach (IGH_Param param in this.Params.Input[1].Sources)
-            {
-                object soupdragon = param as object;
-                if (soupdragon != null)
-                {
-                    localObjs.Add(soupdragon);
-                }
-            }
-
+            deej.GetDataList("Geometry", localObjs);
+            
+            //foreach (IGH_Param param in this.Params.Input[1].Sources)
+            //{
+                
+                //deej.
+                //param.VolatileData.
+                //object soupdragon = param as object;
+                //if (soupdragon != null)
+                //{
+                    //localObjs.Add(soupdragon);
+                //}
+            //}
+            
             // Get only mesh geometry from the object list
             Mesh joinedMesh = new Mesh();
 
