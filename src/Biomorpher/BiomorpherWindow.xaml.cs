@@ -32,6 +32,7 @@ namespace Biomorpher
         private PopHistory popHistory;
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
         private bool GO;
+        private BiomorpherComponent owner;
 
         Grid myGrid;
         List<UserControl1> myUserControls;
@@ -39,9 +40,12 @@ namespace Biomorpher
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
         {
+            // Set the component passed here to a field
+            owner = Owner;
+
             // Get sliders
             sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
-            Owner.GetSliders(sliders);
+            owner.GetSliders(sliders);
             
             // GA things
             generation = 0;
@@ -49,19 +53,9 @@ namespace Biomorpher
             population = new Population(popSize, sliders.Count);
             popHistory = new PopHistory();
 
-            
-            // Get geometry for each chromosome in the initial population
-            for (int i = 0; i < population.chromosomes.Length; i++)
-            {
-                Owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
-                Owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
-                Owner.canvas.Document.Enabled = true;                   // Enable the solver again
-
-                Owner.ExpireSolution(true);                             // Now expire the main component and recompute
-                
-                Owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
-            }
-
+            // Get the phenotypes
+            GetPhenotypes();
+ 
             // Initial Window things
             InitializeComponent();
             Topmost = true;
@@ -74,6 +68,23 @@ namespace Biomorpher
 
         }
 
+        /// <summary>
+        /// Gets the phenotype information for all the current chromosomes
+        /// </summary>
+        public void GetPhenotypes()
+        {
+            // Get geometry for each chromosome in the initial population
+            for (int i = 0; i < population.chromosomes.Length; i++)
+            {
+                owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
+                owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
+                owner.canvas.Document.Enabled = true;                   // Enable the solver again
+
+                owner.ExpireSolution(true);                             // Now expire the main component and recompute
+                
+                owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
+            }
+        }
 
         /// <summary>
         /// When this gets called (probably via a button being triggered) we advance a generation 
@@ -84,7 +95,8 @@ namespace Biomorpher
 
             // 2. Mutate population using user preferences
 
-            // 3. Set sliders and get geometry for each chromosome
+            // 3. Get geometry for each chromosome
+            GetPhenotypes();
 
             // 4. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
