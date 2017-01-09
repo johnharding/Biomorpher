@@ -24,7 +24,7 @@ namespace Biomorpher.IGA
         {
             chromosomes = new Chromosome[popSize];
             generation = 0;
-            GenerateRandom(sliderCount);
+            GenerateRandomPop(sliderCount);
         }
 
         /// <summary>
@@ -45,12 +45,68 @@ namespace Biomorpher.IGA
         /// Generates a random population of new chromosomes. TODO: take away seed
         /// </summary>
         /// <param name="geneNumber"></param>
-        public void GenerateRandom(int geneNumber)
+        public void GenerateRandomPop(int geneNumber)
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 chromosomes[i] = new Chromosome(geneNumber);
-                chromosomes[i].GenerateRandomGenes(i);
+                chromosomes[i].GenerateRandomGenes(i); // pass the i value as a seed
+            }
+        }
+
+        /// <summary>
+        /// Replaces the population with a new one based on fitness using Roulette Wheel selection
+        /// </summary>
+        public void RoulettePop()
+        {
+            // Roulette Wheel technique here as described by Melanie Mitchell, An Introduction to GAs, p.166
+            Random myRandom = new Random();
+            double fitSum;
+            double totalFitness = 0.0;
+
+            // Set up a fresh population  
+            // TODO: Do we have to calculate new geometry for everything? Why not have flags if GetGeometry() needs to be called
+            Population newPop = new Population(this.chromosomes.Length, this.chromosomes[0].GetGenes().Length);
+
+            // find the total fitness
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                totalFitness += chromosomes[i].GetFitness();
+            }
+
+            // Now for the roulette wheel selection for the new population
+            for (int i = 0; i < newPop.chromosomes.Length; i++)
+            {
+                double weightedRandom = myRandom.NextDouble()*totalFitness;
+                fitSum = 0;
+
+                for (int j = 0; j < chromosomes.Length; j++)
+                {
+                    fitSum += chromosomes[j].GetFitness();
+                    if (fitSum > weightedRandom)
+                    {
+                        newPop.chromosomes[i] = chromosomes[j].Clone();
+                        break;
+                    }
+                }
+            }
+            
+            // Replace the current popultion of chromosomes with the newPop
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                chromosomes[i] = newPop.chromosomes[i].Clone();
+            }
+        }
+
+        /// <summary>
+        /// Mutates a gene according to a probability
+        /// </summary>
+        /// <param name="probability"></param>
+        public void MutatePop(double probability)
+        {
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                chromosomes[i].Mutate(probability);
             }
         }
 

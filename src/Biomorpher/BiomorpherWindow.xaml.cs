@@ -33,6 +33,7 @@ namespace Biomorpher
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
         private bool GO;
         private BiomorpherComponent owner;
+        private double mutateProbability;
 
         Grid myGrid;
         List<UserControl1> myUserControls;
@@ -49,11 +50,14 @@ namespace Biomorpher
             
             // GA things
             generation = 0;
-            popSize = 12; // TODO: The population number needs to come from the user
+            popSize = 12;               // TODO: The population number needs to come from the user
+            mutateProbability = 0.01;   // TODO: The mutate probability needs to come from the user
             population = new Population(popSize, sliders.Count);
             popHistory = new PopHistory();
 
-            // Get the phenotypes
+            // Get the phenotypes for the first time... 
+            // note that this should probably be somewhere else later, AFTER the user has engaged with the interface.
+            // because we don't know what population size they want yet.
             GetPhenotypes();
  
             // Initial Window things
@@ -62,7 +66,7 @@ namespace Biomorpher
             myUserControls = new List<UserControl1>();
             
             // 1. create the grid?
-            // 2. display initial population here
+            // 2. display current population here
             // 3. add user controls?
             // 4. add them as children to this window?
 
@@ -79,9 +83,7 @@ namespace Biomorpher
                 owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
                 owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
                 owner.canvas.Document.Enabled = true;                   // Enable the solver again
-
                 owner.ExpireSolution(true);                             // Now expire the main component and recompute
-                
                 owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
             }
         }
@@ -92,8 +94,10 @@ namespace Biomorpher
         public void Run()
         {
             // 1. Create new populaltion using user selection
+            population.RoulettePop();
 
             // 2. Mutate population using user preferences
+            population.MutatePop(mutateProbability);
 
             // 3. Get geometry for each chromosome
             GetPhenotypes();
@@ -102,8 +106,6 @@ namespace Biomorpher
             popHistory.AddPop(population);
             generation++;
             
-            // 5. Visualise the current population
-
         }
 
 

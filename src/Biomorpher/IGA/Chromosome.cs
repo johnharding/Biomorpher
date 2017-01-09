@@ -20,16 +20,14 @@ namespace Biomorpher.IGA
         private double[] genes;
 
         // The real slider values
-        private double[] mapped_genes;
-        double? fitness {get; set;}
+        // private double[] mapped_genes;
+        private double fitness {get; set;}
+
 
         public Chromosome(int newLength)
         {
             genes = new double[newLength];
             fitness = 0.0;
-
-            // Let's work with a seed to start with
-            
             randMutate = new Random();
         }
 
@@ -43,7 +41,7 @@ namespace Biomorpher.IGA
             }
         }
 
-        double? GetFitness()
+        public double GetFitness()
         {
             return fitness;
         }
@@ -63,24 +61,38 @@ namespace Biomorpher.IGA
             return clone;
         }
 
+        /// <summary>
+        /// Goes through each gene and mutates it depending on a given probability
+        /// </summary>
+        /// <param name="probability"></param>
         public void Mutate(double probability)
         {
-            double tempRand = randMutate.NextDouble();
-
-            if(tempRand < probability)
+            for(int i=0; i<genes.Length; i++)
             {
-                int index = (int)(randMutate.NextDouble() * genes.Length);
-                double newgene = randMutate.NextDouble();
-                this.genes[index] = newgene;
-            }
+                double tempRand = randMutate.NextDouble();
 
+                if (tempRand < probability)
+                {
+                    // int index = (int)(randMutate.NextDouble() * genes.Length);
+                    double newgene = randMutate.NextDouble();
+                    genes[i] = newgene;
+                }
+            }
         }
 
+        /// <summary>
+        /// Returns the genes for this chromosome
+        /// </summary>
+        /// <returns></returns>
         public double[] GetGenes()
         {
             return genes;
         }
 
+        /// <summary>
+        /// Sets the phenotype for this chromosome with some input geometry
+        /// </summary>
+        /// <param name="meshes"></param>
         public void SetPhenotype(List<Mesh> meshes)
         {
             // Reset the phenotype to some input meshes

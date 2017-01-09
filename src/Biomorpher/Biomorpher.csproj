@@ -173,7 +173,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)Biomorpher.gha"
-Copy "$(TargetPath)" "C:\Users\je3-harding\AppData\Roaming\Grasshopper\Libraries\Biomorpher.gha"</PostBuildEvent>
+Copy "$(TargetPath)" "%25appdata%25\Grasshopper\Libraries\Biomorpher.gha"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
