@@ -16,13 +16,14 @@ using System.Windows.Shapes;
 using Biomorpher.IGA;
 using Biomorpher;
 using Grasshopper.Kernel;
+using MahApps.Metro.Controls;
 
 namespace Biomorpher
 {
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class BiomorpherWindow : Window
+    public partial class BiomorpherWindow : MetroWindow
     {
 
         // Fields
