@@ -1,19 +1,86 @@
-﻿<Window x:Class="Biomorpher.BiomorpherWindow"
+﻿<controls:MetroWindow x:Class="Biomorpher.BiomorpherWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:h="http://helix-toolkit.org/wpf"
-        Title="Biomorpher" Height="720" Width="1280"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Biomorpher"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:myControls="clr-namespace:Biomorpher"
-        >
-    <!--
-    <Grid>
-        <myControls:UserControl1 Margin="10,10,847,338"></myControls:UserControl1>
-        <myControls:UserControl1 Margin="425,10,434,338"></myControls:UserControl1>
-        <myControls:UserControl1 Margin="838,10,0,338"/>
-        <myControls:UserControl1 Margin="10,348,847,10"/>
-        <myControls:UserControl1 Margin="425,348,434,10"/>
-        <myControls:UserControl1 Margin="838,348,0,10"/>
+        mc:Ignorable="d"
+        Title="Biomorpher" 
+        Height="720" 
+        Width="1280"
+        BorderBrush="{DynamicResource AccentColorBrush}"
+        BorderThickness="1">
+
+    <Grid Background="White">
+        <Border Background="#FFF4F4F5" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
+
+        <TabControl x:Name="tabControl">
+
+            <TabItem Header="K-means">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab0_secondary"/>
+                    <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
+                        <Label x:Name="Tab0_header" Content="K-means clustering" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab0_primary"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Designs">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
+                    <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
+                        <Label x:Name="Tab1_header" Content="12 representative designs" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Selected">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
+                    <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
+                        <Label x:Name="Tab2_header" Content="Selected design" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="History">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3_secondary"/>
+                    <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
+                        <Label x:Name="Tab3_header" Content="Evolution history" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary"/>
+                </DockPanel>
+            </TabItem>
+
+        </TabControl>
+
     </Grid>
-    -->
-   
-</Window>
+
+
+
+    <controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,
+             /MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,
+             /MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,
+             /MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,
+             /MahApps.Metro;component/Styles/Accents/Green.xaml" />
+                <ResourceDictionary Source="pack://application:,,,
+             /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </controls:MetroWindow.Resources>
+
+
+</controls:MetroWindow>
