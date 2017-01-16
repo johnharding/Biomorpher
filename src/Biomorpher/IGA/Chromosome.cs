@@ -12,7 +12,7 @@ namespace Biomorpher.IGA
     {
         private Random randGene;
         private Random randMutate;
-        private List<Mesh> phenotype;       // TODO: should be more than meshes at some point
+        public List<Mesh> phenotype;       // TODO: should be more than meshes at some point
         private List<double> performance;   // (optional) list of performance values
         private List<string> criteria;      // (optional) labels for performance criteria
         
