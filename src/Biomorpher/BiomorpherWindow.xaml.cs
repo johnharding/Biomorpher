@@ -37,8 +37,9 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private double mutateProbability;
 
-        //Grid myGrid;
-        //List<UserControl1> myUserControls;
+        //UI
+        private int parentCount;
+
 
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
@@ -66,17 +67,12 @@ namespace Biomorpher
             InitializeComponent();
             Topmost = true;
 
+            //Tab 1: Designs
             List<Mesh> rDesigns = getRepresentativePhenotypes(population);
-            create3dViewportGrid(rDesigns);
+            parentCount = 0;
+            createTab1ViewportGrid(rDesigns);
+            createTab1Settings();
 
-
-
-            //myUserControls = new List<UserControl1>();
-
-            // 1. create the grid?
-            // 2. display current population here
-            // 3. add user controls?
-            // 4. add them as children to this window?
 
         }
 
@@ -129,7 +125,60 @@ namespace Biomorpher
 
 
         //UI methods
-        public void create3dViewportGrid(List<Mesh> meshes)
+        public void createTab1Settings()
+        {
+            
+            Border border = new Border();
+            border.Padding = new Thickness(5);
+
+            StackPanel sp = new StackPanel();
+
+            Label label = new Label();
+            label.Content = "Parent count: " + parentCount;
+
+            sp.Children.Add(label);
+
+            border.Child = sp;
+            
+
+            Tab1_secondary.Child = border;
+
+
+
+            //Text: Iteration count
+
+            //Text: Selection count
+
+            //Button: Add parents
+
+
+        }
+
+
+        //One event handler for all checkboxes in tab 1        
+        public void tab1_Event_Checkboxes(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
+
+            if (checkbox.IsChecked == true)
+            {
+                parentCount++;
+                Label lb = new Label();
+                lb.Content = "parent count: " + parentCount;
+                Tab1_secondary.Child = lb;
+            }
+            else
+            {
+                parentCount--;
+                Label lb = new Label();
+                lb.Content = "parent count: " + parentCount;
+                Tab1_secondary.Child = lb;
+            }
+
+        }
+
+
+        public void createTab1ViewportGrid(List<Mesh> meshes)
         {
             //Create grid 3x4 layout
             int rowCount = 3;
@@ -146,8 +195,8 @@ namespace Biomorpher
                 DockPanel dp = new DockPanel();
 
                 //Checkbox
-                string name = "cb_design_" + i;
-                CheckBox cb = createCheckBox(name);
+                string name = "cb_tab1_" + i;
+                CheckBox cb = createCheckBox(name, new RoutedEventHandler(tab1_Event_Checkboxes));
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
 
                 DockPanel.SetDock(cb, Dock.Top);
@@ -172,9 +221,8 @@ namespace Biomorpher
         }
 
 
-
         //Create Grid control
-        private Grid createGrid(int rowCount, int columnCount, double width, double height)
+        public Grid createGrid(int rowCount, int columnCount, double width, double height)
         {
             Grid grid = new Grid();
             grid.Width = width;
@@ -196,10 +244,14 @@ namespace Biomorpher
 
 
         //Create checkbox control
-        private CheckBox createCheckBox(string name)
+        public CheckBox createCheckBox(string name, RoutedEventHandler handler)
         {
             CheckBox cb = new CheckBox();
             cb.Name = name;
+            cb.IsChecked = false;
+            cb.Checked += handler;
+            cb.Unchecked += handler;
+
             return cb;
         }
 
