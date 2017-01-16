@@ -137,9 +137,12 @@ namespace Biomorpher
             Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
 
 
-            //For each grid cell, create dock panel and add checkbox and 3d viewport controls
+            //For each grid cell: create border, dock panel and add checkbox and 3d viewport controls
             for(int i=0; i<meshes.Count; i++)
             {
+                Border border = new Border();
+                border.Padding = new Thickness(5);
+
                 DockPanel dp = new DockPanel();
 
                 //Checkbox
@@ -154,10 +157,14 @@ namespace Biomorpher
                 Viewport3d vp3d = new Viewport3d(meshes[i]);
                 dp.Children.Add(vp3d);
 
+                border.Child = dp;
+
+
+
                 //add dockpanel to grid
-                Grid.SetRow(dp, (int)(i / 4));
-                Grid.SetColumn(dp, i % 4);
-                grid.Children.Add(dp);
+                Grid.SetRow(border, (int)(i / 4));
+                Grid.SetColumn(border, i % 4);
+                grid.Children.Add(border);
             }
 
             //add to primary area of tab 1
