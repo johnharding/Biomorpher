@@ -35,7 +35,7 @@
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
                         <Label x:Name="Tab1_header" Content="12 representative designs" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
+                    <Border BorderThickness="0" Padding ="20" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
                 </DockPanel>
             </TabItem>
 

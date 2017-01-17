@@ -17,6 +17,7 @@ using Biomorpher.IGA;
 using Biomorpher;
 using Grasshopper.Kernel;
 using MahApps.Metro.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace Biomorpher
 {
@@ -36,8 +37,9 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private double mutateProbability;
 
-        Grid myGrid;
-        List<UserControl1> myUserControls;
+        //UI
+        private int parentCount;
+
 
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
@@ -64,12 +66,13 @@ namespace Biomorpher
             // Initial Window things
             InitializeComponent();
             Topmost = true;
-            myUserControls = new List<UserControl1>();
-            
-            // 1. create the grid?
-            // 2. display current population here
-            // 3. add user controls?
-            // 4. add them as children to this window?
+
+            //Tab 1: Designs
+            List<Mesh> rDesigns = getRepresentativePhenotypes(population);
+            parentCount = 0;
+            createTab1ViewportGrid(rDesigns);
+            createTab1Settings();
+
 
         }
 
@@ -116,6 +119,161 @@ namespace Biomorpher
 
             // Close the window
         }
+
+
+
+
+
+        //UI methods
+        public void createTab1Settings()
+        {
+            
+            Border border = new Border();
+            border.Padding = new Thickness(5);
+
+            StackPanel sp = new StackPanel();
+
+            Label label = new Label();
+            label.Content = "Parent count: " + parentCount;
+
+            sp.Children.Add(label);
+
+            border.Child = sp;
+            
+
+            Tab1_secondary.Child = border;
+
+
+
+            //Text: Iteration count
+
+            //Text: Selection count
+
+            //Button: Add parents
+
+
+        }
+
+
+        //One event handler for all checkboxes in tab 1        
+        public void tab1_Event_Checkboxes(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
+
+            if (checkbox.IsChecked == true)
+            {
+                parentCount++;
+                Label lb = new Label();
+                lb.Content = "parent count: " + parentCount;
+                Tab1_secondary.Child = lb;
+            }
+            else
+            {
+                parentCount--;
+                Label lb = new Label();
+                lb.Content = "parent count: " + parentCount;
+                Tab1_secondary.Child = lb;
+            }
+
+        }
+
+
+        public void createTab1ViewportGrid(List<Mesh> meshes)
+        {
+            //Create grid 3x4 layout
+            int rowCount = 3;
+            int columnCount = 4;
+            Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
+
+
+            //For each grid cell: create border, dock panel and add checkbox and 3d viewport controls
+            for(int i=0; i<meshes.Count; i++)
+            {
+                Border border = new Border();
+                border.Padding = new Thickness(5);
+
+                DockPanel dp = new DockPanel();
+
+                //Checkbox
+                string name = "cb_tab1_" + i;
+                CheckBox cb = createCheckBox(name, new RoutedEventHandler(tab1_Event_Checkboxes));
+                cb.HorizontalAlignment = HorizontalAlignment.Right;
+
+                DockPanel.SetDock(cb, Dock.Top);
+                dp.Children.Add(cb);
+
+                //3d viewport
+                Viewport3d vp3d = new Viewport3d(meshes[i]);
+                dp.Children.Add(vp3d);
+
+                border.Child = dp;
+
+
+
+                //add dockpanel to grid
+                Grid.SetRow(border, (int)(i / 4));
+                Grid.SetColumn(border, i % 4);
+                grid.Children.Add(border);
+            }
+
+            //add to primary area of tab 1
+            Tab1_primary.Child = grid;
+        }
+
+
+        //Create Grid control
+        public Grid createGrid(int rowCount, int columnCount, double width, double height)
+        {
+            Grid grid = new Grid();
+            grid.Width = width;
+            grid.Height = height;
+            grid.ShowGridLines = true;
+
+            for (int i = 0; i < rowCount; i++)
+            {
+                grid.RowDefinitions.Add(new RowDefinition());
+            }
+
+            for (int i = 0; i < columnCount; i++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+
+            return grid;
+        }
+
+
+        //Create checkbox control
+        public CheckBox createCheckBox(string name, RoutedEventHandler handler)
+        {
+            CheckBox cb = new CheckBox();
+            cb.Name = name;
+            cb.IsChecked = false;
+            cb.Checked += handler;
+            cb.Unchecked += handler;
+
+            return cb;
+        }
+
+
+        //To do: change to get centroids from K-means clustering
+        private List<Mesh> getRepresentativePhenotypes(Population pop)
+        {
+            List<Mesh> phenotypes = new List<Mesh>();
+
+            Chromosome[] chromosomes = pop.chromosomes;
+            for(int i=0; i<12; i++)
+            {
+                phenotypes.Add(chromosomes[i].phenotype[0]);
+            }
+
+            return phenotypes;
+        }
+
+
+
+
+
 
 
     }
