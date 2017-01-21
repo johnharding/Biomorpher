@@ -88,6 +88,8 @@ namespace Biomorpher
                 owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
                 owner.canvas.Document.Enabled = true;                   // Enable the solver again
                 owner.ExpireSolution(true);                             // Now expire the main component and recompute
+                //owner.CollectData();
+                //owner.ComputeData();
                 owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
             }
         }

@@ -69,25 +69,8 @@ namespace Biomorpher
                 deej = DA;
             }
 
-            
-            /*
-            // If we are currently static, then reset things and collect sliders
-            if (GO)
-            {
-                // Instantiate the window
-                myMainWindow = new BiomorpherWindow(this);
-                myMainWindow.Show();
-                GO = false;
-
-                // Expire the solution
-                //this.ExpireSolution(true);
-            }
-            */
-
             solveinstanceCounter++;
-
             DA.SetData(0, solveinstanceCounter);
-
         }
 
         
@@ -137,20 +120,14 @@ namespace Biomorpher
             // Collect the object at the current instance
             List<object> localObjs = new List<object>();
 
-            // OK, so this needs a complete clean here. Need to avoid using DA though.
-            deej.GetDataList("Geometry", localObjs);
-            
-            //foreach (IGH_Param param in this.Params.Input[1].Sources)
-            //{
-                
-                //deej.
-                //param.VolatileData.
-                //object soupdragon = param as object;
-                //if (soupdragon != null)
-                //{
-                    //localObjs.Add(soupdragon);
-                //}
-            //}
+            // Thank you Dimitrie :)
+            foreach (IGH_Param param in Params.Input[1].Sources)
+            {
+                foreach (Object myObj in param.VolatileData.AllData(true))
+                {
+                    localObjs.Add(myObj);
+                }
+            }
             
             // Get only mesh geometry from the object list
             Mesh joinedMesh = new Mesh();
