@@ -18,13 +18,14 @@ using Biomorpher;
 using Grasshopper.Kernel;
 using MahApps.Metro.Controls;
 using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 
 namespace Biomorpher
 {
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class BiomorpherWindow : MetroWindow
+    public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
 
         // Fields
@@ -37,11 +38,27 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private double mutateProbability;
 
-        //UI
+
+        //UI properties
         private int parentCount;
+        public int ParentCount
+        {
+            get { return parentCount; }
+            set
+            {
+                if(value != parentCount)
+                {
+                    parentCount = value;
+                    OnPropertyChanged("ParentCount");
+                }
+            }
+        }
 
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
-        private Dictionary<string, FrameworkElement> controls = new Dictionary<string, FrameworkElement>();
+        private Dictionary<string, FrameworkElement> controls;
+
+        bool addParents;
+        List<int> selectedParentsIndexes;
 
 
         // Constructor
@@ -71,14 +88,18 @@ namespace Biomorpher
             Topmost = true;
 
 
-            //Tab 1: Designs
-            List<Mesh> repDesigns = getRepresentativePhenotypes(population);
+            //UI properties
             parentCount = 0;
+            controls = new Dictionary<string, FrameworkElement>();
+            addParents = false;
+            selectedParentsIndexes = new List<int>();
 
+
+            //Tab 1: Designs
+            List<Mesh> repDesigns = getRepresentativePhenotypes(population); 
             tab1_primary_permanent();
             tab1_primary_variable(repDesigns);
-            //createTab1ViewportGrid(repDesigns);
-            createTab1Settings();
+            tab1_secondary_settings();
 
 
         }
@@ -151,7 +172,8 @@ namespace Biomorpher
 
         //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
 
-        //TAB 1
+
+        //-------------------------------------------------------------------------------TAB 1------------------------------------------------------------------------//
 
         //Create permanent grid layout with check boxes
         public void tab1_primary_permanent()
@@ -177,7 +199,7 @@ namespace Biomorpher
 
                 //Create checkbox with an event handler
                 string cb_name = "cb_tab1_" + i;
-                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab1_Event_Checkboxes));
+                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab1_SelectParents_Check));
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
 
                 DockPanel.SetDock(cb, Dock.Top);
@@ -271,6 +293,91 @@ namespace Biomorpher
         */
 
 
+        public void tab1_secondary_settings()
+        {
+            int fontsize = 12;
+
+            int margin_w = 20;
+            int margin_h = 20;
+
+            StackPanel sp = new StackPanel();
+
+
+            //Designs description
+            Border border0 = new Border();
+            border0.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+            TextBlock txt0 = new TextBlock();
+            txt0.TextWrapping = TextWrapping.Wrap;
+            txt0.FontSize = fontsize;
+            txt0.Inlines.Add(new Bold(new Run("REPRESENTATIVES")));
+            txt0.Inlines.Add("\nBy default the centroids of the 12 k-means clusters are shown");            
+
+            border0.Child = txt0;
+            sp.Children.Add(border0);
+
+
+            //Performance description
+            Border border1 = new Border();
+            border1.Margin = new Thickness(margin_w, margin_h * 2, margin_w, 0);
+
+            TextBlock txt1 = new TextBlock();
+            txt1.TextWrapping = TextWrapping.Wrap;
+            txt1.FontSize = fontsize;
+            txt1.Inlines.Add(new Bold(new Run("PERFORMANCE")));
+            txt1.Inlines.Add("\nSome colour coding labels for max/min performance values");
+
+            border1.Child = txt1;
+            sp.Children.Add(border1);
+
+
+
+            //Selection description
+            Border border2 = new Border();
+            border2.Margin = new Thickness(margin_w, margin_h*2, margin_w, 0);
+
+            TextBlock txt2 = new TextBlock();
+            txt2.TextWrapping = TextWrapping.Wrap;
+            txt2.FontSize = fontsize;
+            txt2.Inlines.Add(new Bold(new Run("SELECTION")));
+            txt2.Inlines.Add("\nSelect parent(s) whose genes will be used to create the next design generation via the checkboxes");
+            
+            border2.Child = txt2;
+            sp.Children.Add(border2);
+
+
+
+            //Selected number of parents
+            Border border3 = new Border();
+            border3.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+            Label label = new Label();
+            label.SetBinding(ContentProperty, new Binding("ParentCount"));
+            label.DataContext = this;
+            label.ContentStringFormat = "Selected parents: {0}";
+            label.FontSize = fontsize;
+
+            border3.Child = label;
+            sp.Children.Add(border3);
+
+
+            //Add parents button
+            Border border4 = new Border();
+            border4.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+            Button button = createButton("b_tab1_AddParents", "Add parent(s)", Tab1_secondary.Width * 0.5, new RoutedEventHandler(tab1_AddParents_Click));
+
+            border4.Child = button;
+            sp.Children.Add(border4);
+
+
+            //Add the stackpanel to the secondary area of Tab 1
+            Tab1_secondary.Child = sp;
+        }
+
+
+        //-------------------------------------------------------------------------------CREATE CONTROLS------------------------------------------------------------------------//
+
         //Create Grid control
         public Grid createGrid(int rowCount, int columnCount, double width, double height)
         {
@@ -306,65 +413,71 @@ namespace Biomorpher
         }
 
 
-
-
-        public void createTab1Settings()
+        //Create button control
+        public Button createButton(string name, string content, double width, RoutedEventHandler handler)
         {
-            
-            Border border = new Border();
-            border.Padding = new Thickness(5);
+            Button b = new Button();
+            b.Name = name;
+            b.Content = content;
+            b.Width = width;
+            b.HorizontalAlignment = HorizontalAlignment.Left;
 
-            StackPanel sp = new StackPanel();
+            b.Click += handler;
 
-            Label label = new Label();
-            label.Content = "Parent count: " + parentCount;
-
-            sp.Children.Add(label);
-
-            border.Child = sp;
-            
-
-            Tab1_secondary.Child = border;
-
-
-
-            //Text: Iteration count
-
-            //Text: Selection count
-
-            //Button: Add parents
-
-
+            return b;
         }
 
 
+        //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
+
         //One event handler for all checkboxes in tab 1        
-        public void tab1_Event_Checkboxes(object sender, RoutedEventArgs e)
+        public void tab1_SelectParents_Check(object sender, RoutedEventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
 
             if (checkbox.IsChecked == true)
             {
-                parentCount++;
-                Label lb = new Label();
-                lb.Content = "parent count: " + parentCount;
-                Tab1_secondary.Child = lb;
+                ParentCount++;
             }
             else
             {
-                parentCount--;
-                Label lb = new Label();
-                lb.Content = "parent count: " + parentCount;
-                Tab1_secondary.Child = lb;
+                ParentCount--;
             }
 
         }
 
 
-        
+        //Handle event when the "Add parents" button is clicked in tab 1       
+        public void tab1_AddParents_Click(object sender, RoutedEventArgs e)
+        {
+            Button b_clicked = (Button) sender;
+
+            //To do: Extract indexes from names of checked boxes
+
+            //change toggle
+            addParents = true;
+        }
 
 
-        
+
+
+
+        //INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string name)
+        {
+            var handler = System.Threading.Interlocked.CompareExchange(ref PropertyChanged, null, null);
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+
+
+
+
+
 
 
 
