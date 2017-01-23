@@ -40,6 +40,9 @@ namespace Biomorpher
         //UI
         private int parentCount;
 
+        //A dictionary, which contains the controls that need to be accessible from other methods after their creation
+        private Dictionary<string, FrameworkElement> controls = new Dictionary<string, FrameworkElement>();
+
 
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
@@ -67,10 +70,13 @@ namespace Biomorpher
             InitializeComponent();
             Topmost = true;
 
+
             //Tab 1: Designs
             List<Mesh> repDesigns = getRepresentativePhenotypes(population);
             parentCount = 0;
+
             tab1_primary_permanent();
+            tab1_primary_variable(repDesigns);
             //createTab1ViewportGrid(repDesigns);
             createTab1Settings();
 
@@ -153,12 +159,12 @@ namespace Biomorpher
             //Create grid 3x4 layout
             int rowCount = 3;
             int columnCount = 4;
-            int meshCount = rowCount * columnCount;
+            int gridCount = rowCount * columnCount;
             Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
 
 
-            //For each grid cell: create border, dock panel and add checkbox and 3d viewport controls
-            for (int i = 0; i < meshCount; i++)
+            //For each grid cell: create border with padding, a dock panel and add a checkbox
+            for (int i = 0; i < gridCount; i++)
             {
                 //Border
                 Border border = new Border();
@@ -169,7 +175,7 @@ namespace Biomorpher
                 string dp_name = "dp_tab1_" + i;
                 dp.Name = dp_name;
 
-                //Checkbox
+                //Create checkbox with an event handler
                 string cb_name = "cb_tab1_" + i;
                 CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab1_Event_Checkboxes));
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
@@ -177,27 +183,45 @@ namespace Biomorpher
                 DockPanel.SetDock(cb, Dock.Top);
                 dp.Children.Add(cb);
 
+                //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
+                controls.Add(dp_name, dp);
 
-                /*
-                //3d viewport
-                Viewport3d vp3d = new Viewport3d(meshes[i]);
-                dp.Children.Add(vp3d);
-                */
-
-                
-
+                //Set the dockpanel as the child of the border element
                 border.Child = dp;
 
-
-
-                //add dockpanel to grid
-                Grid.SetRow(border, (int)(i / 4));
-                Grid.SetColumn(border, i % 4);
+                //Add the border to the grid
+                Grid.SetRow(border, (int)(i / columnCount));
+                Grid.SetColumn(border, i % columnCount);
                 grid.Children.Add(border);
             }
 
-            //add to primary area of tab 1
+
+            //Add the grid to the primary area of Tab 1
             Tab1_primary.Child = grid;
+        }
+
+
+        public void tab1_primary_variable(List<Mesh> meshes)
+        {
+            //Run through the list of meshes and create a viewport3d control for each
+            for(int i=0; i<meshes.Count; i++)
+            {
+                //The name of the control to add the viewport3d to
+                string dp_name = "dp_tab1_" + i;
+
+                //Get this control from the dictionary
+                DockPanel dp = (DockPanel) controls[dp_name];
+
+                //If there already is a viewport3d control in the dockpanel then remove it
+                if (dp.Children.Count > 1)
+                {
+                    dp.Children.RemoveAt(dp.Children.Count - 1);
+                }
+
+                //Add the new viewport3d control to the dockpanel
+                Viewport3d vp3d = new Viewport3d(meshes[i]);
+                dp.Children.Add(vp3d);
+            }
         }
 
 
