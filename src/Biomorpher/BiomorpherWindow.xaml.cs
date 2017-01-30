@@ -72,8 +72,6 @@ namespace Biomorpher
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
         private Dictionary<string, FrameworkElement> controls;
 
-        bool evolve;
-        List<int> selectedParentIndexes;
 
 
         // Constructor
@@ -87,38 +85,25 @@ namespace Biomorpher
             owner.GetSliders(sliders);
             
             // GA things
-            generation = 0;
             popSize = 12;               // TODO: The population number needs to come from the user
             mutateProbability = 0.01;   // TODO: The mutate probability needs to come from the user
             population = new Population(popSize, sliders.Count);
             popHistory = new PopHistory();
-
-            // Get the phenotypes for the first time... 
-            // note that this should probably be somewhere else later, AFTER the user has engaged with the interface.
-            // because we don't know what population size they want yet.
-            GetPhenotypes();
  
             // Initial Window things
             InitializeComponent();
             Topmost = true;
 
-
             //UI properties
             Generation = 0;
-            parentCount = 0;
+            ParentCount = 0;
             controls = new Dictionary<string, FrameworkElement>();
-            evolve = false;
-            selectedParentIndexes = new List<int>();
 
-
-            //Tab 2: Designs
-            List<Mesh> repDesigns = getRepresentativePhenotypes(population); 
-            tab2_primary_permanent();
-            tab2_primary_variable(repDesigns);
-            tab2_secondary_settings();
-
+            //Tab 0: Settings
+            tab0_secondary_settings();
 
         }
+
 
         /// <summary>
         /// Gets the phenotype information for all the current chromosomes
@@ -152,10 +137,23 @@ namespace Biomorpher
             // 3. Get geometry for each chromosome
             GetPhenotypes();
 
-            // 4. Advance the generation counter and store the population historically.
+            // 4. Display meshes
+            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+
+
+            //Test
+            List<Mesh> testMeshes = new List<Mesh>();
+            for(int i=0; i<popMeshes.Count; i++)
+            {
+                testMeshes.Add(popMeshes[0]);
+            }
+
+            tab2_primary_variable(testMeshes);
+
+
+            // 5. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
-            generation++;
-            
+            Generation++; 
         }
 
 
@@ -165,8 +163,6 @@ namespace Biomorpher
 
             // Close the window
         }
-
-
 
 
 
@@ -187,6 +183,48 @@ namespace Biomorpher
 
 
         //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
+
+
+        //-------------------------------------------------------------------------------TAB 0------------------------------------------------------------------------//
+
+        public void tab0_secondary_settings()
+        {
+            int fontsize = 12;
+            int margin_w = 20;
+            int margin_h = 20;
+
+            StackPanel sp = new StackPanel();
+
+            DockPanel dp = new DockPanel();
+            dp.LastChildFill = false;
+
+            Border border_buttons = new Border();
+            border_buttons.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+
+            //GO button
+            Button button_go = createButton("b_tab0_Go", "GO!", Tab0_secondary.Width * 0.3, new RoutedEventHandler(tab0_Go_Click));
+
+            //EXIT button
+            Button button_exit = createButton("b_tab0_Exit", "Exit", Tab0_secondary.Width * 0.3, new RoutedEventHandler(tab0_Exit_Click));
+
+
+            DockPanel.SetDock(button_go, Dock.Left);
+            dp.Children.Add(button_go);
+
+            DockPanel.SetDock(button_exit, Dock.Right);
+            dp.Children.Add(button_exit);
+
+
+            border_buttons.Child = dp;
+            sp.Children.Add(border_buttons);
+
+
+            //Add the stackpanel to the secondary area of Tab 0
+            Tab0_secondary.Child = sp;
+        }
+
+
 
 
         //-------------------------------------------------------------------------------TAB 2------------------------------------------------------------------------//
@@ -328,7 +366,7 @@ namespace Biomorpher
             sp.Children.Add(border_evo);
 
 
-            //Add the stackpanel to the secondary area of Tab 1
+            //Add the stackpanel to the secondary area of Tab 2
             Tab2_secondary.Child = sp;
         }
 
@@ -387,6 +425,38 @@ namespace Biomorpher
 
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
 
+        //Handle event when the "GO!" button is clicked in tab 0       
+        public void tab0_Go_Click(object sender, RoutedEventArgs e)
+        {
+            //Button b_clicked = (Button)sender;
+
+            GO = true;
+
+            //Tab 2: Designs
+            tab2_primary_permanent();
+            tab2_secondary_settings();
+
+            GetPhenotypes();
+
+            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+            tab2_primary_variable(popMeshes);
+            
+
+            //Disable sliders in tab 0
+        }
+
+
+        //Handle event when the "Exit" button is clicked in tab 0       
+        public void tab0_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            //Button b_clicked = (Button)sender;
+
+            Exit();
+
+            this.Close();
+        }
+
+
         //One event handler for all checkboxes in tab 2        
         public void tab2_SelectParents_Check(object sender, RoutedEventArgs e)
         {
@@ -404,7 +474,7 @@ namespace Biomorpher
         }
 
 
-        //Handle event when the "Add parents" button is clicked in tab 2       
+        //Handle event when the "Evolve" button is clicked in tab 2       
         public void tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button) sender;
@@ -416,14 +486,11 @@ namespace Biomorpher
             }
             else
             {
-                //Increase generation count
-                Generation++;
-
-                //Clear list of selected parent indexes
-                selectedParentIndexes = new List<int>();
+                //Create list of selected parent indexes
+                List<int> selectedParentIndexes = new List<int>();
 
                 //Extract indexes from names of checked boxes and uncheck all
-                for (int i=0; i<12; i++)
+                for (int i=0; i<popSize; i++)
                 {
                     //The name of the checkbox control
                     string cb_name = "cb_tab2_" + i;
@@ -438,16 +505,18 @@ namespace Biomorpher
                     }
                 }
 
+                //TO DO: Run should know about the parents
+                Run();
+
                 //Set parent count to zero
                 ParentCount = 0;
 
-                //Change toggle status
-                evolve = true;
             }
-
-
-            
+   
         }
+
+
+        
 
 
 
