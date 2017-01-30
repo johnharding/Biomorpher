@@ -19,33 +19,33 @@
 
         <TabControl x:Name="tabControl">
 
-            <TabItem Header="K-means">
+            <TabItem Header="Settings">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab0_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
-                        <Label x:Name="Tab0_header" Content="K-means clustering" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Label x:Name="Tab0_header" Content="Evolution settings" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab0_primary"/>
+                </DockPanel>
+            </TabItem>
+            
+            <TabItem Header="K-means">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
+                    <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
+                        <Label x:Name="Tab1_header" Content="K-means clustering" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
                 </DockPanel>
             </TabItem>
 
             <TabItem Header="Designs">
                 <DockPanel LastChildFill="True">
-                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
-                    <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
-                        <Label x:Name="Tab1_header" Content="12 representative designs" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    </Border>
-                    <Border BorderThickness="0" Padding ="20" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
-                </DockPanel>
-            </TabItem>
-
-            <TabItem Header="Selected">
-                <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
-                        <Label x:Name="Tab2_header" Content="Selected design" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Label x:Name="Tab2_header" Content="Cluster representatives" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
+                    <Border BorderThickness="0" Padding ="20" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
                 </DockPanel>
             </TabItem>
 

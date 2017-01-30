@@ -27,19 +27,59 @@ namespace Biomorpher
     /// </summary>
     public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
-
         // Fields
-        private int generation;
-        private int popSize;
+        private bool GO;
         private Population population;
         private PopHistory popHistory;
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
-        private bool GO;
         private BiomorpherComponent owner;
-        private double mutateProbability;
 
 
         //UI properties
+        private int popSize;
+        public int PopSize
+        {
+            get { return popSize; }
+            set
+            {
+                if (value != popSize)
+                {
+                    popSize = value;
+                    OnPropertyChanged("PopSize");
+                }
+            }
+        }
+
+        private double mutateProbability;
+        public double MutateProbability
+        {
+            get { return mutateProbability; }
+            set
+            {
+                if (value != mutateProbability)
+                {
+                    mutateProbability = value;
+                    OnPropertyChanged("MutateProbability");
+                }
+            }
+        }
+
+
+        private int generation;
+        public int Generation
+        {
+            get { return generation; }
+            set
+            {
+                if (value != generation)
+                {
+                    generation = value;
+                    OnPropertyChanged("Generation");
+                }
+            }
+        }
+
+
         private int parentCount;
         public int ParentCount
         {
@@ -54,11 +94,10 @@ namespace Biomorpher
             }
         }
 
+
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
         private Dictionary<string, FrameworkElement> controls;
 
-        bool addParents;
-        List<int> selectedParentsIndexes;
 
 
         // Constructor
@@ -70,39 +109,22 @@ namespace Biomorpher
             // Get sliders
             sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
             owner.GetSliders(sliders);
-            
-            // GA things
-            generation = 0;
-            popSize = 12;               // TODO: The population number needs to come from the user
-            mutateProbability = 0.01;   // TODO: The mutate probability needs to come from the user
-            population = new Population(popSize, sliders.Count);
-            popHistory = new PopHistory();
-
-            // Get the phenotypes for the first time... 
-            // note that this should probably be somewhere else later, AFTER the user has engaged with the interface.
-            // because we don't know what population size they want yet.
-            GetPhenotypes();
  
             // Initial Window things
             InitializeComponent();
             Topmost = true;
 
-
-            //UI properties
-            parentCount = 0;
+            PopSize = 12;
+            MutateProbability = 0.2;
+            Generation = 0;
+            ParentCount = 0;
+            GO = false;
             controls = new Dictionary<string, FrameworkElement>();
-            addParents = false;
-            selectedParentsIndexes = new List<int>();
 
-
-            //Tab 1: Designs
-            List<Mesh> repDesigns = getRepresentativePhenotypes(population); 
-            tab1_primary_permanent();
-            tab1_primary_variable(repDesigns);
-            tab1_secondary_settings();
-
-
+            //Tab 0: Settings
+            tab0_secondary_settings();
         }
+
 
         /// <summary>
         /// Gets the phenotype information for all the current chromosomes
@@ -122,6 +144,27 @@ namespace Biomorpher
             }
         }
 
+        public void RunInit()
+        {
+            // 1. Initialise population history
+            popHistory = new PopHistory();
+
+            // 2. Create initial population and add to history
+            population = new Population(popSize, sliders.Count);
+            popHistory.AddPop(population);
+
+            // 3. Get geometry for each chromosome
+            GetPhenotypes();
+
+            // 4. Setup tab layout
+            tab2_primary_permanent();
+            tab2_secondary_settings();
+            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+            tab2_primary_variable(popMeshes);            
+        }
+
+
+
         /// <summary>
         /// When this gets called (probably via a button being triggered) we advance a generation 
         /// </summary>
@@ -136,10 +179,13 @@ namespace Biomorpher
             // 3. Get geometry for each chromosome
             GetPhenotypes();
 
-            // 4. Advance the generation counter and store the population historically.
+            // 4. Display meshes
+            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+            tab2_primary_variable(popMeshes);
+
+            // 5. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
-            generation++;
-            
+            Generation++; 
         }
 
 
@@ -149,8 +195,6 @@ namespace Biomorpher
 
             // Close the window
         }
-
-
 
 
 
@@ -173,16 +217,71 @@ namespace Biomorpher
         //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
 
 
-        //-------------------------------------------------------------------------------TAB 1------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------TAB 0------------------------------------------------------------------------//
+
+        public void tab0_secondary_settings()
+        {
+            int fontsize = 12;
+            int margin_w = 20;
+            int margin_h = 20;
+
+            //Container for all the controls
+            StackPanel sp = new StackPanel();
+
+
+            //Create sliders with labels
+            Border border_popSize = new Border();
+            border_popSize.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            DockPanel dp_popSize = createSlider("Population size", "s_tab0_popSize", 12, 500, 100, true);
+            border_popSize.Child = dp_popSize;
+            sp.Children.Add(border_popSize);
+
+            Border border_mutation = new Border();
+            border_mutation.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab0_mutation", 0.00, 1.00, 0.10, false);
+            border_mutation.Child = dp_mutation;
+            sp.Children.Add(border_mutation);
+
+
+            DockPanel dp_buttons = new DockPanel();
+            dp_buttons.LastChildFill = false;
+
+            Border border_buttons = new Border();
+            border_buttons.Margin = new Thickness(margin_w, margin_h*3, margin_w, 0);
+
+
+            //GO button
+            Button button_go = createButton("b_tab0_Go", "GO!", Tab0_secondary.Width * 0.3, new RoutedEventHandler(tab0_Go_Click));
+            DockPanel.SetDock(button_go, Dock.Left);
+            dp_buttons.Children.Add(button_go);
+
+            //EXIT button
+            Button button_exit = createButton("b_tab0_Exit", "Exit", Tab0_secondary.Width * 0.3, new RoutedEventHandler(tab0_Exit_Click));
+            DockPanel.SetDock(button_exit, Dock.Right);
+            dp_buttons.Children.Add(button_exit);
+
+
+            border_buttons.Child = dp_buttons;
+            sp.Children.Add(border_buttons);
+
+
+            //Add the stackpanel to the secondary area of Tab 0
+            Tab0_secondary.Child = sp;
+        }
+
+
+
+
+        //-------------------------------------------------------------------------------TAB 2------------------------------------------------------------------------//
 
         //Create permanent grid layout with check boxes
-        public void tab1_primary_permanent()
+        public void tab2_primary_permanent()
         {
             //Create grid 3x4 layout
             int rowCount = 3;
             int columnCount = 4;
             int gridCount = rowCount * columnCount;
-            Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
+            Grid grid = createGrid(rowCount, columnCount, Tab2_primary.Width, Tab2_primary.Height);
 
 
             //For each grid cell: create border with padding, a dock panel and add a checkbox
@@ -194,12 +293,12 @@ namespace Biomorpher
 
                 //Dock panel
                 DockPanel dp = new DockPanel();
-                string dp_name = "dp_tab1_" + i;
+                string dp_name = "dp_tab2_" + i;
                 dp.Name = dp_name;
 
                 //Create checkbox with an event handler
-                string cb_name = "cb_tab1_" + i;
-                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab1_SelectParents_Check));
+                string cb_name = "cb_tab2_" + i;
+                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check));
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
 
                 DockPanel.SetDock(cb, Dock.Top);
@@ -207,6 +306,7 @@ namespace Biomorpher
 
                 //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
                 controls.Add(dp_name, dp);
+                controls.Add(cb_name, cb);
 
                 //Set the dockpanel as the child of the border element
                 border.Child = dp;
@@ -218,18 +318,18 @@ namespace Biomorpher
             }
 
 
-            //Add the grid to the primary area of Tab 1
-            Tab1_primary.Child = grid;
+            //Add the grid to the primary area of Tab 2
+            Tab2_primary.Child = grid;
         }
 
 
-        public void tab1_primary_variable(List<Mesh> meshes)
+        public void tab2_primary_variable(List<Mesh> meshes)
         {
             //Run through the list of meshes and create a viewport3d control for each
             for(int i=0; i<meshes.Count; i++)
             {
                 //The name of the control to add the viewport3d to
-                string dp_name = "dp_tab1_" + i;
+                string dp_name = "dp_tab2_" + i;
 
                 //Get this control from the dictionary
                 DockPanel dp = (DockPanel) controls[dp_name];
@@ -248,52 +348,7 @@ namespace Biomorpher
 
 
 
-        /*
-        public void createTab1ViewportGrid(List<Mesh> meshes)
-        {
-            //Create grid 3x4 layout
-            int rowCount = 3;
-            int columnCount = 4;
-            Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
-
-
-            //For each grid cell: create border, dock panel and add checkbox and 3d viewport controls
-            for (int i = 0; i < meshes.Count; i++)
-            {
-                Border border = new Border();
-                border.Padding = new Thickness(5);
-
-                DockPanel dp = new DockPanel();
-
-                //Checkbox
-                string name = "cb_tab1_" + i;
-                CheckBox cb = createCheckBox(name, new RoutedEventHandler(tab1_Event_Checkboxes));
-                cb.HorizontalAlignment = HorizontalAlignment.Right;
-
-                DockPanel.SetDock(cb, Dock.Top);
-                dp.Children.Add(cb);
-
-                //3d viewport
-                Viewport3d vp3d = new Viewport3d(meshes[i]);
-                dp.Children.Add(vp3d);
-
-                border.Child = dp;
-
-
-
-                //add dockpanel to grid
-                Grid.SetRow(border, (int)(i / 4));
-                Grid.SetColumn(border, i % 4);
-                grid.Children.Add(border);
-            }
-
-            //add to primary area of tab 1
-            Tab1_primary.Child = grid;
-        }
-        */
-
-
-        public void tab1_secondary_settings()
+        public void tab2_secondary_settings()
         {
             int fontsize = 12;
 
@@ -303,76 +358,61 @@ namespace Biomorpher
             StackPanel sp = new StackPanel();
 
 
-            //Designs description
-            Border border0 = new Border();
-            border0.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            //Generation info
+            Border border_gen = new Border();
+            border_gen.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            TextBlock txt0 = new TextBlock();
-            txt0.TextWrapping = TextWrapping.Wrap;
-            txt0.FontSize = fontsize;
-            txt0.Inlines.Add(new Bold(new Run("REPRESENTATIVES")));
-            txt0.Inlines.Add("\nBy default the centroids of the 12 k-means clusters are shown");            
+            Label label_gen = new Label();
+            label_gen.SetBinding(ContentProperty, new Binding("Generation"));
+            label_gen.DataContext = this;
+            label_gen.ContentStringFormat = "GENERATION #{0}";
+            label_gen.FontSize = fontsize;
+            label_gen.FontWeight = FontWeights.Bold;
 
-            border0.Child = txt0;
-            sp.Children.Add(border0);
-
-
-            //Performance description
-            Border border1 = new Border();
-            border1.Margin = new Thickness(margin_w, margin_h * 2, margin_w, 0);
-
-            TextBlock txt1 = new TextBlock();
-            txt1.TextWrapping = TextWrapping.Wrap;
-            txt1.FontSize = fontsize;
-            txt1.Inlines.Add(new Bold(new Run("PERFORMANCE")));
-            txt1.Inlines.Add("\nSome colour coding labels for max/min performance values");
-
-            border1.Child = txt1;
-            sp.Children.Add(border1);
-
+            border_gen.Child = label_gen;
+            sp.Children.Add(border_gen);
 
 
             //Selection description
-            Border border2 = new Border();
-            border2.Margin = new Thickness(margin_w, margin_h*2, margin_w, 0);
+            Border border_sel = new Border();
+            border_sel.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            TextBlock txt2 = new TextBlock();
-            txt2.TextWrapping = TextWrapping.Wrap;
-            txt2.FontSize = fontsize;
-            txt2.Inlines.Add(new Bold(new Run("SELECTION")));
-            txt2.Inlines.Add("\nSelect parent(s) whose genes will be used to create the next design generation via the checkboxes");
-            
-            border2.Child = txt2;
-            sp.Children.Add(border2);
+            TextBlock txt_sel = new TextBlock();
+            txt_sel.TextWrapping = TextWrapping.Wrap;
+            txt_sel.FontSize = fontsize;
+            txt_sel.Inlines.Add(new Bold(new Run("SELECTION")));
+            txt_sel.Inlines.Add("\nSelect parent(s) whose genes will be used to create the next design generation via the checkboxes");
 
+            border_sel.Child = txt_sel;
+            sp.Children.Add(border_sel);
 
 
             //Selected number of parents
-            Border border3 = new Border();
-            border3.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            Border border_par = new Border();
+            border_par.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            Label label = new Label();
-            label.SetBinding(ContentProperty, new Binding("ParentCount"));
-            label.DataContext = this;
-            label.ContentStringFormat = "Selected parents: {0}";
-            label.FontSize = fontsize;
+            Label label_par = new Label();
+            label_par.SetBinding(ContentProperty, new Binding("ParentCount"));
+            label_par.DataContext = this;
+            label_par.ContentStringFormat = "Selected parents: {0}";
+            label_par.FontSize = fontsize;
 
-            border3.Child = label;
-            sp.Children.Add(border3);
-
-
-            //Add parents button
-            Border border4 = new Border();
-            border4.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-
-            Button button = createButton("b_tab1_AddParents", "Add parent(s)", Tab1_secondary.Width * 0.5, new RoutedEventHandler(tab1_AddParents_Click));
-
-            border4.Child = button;
-            sp.Children.Add(border4);
+            border_par.Child = label_par;
+            sp.Children.Add(border_par);
 
 
-            //Add the stackpanel to the secondary area of Tab 1
-            Tab1_secondary.Child = sp;
+            //Evolve button
+            Border border_evo = new Border();
+            border_evo.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+            Button button_evo = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_Evolve_Click));
+
+            border_evo.Child = button_evo;
+            sp.Children.Add(border_evo);
+
+
+            //Add the stackpanel to the secondary area of Tab 2
+            Tab2_secondary.Child = sp;
         }
 
 
@@ -428,10 +468,100 @@ namespace Biomorpher
         }
 
 
+        //Create slider control with label
+        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider)
+        {
+            //Container for slider + label
+            DockPanel dp = new DockPanel();
+
+
+            //Create slider
+            Slider slider = new Slider();
+            slider.Minimum = minVal;
+            slider.Maximum = maxVal;
+            slider.Value = val;
+
+            slider.Name = controlName;
+            slider.Focusable = false;
+            slider.TickFrequency = 0.01;
+            slider.IsSnapToTickEnabled = true;
+
+
+            string format = "{0:0.00}";
+            if (isIntSlider)
+            {
+                slider.TickFrequency = 1.0;
+                format = "{0:0}";
+            }
+
+            //Add slider to control dictionary
+            controls.Add(controlName, slider);
+
+
+            //Create a label with the name of the slider
+            Label label_name = new Label();
+            label_name.HorizontalContentAlignment = HorizontalAlignment.Left;
+            label_name.Content = labelName;
+
+            DockPanel.SetDock(label_name, Dock.Top);
+            dp.Children.Add(label_name);
+
+
+            //Create a label with the current value of the slider
+            Label label_val = new Label();
+            Binding binding_val = new Binding("Value");
+            label_val.ContentStringFormat = format;
+            binding_val.Source = slider;
+            label_val.SetBinding(Label.ContentProperty, binding_val);
+
+
+            DockPanel.SetDock(label_val, Dock.Right);
+            dp.Children.Add(label_val);
+
+
+            dp.Children.Add(slider);
+
+
+            return dp;
+        }
+
+
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
 
-        //One event handler for all checkboxes in tab 1        
-        public void tab1_SelectParents_Check(object sender, RoutedEventArgs e)
+        //Handle event when the "GO!" button is clicked in tab 0       
+        public void tab0_Go_Click(object sender, RoutedEventArgs e)
+        {
+            //Button b_clicked = (Button)sender;
+
+            if (!GO)
+            {
+                RunInit();
+
+                //Disable sliders in tab 0
+                Slider s_popSize = (Slider)controls["s_tab0_popSize"];
+                s_popSize.IsEnabled = false;
+
+                Slider s_mutation = (Slider)controls["s_tab0_mutation"];
+                s_mutation.IsEnabled = false;
+            }
+
+            GO = true;
+        }
+
+
+        //Handle event when the "Exit" button is clicked in tab 0       
+        public void tab0_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            //Button b_clicked = (Button)sender;
+
+            Exit();
+
+            this.Close();
+        }
+
+
+        //One event handler for all checkboxes in tab 2        
+        public void tab2_SelectParents_Check(object sender, RoutedEventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
 
@@ -447,16 +577,49 @@ namespace Biomorpher
         }
 
 
-        //Handle event when the "Add parents" button is clicked in tab 1       
-        public void tab1_AddParents_Click(object sender, RoutedEventArgs e)
+        //Handle event when the "Evolve" button is clicked in tab 2       
+        public void tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button) sender;
 
-            //To do: Extract indexes from names of checked boxes
+            //Test if minimum one parent is selected
+            if(ParentCount < 1)
+            {
+                MessageBoxResult message = MessageBox.Show(this, "Select minimum one parent via the checkboxes");
+            }
+            else
+            {
+                //Create list of selected parent indexes
+                List<int> selectedParentIndexes = new List<int>();
 
-            //change toggle
-            addParents = true;
+                //Extract indexes from names of checked boxes and uncheck all
+                for (int i=0; i<12; i++)
+                {
+                    //The name of the checkbox control
+                    string cb_name = "cb_tab2_" + i;
+
+                    //Get this control from the dictionary
+                    CheckBox cb = (CheckBox) controls[cb_name];
+
+                    if(cb.IsChecked == true)
+                    {
+                        selectedParentIndexes.Add(i);
+                        cb.IsChecked = false;
+                    }
+                }
+
+                //TO DO: Run should know about the parents
+                Run();
+
+                //Set parent count to zero
+                ParentCount = 0;
+
+            }
+   
         }
+
+
+        
 
 
 
