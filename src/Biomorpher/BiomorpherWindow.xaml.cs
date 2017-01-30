@@ -29,7 +29,6 @@ namespace Biomorpher
     {
 
         // Fields
-        private int generation;
         private int popSize;
         private Population population;
         private PopHistory popHistory;
@@ -40,6 +39,21 @@ namespace Biomorpher
 
 
         //UI properties
+        private int generation;
+        public int Generation
+        {
+            get { return generation; }
+            set
+            {
+                if (value != generation)
+                {
+                    generation = value;
+                    OnPropertyChanged("Generation");
+                }
+            }
+        }
+
+
         private int parentCount;
         public int ParentCount
         {
@@ -53,6 +67,7 @@ namespace Biomorpher
                 }
             }
         }
+
 
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
         private Dictionary<string, FrameworkElement> controls;
@@ -89,6 +104,7 @@ namespace Biomorpher
 
 
             //UI properties
+            Generation = 0;
             parentCount = 0;
             controls = new Dictionary<string, FrameworkElement>();
             evolve = false;
@@ -259,72 +275,57 @@ namespace Biomorpher
             StackPanel sp = new StackPanel();
 
 
-            //Designs description
-            Border border0 = new Border();
-            border0.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            //Generation info
+            Border border_gen = new Border();
+            border_gen.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            TextBlock txt0 = new TextBlock();
-            txt0.TextWrapping = TextWrapping.Wrap;
-            txt0.FontSize = fontsize;
-            txt0.Inlines.Add(new Bold(new Run("REPRESENTATIVES")));
-            txt0.Inlines.Add("\nBy default the centroids of the 12 k-means clusters are shown");            
+            Label label_gen = new Label();
+            label_gen.SetBinding(ContentProperty, new Binding("Generation"));
+            label_gen.DataContext = this;
+            label_gen.ContentStringFormat = "GENERATION #{0}";
+            label_gen.FontSize = fontsize;
+            label_gen.FontWeight = FontWeights.Bold;
 
-            border0.Child = txt0;
-            sp.Children.Add(border0);
-
-
-            //Performance description
-            Border border1 = new Border();
-            border1.Margin = new Thickness(margin_w, margin_h * 2, margin_w, 0);
-
-            TextBlock txt1 = new TextBlock();
-            txt1.TextWrapping = TextWrapping.Wrap;
-            txt1.FontSize = fontsize;
-            txt1.Inlines.Add(new Bold(new Run("PERFORMANCE")));
-            txt1.Inlines.Add("\nSome colour coding labels for max/min performance values");
-
-            border1.Child = txt1;
-            sp.Children.Add(border1);
-
+            border_gen.Child = label_gen;
+            sp.Children.Add(border_gen);
 
 
             //Selection description
-            Border border2 = new Border();
-            border2.Margin = new Thickness(margin_w, margin_h*2, margin_w, 0);
+            Border border_sel = new Border();
+            border_sel.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            TextBlock txt2 = new TextBlock();
-            txt2.TextWrapping = TextWrapping.Wrap;
-            txt2.FontSize = fontsize;
-            txt2.Inlines.Add(new Bold(new Run("SELECTION")));
-            txt2.Inlines.Add("\nSelect parent(s) whose genes will be used to create the next design generation via the checkboxes");
-            
-            border2.Child = txt2;
-            sp.Children.Add(border2);
+            TextBlock txt_sel = new TextBlock();
+            txt_sel.TextWrapping = TextWrapping.Wrap;
+            txt_sel.FontSize = fontsize;
+            txt_sel.Inlines.Add(new Bold(new Run("SELECTION")));
+            txt_sel.Inlines.Add("\nSelect parent(s) whose genes will be used to create the next design generation via the checkboxes");
 
+            border_sel.Child = txt_sel;
+            sp.Children.Add(border_sel);
 
 
             //Selected number of parents
-            Border border3 = new Border();
-            border3.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            Border border_par = new Border();
+            border_par.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            Label label = new Label();
-            label.SetBinding(ContentProperty, new Binding("ParentCount"));
-            label.DataContext = this;
-            label.ContentStringFormat = "Selected parents: {0}";
-            label.FontSize = fontsize;
+            Label label_par = new Label();
+            label_par.SetBinding(ContentProperty, new Binding("ParentCount"));
+            label_par.DataContext = this;
+            label_par.ContentStringFormat = "Selected parents: {0}";
+            label_par.FontSize = fontsize;
 
-            border3.Child = label;
-            sp.Children.Add(border3);
+            border_par.Child = label_par;
+            sp.Children.Add(border_par);
 
 
-            //Add parents button
-            Border border4 = new Border();
-            border4.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            //Evolve button
+            Border border_evo = new Border();
+            border_evo.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            Button button = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_Evolve_Click));
+            Button button_evo = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_Evolve_Click));
 
-            border4.Child = button;
-            sp.Children.Add(border4);
+            border_evo.Child = button_evo;
+            sp.Children.Add(border_evo);
 
 
             //Add the stackpanel to the secondary area of Tab 1
@@ -415,6 +416,9 @@ namespace Biomorpher
             }
             else
             {
+                //Increase generation count
+                Generation++;
+
                 //Clear list of selected parent indexes
                 selectedParentIndexes = new List<int>();
 

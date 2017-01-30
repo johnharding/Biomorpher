@@ -43,7 +43,7 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
-                        <Label x:Name="Tab2_header" Content="12 representative designs" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Label x:Name="Tab2_header" Content="Cluster representatives" FontSize="35" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
                     <Border BorderThickness="0" Padding ="20" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
                 </DockPanel>
