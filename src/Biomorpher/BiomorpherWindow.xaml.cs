@@ -27,18 +27,44 @@ namespace Biomorpher
     /// </summary>
     public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
-
         // Fields
-        private int popSize;
+        private bool GO;
         private Population population;
         private PopHistory popHistory;
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
-        private bool GO;
         private BiomorpherComponent owner;
-        private double mutateProbability;
 
 
         //UI properties
+        private int popSize;
+        public int PopSize
+        {
+            get { return popSize; }
+            set
+            {
+                if (value != popSize)
+                {
+                    popSize = value;
+                    OnPropertyChanged("PopSize");
+                }
+            }
+        }
+
+        private double mutateProbability;
+        public double MutateProbability
+        {
+            get { return mutateProbability; }
+            set
+            {
+                if (value != mutateProbability)
+                {
+                    mutateProbability = value;
+                    OnPropertyChanged("MutateProbability");
+                }
+            }
+        }
+
+
         private int generation;
         public int Generation
         {
@@ -83,25 +109,20 @@ namespace Biomorpher
             // Get sliders
             sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
             owner.GetSliders(sliders);
-            
-            // GA things
-            popSize = 12;               // TODO: The population number needs to come from the user
-            mutateProbability = 0.01;   // TODO: The mutate probability needs to come from the user
-            population = new Population(popSize, sliders.Count);
-            popHistory = new PopHistory();
  
             // Initial Window things
             InitializeComponent();
             Topmost = true;
 
-            //UI properties
+            PopSize = 12;
+            MutateProbability = 0.2;
             Generation = 0;
             ParentCount = 0;
+            GO = false;
             controls = new Dictionary<string, FrameworkElement>();
 
             //Tab 0: Settings
             tab0_secondary_settings();
-
         }
 
 
@@ -123,6 +144,27 @@ namespace Biomorpher
             }
         }
 
+        public void RunInit()
+        {
+            // 1. Initialise population history
+            popHistory = new PopHistory();
+
+            // 2. Create initial population and add to history
+            population = new Population(popSize, sliders.Count);
+            popHistory.AddPop(population);
+
+            // 3. Get geometry for each chromosome
+            GetPhenotypes();
+
+            // 4. Setup tab layout
+            tab2_primary_permanent();
+            tab2_secondary_settings();
+            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+            tab2_primary_variable(popMeshes);            
+        }
+
+
+
         /// <summary>
         /// When this gets called (probably via a button being triggered) we advance a generation 
         /// </summary>
@@ -139,17 +181,7 @@ namespace Biomorpher
 
             // 4. Display meshes
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
-
-
-            //Test
-            List<Mesh> testMeshes = new List<Mesh>();
-            for(int i=0; i<popMeshes.Count; i++)
-            {
-                testMeshes.Add(popMeshes[0]);
-            }
-
-            tab2_primary_variable(testMeshes);
-
+            tab2_primary_variable(popMeshes);
 
             // 5. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
@@ -193,30 +225,43 @@ namespace Biomorpher
             int margin_w = 20;
             int margin_h = 20;
 
+            //Container for all the controls
             StackPanel sp = new StackPanel();
 
-            DockPanel dp = new DockPanel();
-            dp.LastChildFill = false;
+
+            //Create sliders with labels
+            Border border_popSize = new Border();
+            border_popSize.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            DockPanel dp_popSize = createSlider("Population size", "s_tab0_popSize", 12, 500, 100, true);
+            border_popSize.Child = dp_popSize;
+            sp.Children.Add(border_popSize);
+
+            Border border_mutation = new Border();
+            border_mutation.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab0_mutation", 0.00, 1.00, 0.10, false);
+            border_mutation.Child = dp_mutation;
+            sp.Children.Add(border_mutation);
+
+
+            DockPanel dp_buttons = new DockPanel();
+            dp_buttons.LastChildFill = false;
 
             Border border_buttons = new Border();
-            border_buttons.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            border_buttons.Margin = new Thickness(margin_w, margin_h*3, margin_w, 0);
 
 
             //GO button
             Button button_go = createButton("b_tab0_Go", "GO!", Tab0_secondary.Width * 0.3, new RoutedEventHandler(tab0_Go_Click));
+            DockPanel.SetDock(button_go, Dock.Left);
+            dp_buttons.Children.Add(button_go);
 
             //EXIT button
             Button button_exit = createButton("b_tab0_Exit", "Exit", Tab0_secondary.Width * 0.3, new RoutedEventHandler(tab0_Exit_Click));
-
-
-            DockPanel.SetDock(button_go, Dock.Left);
-            dp.Children.Add(button_go);
-
             DockPanel.SetDock(button_exit, Dock.Right);
-            dp.Children.Add(button_exit);
+            dp_buttons.Children.Add(button_exit);
 
 
-            border_buttons.Child = dp;
+            border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
 
 
@@ -423,6 +468,64 @@ namespace Biomorpher
         }
 
 
+        //Create slider control with label
+        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider)
+        {
+            //Container for slider + label
+            DockPanel dp = new DockPanel();
+
+
+            //Create slider
+            Slider slider = new Slider();
+            slider.Minimum = minVal;
+            slider.Maximum = maxVal;
+            slider.Value = val;
+
+            slider.Name = controlName;
+            slider.Focusable = false;
+            slider.TickFrequency = 0.01;
+            slider.IsSnapToTickEnabled = true;
+
+
+            string format = "{0:0.00}";
+            if (isIntSlider)
+            {
+                slider.TickFrequency = 1.0;
+                format = "{0:0}";
+            }
+
+            //Add slider to control dictionary
+            controls.Add(controlName, slider);
+
+
+            //Create a label with the name of the slider
+            Label label_name = new Label();
+            label_name.HorizontalContentAlignment = HorizontalAlignment.Left;
+            label_name.Content = labelName;
+
+            DockPanel.SetDock(label_name, Dock.Top);
+            dp.Children.Add(label_name);
+
+
+            //Create a label with the current value of the slider
+            Label label_val = new Label();
+            Binding binding_val = new Binding("Value");
+            label_val.ContentStringFormat = format;
+            binding_val.Source = slider;
+            label_val.SetBinding(Label.ContentProperty, binding_val);
+
+
+            DockPanel.SetDock(label_val, Dock.Right);
+            dp.Children.Add(label_val);
+
+
+            dp.Children.Add(slider);
+
+
+            return dp;
+        }
+
+
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
 
         //Handle event when the "GO!" button is clicked in tab 0       
@@ -430,19 +533,19 @@ namespace Biomorpher
         {
             //Button b_clicked = (Button)sender;
 
+            if (!GO)
+            {
+                RunInit();
+
+                //Disable sliders in tab 0
+                Slider s_popSize = (Slider)controls["s_tab0_popSize"];
+                s_popSize.IsEnabled = false;
+
+                Slider s_mutation = (Slider)controls["s_tab0_mutation"];
+                s_mutation.IsEnabled = false;
+            }
+
             GO = true;
-
-            //Tab 2: Designs
-            tab2_primary_permanent();
-            tab2_secondary_settings();
-
-            GetPhenotypes();
-
-            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
-            tab2_primary_variable(popMeshes);
-            
-
-            //Disable sliders in tab 0
         }
 
 
@@ -490,7 +593,7 @@ namespace Biomorpher
                 List<int> selectedParentIndexes = new List<int>();
 
                 //Extract indexes from names of checked boxes and uncheck all
-                for (int i=0; i<popSize; i++)
+                for (int i=0; i<12; i++)
                 {
                     //The name of the checkbox control
                     string cb_name = "cb_tab2_" + i;
