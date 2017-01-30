@@ -57,8 +57,8 @@ namespace Biomorpher
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
         private Dictionary<string, FrameworkElement> controls;
 
-        bool addParents;
-        List<int> selectedParentsIndexes;
+        bool evolve;
+        List<int> selectedParentIndexes;
 
 
         // Constructor
@@ -91,8 +91,8 @@ namespace Biomorpher
             //UI properties
             parentCount = 0;
             controls = new Dictionary<string, FrameworkElement>();
-            addParents = false;
-            selectedParentsIndexes = new List<int>();
+            evolve = false;
+            selectedParentIndexes = new List<int>();
 
 
             //Tab 2: Designs
@@ -207,6 +207,7 @@ namespace Biomorpher
 
                 //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
                 controls.Add(dp_name, dp);
+                controls.Add(cb_name, cb);
 
                 //Set the dockpanel as the child of the border element
                 border.Child = dp;
@@ -320,7 +321,7 @@ namespace Biomorpher
             Border border4 = new Border();
             border4.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            Button button = createButton("b_tab2_AddParents", "Add parent(s)", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_AddParents_Click));
+            Button button = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_Evolve_Click));
 
             border4.Child = button;
             sp.Children.Add(border4);
@@ -403,14 +404,45 @@ namespace Biomorpher
 
 
         //Handle event when the "Add parents" button is clicked in tab 2       
-        public void tab2_AddParents_Click(object sender, RoutedEventArgs e)
+        public void tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button) sender;
 
-            //To do: Extract indexes from names of checked boxes
+            //Test if minimum one parent is selected
+            if(ParentCount < 1)
+            {
+                MessageBoxResult message = MessageBox.Show(this, "Select minimum one parent via the checkboxes");
+            }
+            else
+            {
+                //Clear list of selected parent indexes
+                selectedParentIndexes = new List<int>();
 
-            //change toggle
-            addParents = true;
+                //Extract indexes from names of checked boxes and uncheck all
+                for (int i=0; i<12; i++)
+                {
+                    //The name of the checkbox control
+                    string cb_name = "cb_tab2_" + i;
+
+                    //Get this control from the dictionary
+                    CheckBox cb = (CheckBox) controls[cb_name];
+
+                    if(cb.IsChecked == true)
+                    {
+                        selectedParentIndexes.Add(i);
+                        cb.IsChecked = false;
+                    }
+                }
+
+                //Set parent count to zero
+                ParentCount = 0;
+
+                //Change toggle status
+                evolve = true;
+            }
+
+
+            
         }
 
 
