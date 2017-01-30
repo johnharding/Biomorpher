@@ -95,11 +95,11 @@ namespace Biomorpher
             selectedParentsIndexes = new List<int>();
 
 
-            //Tab 1: Designs
+            //Tab 2: Designs
             List<Mesh> repDesigns = getRepresentativePhenotypes(population); 
-            tab1_primary_permanent();
-            tab1_primary_variable(repDesigns);
-            tab1_secondary_settings();
+            tab2_primary_permanent();
+            tab2_primary_variable(repDesigns);
+            tab2_secondary_settings();
 
 
         }
@@ -173,16 +173,16 @@ namespace Biomorpher
         //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
 
 
-        //-------------------------------------------------------------------------------TAB 1------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------TAB 2------------------------------------------------------------------------//
 
         //Create permanent grid layout with check boxes
-        public void tab1_primary_permanent()
+        public void tab2_primary_permanent()
         {
             //Create grid 3x4 layout
             int rowCount = 3;
             int columnCount = 4;
             int gridCount = rowCount * columnCount;
-            Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
+            Grid grid = createGrid(rowCount, columnCount, Tab2_primary.Width, Tab2_primary.Height);
 
 
             //For each grid cell: create border with padding, a dock panel and add a checkbox
@@ -194,12 +194,12 @@ namespace Biomorpher
 
                 //Dock panel
                 DockPanel dp = new DockPanel();
-                string dp_name = "dp_tab1_" + i;
+                string dp_name = "dp_tab2_" + i;
                 dp.Name = dp_name;
 
                 //Create checkbox with an event handler
-                string cb_name = "cb_tab1_" + i;
-                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab1_SelectParents_Check));
+                string cb_name = "cb_tab2_" + i;
+                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check));
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
 
                 DockPanel.SetDock(cb, Dock.Top);
@@ -218,18 +218,18 @@ namespace Biomorpher
             }
 
 
-            //Add the grid to the primary area of Tab 1
-            Tab1_primary.Child = grid;
+            //Add the grid to the primary area of Tab 2
+            Tab2_primary.Child = grid;
         }
 
 
-        public void tab1_primary_variable(List<Mesh> meshes)
+        public void tab2_primary_variable(List<Mesh> meshes)
         {
             //Run through the list of meshes and create a viewport3d control for each
             for(int i=0; i<meshes.Count; i++)
             {
                 //The name of the control to add the viewport3d to
-                string dp_name = "dp_tab1_" + i;
+                string dp_name = "dp_tab2_" + i;
 
                 //Get this control from the dictionary
                 DockPanel dp = (DockPanel) controls[dp_name];
@@ -248,52 +248,7 @@ namespace Biomorpher
 
 
 
-        /*
-        public void createTab1ViewportGrid(List<Mesh> meshes)
-        {
-            //Create grid 3x4 layout
-            int rowCount = 3;
-            int columnCount = 4;
-            Grid grid = createGrid(rowCount, columnCount, Tab1_primary.Width, Tab1_primary.Height);
-
-
-            //For each grid cell: create border, dock panel and add checkbox and 3d viewport controls
-            for (int i = 0; i < meshes.Count; i++)
-            {
-                Border border = new Border();
-                border.Padding = new Thickness(5);
-
-                DockPanel dp = new DockPanel();
-
-                //Checkbox
-                string name = "cb_tab1_" + i;
-                CheckBox cb = createCheckBox(name, new RoutedEventHandler(tab1_Event_Checkboxes));
-                cb.HorizontalAlignment = HorizontalAlignment.Right;
-
-                DockPanel.SetDock(cb, Dock.Top);
-                dp.Children.Add(cb);
-
-                //3d viewport
-                Viewport3d vp3d = new Viewport3d(meshes[i]);
-                dp.Children.Add(vp3d);
-
-                border.Child = dp;
-
-
-
-                //add dockpanel to grid
-                Grid.SetRow(border, (int)(i / 4));
-                Grid.SetColumn(border, i % 4);
-                grid.Children.Add(border);
-            }
-
-            //add to primary area of tab 1
-            Tab1_primary.Child = grid;
-        }
-        */
-
-
-        public void tab1_secondary_settings()
+        public void tab2_secondary_settings()
         {
             int fontsize = 12;
 
@@ -365,14 +320,14 @@ namespace Biomorpher
             Border border4 = new Border();
             border4.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-            Button button = createButton("b_tab1_AddParents", "Add parent(s)", Tab1_secondary.Width * 0.5, new RoutedEventHandler(tab1_AddParents_Click));
+            Button button = createButton("b_tab2_AddParents", "Add parent(s)", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_AddParents_Click));
 
             border4.Child = button;
             sp.Children.Add(border4);
 
 
             //Add the stackpanel to the secondary area of Tab 1
-            Tab1_secondary.Child = sp;
+            Tab2_secondary.Child = sp;
         }
 
 
@@ -430,8 +385,8 @@ namespace Biomorpher
 
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
 
-        //One event handler for all checkboxes in tab 1        
-        public void tab1_SelectParents_Check(object sender, RoutedEventArgs e)
+        //One event handler for all checkboxes in tab 2        
+        public void tab2_SelectParents_Check(object sender, RoutedEventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
 
@@ -447,8 +402,8 @@ namespace Biomorpher
         }
 
 
-        //Handle event when the "Add parents" button is clicked in tab 1       
-        public void tab1_AddParents_Click(object sender, RoutedEventArgs e)
+        //Handle event when the "Add parents" button is clicked in tab 2       
+        public void tab2_AddParents_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button) sender;
 
