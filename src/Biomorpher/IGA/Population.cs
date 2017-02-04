@@ -116,7 +116,7 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i].ResetFitness();
+                chromosomes[i].SetFitness(0.0);
             }
         }
 

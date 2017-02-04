@@ -171,11 +171,11 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
-            // 0. Reset the 'fitness' values for each chromo
+            // 0. Reset the 'fitness' value for each chromosome
             population.ResetAllFitness();
 
             // 1. Create new populaltion using user selection
-            //population.RoulettePop();
+            population.RoulettePop();
 
             // 2. Mutate population using user preferences
             population.MutatePop(mutateProbability);
@@ -302,7 +302,7 @@ namespace Biomorpher
                 string cb_name = "cb_tab2_" + i;
                 CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check));
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
-
+ 
                 DockPanel.SetDock(cb, Dock.Top);
                 dp.Children.Add(cb);
 

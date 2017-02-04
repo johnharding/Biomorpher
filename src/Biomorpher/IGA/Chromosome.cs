@@ -104,11 +104,13 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
-        /// Resets the fitness to zero
+        /// Sets the fitness value (0.0 min to 1.0 max)
         /// </summary>
-        public void ResetFitness()
+        public void SetFitness(double value)
         {
-            fitness = 0.0;
+            if (value < 0.0) value = 0.0;
+            if (value > 1.0) value = 1.0;
+            fitness = value;
         }
 
     }
