@@ -50,7 +50,7 @@ namespace Biomorpher.IGA
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 chromosomes[i] = new Chromosome(geneNumber);
-                chromosomes[i].GenerateRandomGenes(i); // pass the i value as a seed
+                chromosomes[i].GenerateRandomGenes();
             }
         }
 
@@ -60,7 +60,6 @@ namespace Biomorpher.IGA
         public void RoulettePop()
         {
             // Roulette Wheel technique here as described by Melanie Mitchell, An Introduction to GAs, p.166
-            Random myRandom = new Random();
             double fitSum;
             double totalFitness = 0.0;
 
@@ -77,8 +76,8 @@ namespace Biomorpher.IGA
             // Now for the roulette wheel selection for the new population
             for (int i = 0; i < newPop.chromosomes.Length; i++)
             {
-                double weightedRandom = myRandom.NextDouble()*totalFitness;
-                fitSum = 0;
+                double weightedRandom = Friends.GetRandomDouble()*totalFitness;
+                fitSum = 0.0;
 
                 for (int j = 0; j < chromosomes.Length; j++)
                 {
@@ -107,6 +106,17 @@ namespace Biomorpher.IGA
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 chromosomes[i].Mutate(probability);
+            }
+        }
+
+        /// <summary>
+        /// Resets all the fitness values to zero at the start of a new generation
+        /// </summary>
+        public void ResetAllFitness()
+        {
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                chromosomes[i].ResetFitness();
             }
         }
 

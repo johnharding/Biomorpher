@@ -5,13 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using Biomorpher.IGA;
 
 namespace Biomorpher.IGA
 {
     public class Chromosome
     {
-        private Random randGene;
-        private Random randMutate;
         public List<Mesh> phenotype;       // TODO: should be more than meshes at some point
         private List<double> performance;   // (optional) list of performance values
         private List<string> criteria;      // (optional) labels for performance criteria
@@ -19,25 +18,27 @@ namespace Biomorpher.IGA
         // Normalised values used in the chromosome
         private double[] genes;
 
-        // The real slider values
+        // TODO: store the original slider values?
+
         // private double[] mapped_genes;
         private double fitness {get; set;}
 
-
+        /// <summary>
+        /// Main chromosome constructor
+        /// </summary>
+        /// <param name="newLength"></param>
+        /// <param name="randSeed"></param>
         public Chromosome(int newLength)
         {
             genes = new double[newLength];
             fitness = 0.0;
-            randMutate = new Random();
         }
 
-        public void GenerateRandomGenes(int seed)
+        public void GenerateRandomGenes()
         {
-            randGene = new Random(seed+10);
-
             for (int i=0; i<genes.Length; i++)
             {
-                genes[i] = randGene.NextDouble();
+                genes[i] = Friends.GetRandomDouble();
             }
         }
 
@@ -56,7 +57,7 @@ namespace Biomorpher.IGA
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             clone.fitness = this.fitness;
 
-            // need to also clone the phenotype geometry and optional performance criteria
+            // need to also clone the phenotype geometry and optional performance criteria?
 
             return clone;
         }
@@ -69,13 +70,12 @@ namespace Biomorpher.IGA
         {
             for(int i=0; i<genes.Length; i++)
             {
-                double tempRand = randMutate.NextDouble();
+                double tempRand = Friends.GetRandomDouble();
 
                 if (tempRand < probability)
                 {
                     // int index = (int)(randMutate.NextDouble() * genes.Length);
-                    double newgene = randMutate.NextDouble();
-                    genes[i] = newgene;
+                    genes[i] = Friends.GetRandomDouble();
                 }
             }
         }
@@ -101,6 +101,14 @@ namespace Biomorpher.IGA
             phenotype = new List<Mesh>(meshes);
 
             // TODO: Update performance criteria in this method.
+        }
+
+        /// <summary>
+        /// Resets the fitness to zero
+        /// </summary>
+        public void ResetFitness()
+        {
+            fitness = 0.0;
         }
 
     }

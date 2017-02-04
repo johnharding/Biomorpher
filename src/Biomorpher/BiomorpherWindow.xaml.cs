@@ -115,7 +115,7 @@ namespace Biomorpher
             Topmost = true;
 
             PopSize = 12;
-            MutateProbability = 0.2;
+            MutateProbability = 1.0;
             Generation = 0;
             ParentCount = 0;
             GO = false;
@@ -138,12 +138,13 @@ namespace Biomorpher
                 owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
                 owner.canvas.Document.Enabled = true;                   // Enable the solver again
                 owner.ExpireSolution(true);                             // Now expire the main component and recompute
-                //owner.CollectData();
-                //owner.ComputeData();
                 owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
             }
         }
 
+        /// <summary>
+        /// Instantiate the population and intialise the window
+        /// </summary>
         public void RunInit()
         {
             // 1. Initialise population history
@@ -170,8 +171,11 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
+            // 0. Reset the 'fitness' values for each chromo
+            population.ResetAllFitness();
+
             // 1. Create new populaltion using user selection
-            population.RoulettePop();
+            //population.RoulettePop();
 
             // 2. Mutate population using user preferences
             population.MutatePop(mutateProbability);
@@ -270,8 +274,6 @@ namespace Biomorpher
         }
 
 
-
-
         //-------------------------------------------------------------------------------TAB 2------------------------------------------------------------------------//
 
         //Create permanent grid layout with check boxes
@@ -345,7 +347,6 @@ namespace Biomorpher
                 dp.Children.Add(vp3d);
             }
         }
-
 
 
         public void tab2_secondary_settings()
@@ -619,12 +620,6 @@ namespace Biomorpher
         }
 
 
-        
-
-
-
-
-
         //INotifyPropertyChanged Implementation
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string name)
@@ -635,16 +630,6 @@ namespace Biomorpher
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
-
-
-
-
-
-
-
-
-
-
 
 
 
