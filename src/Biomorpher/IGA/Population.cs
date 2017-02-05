@@ -13,6 +13,9 @@ namespace Biomorpher.IGA
         
         // the population of chromosomes
         public Chromosome[] chromosomes {get; set;}
+        
+        // IDs of (12) cluster representatives
+        private List<int> clusterIDs {get; set;}
 
         // TODO: Store the geometry phenotype here
 
@@ -95,6 +98,9 @@ namespace Biomorpher.IGA
             {
                 chromosomes[i] = newPop.chromosomes[i].Clone();
             }
+
+            // Make sure to reset all the fitnesses here (selection has now already occured).
+            ResetAllFitness();
         }
 
         /// <summary>

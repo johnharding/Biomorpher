@@ -115,7 +115,7 @@ namespace Biomorpher
             Topmost = true;
 
             PopSize = 12;
-            MutateProbability = 1.0;
+            MutateProbability = 0.1;
             Generation = 0;
             ParentCount = 0;
             GO = false;
@@ -171,8 +171,6 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
-            // 0. Reset the 'fitness' value for each chromosome
-            population.ResetAllFitness();
 
             // 1. Create new populaltion using user selection
             population.RoulettePop();
@@ -202,7 +200,7 @@ namespace Biomorpher
 
 
 
-        //To do: change to get centroids from K-means clustering
+        //To do: change to get centroids from K-means clustering (or 'closest to centroid')
         private List<Mesh> getRepresentativePhenotypes(Population pop)
         {
             List<Mesh> phenotypes = new List<Mesh>();
@@ -300,7 +298,7 @@ namespace Biomorpher
 
                 //Create checkbox with an event handler
                 string cb_name = "cb_tab2_" + i;
-                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check));
+                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
  
                 DockPanel.SetDock(cb, Dock.Top);
@@ -442,14 +440,14 @@ namespace Biomorpher
 
 
         //Create checkbox control
-        public CheckBox createCheckBox(string name, RoutedEventHandler handler)
+        public CheckBox createCheckBox(string name, RoutedEventHandler handler, int chromoID)
         {
             CheckBox cb = new CheckBox();
             cb.Name = name;
             cb.IsChecked = false;
             cb.Checked += handler;
             cb.Unchecked += handler;
-
+            cb.Tag = chromoID;
             return cb;
         }
 
@@ -569,11 +567,21 @@ namespace Biomorpher
             if (checkbox.IsChecked == true)
             {
                 ParentCount++;
+
+                if (checkbox.Tag != null)
+                    population.chromosomes[(int)checkbox.Tag].SetFitness(1.0);
+
             }
             else
             {
                 ParentCount--;
+
+                if (checkbox.Tag != null)
+                    population.chromosomes[(int)checkbox.Tag].SetFitness(0.0);
+
             }
+
+            
 
         }
 
@@ -591,7 +599,11 @@ namespace Biomorpher
             else
             {
                 //Create list of selected parent indexes
-                List<int> selectedParentIndexes = new List<int>();
+                //List<int> selectedParentIndexes = new List<int>(); (now not required... I think)
+
+                //Run now moved to before we start to uncheck checkboxes
+                //In order to maintin fitness values
+                Run();
 
                 //Extract indexes from names of checked boxes and uncheck all
                 for (int i=0; i<12; i++)
@@ -604,13 +616,11 @@ namespace Biomorpher
 
                     if(cb.IsChecked == true)
                     {
-                        selectedParentIndexes.Add(i);
+                        //selectedParentIndexes.Add(i);
                         cb.IsChecked = false;
                     }
                 }
 
-                //TO DO: Run should know about the parents
-                Run();
 
                 //Set parent count to zero
                 ParentCount = 0;
