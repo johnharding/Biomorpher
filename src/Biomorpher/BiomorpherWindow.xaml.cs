@@ -238,13 +238,14 @@ namespace Biomorpher
             //Create sliders with labels
             Border border_popSize = new Border();
             border_popSize.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-            DockPanel dp_popSize = createSlider("Population size", "s_tab0_popSize", 12, 500, 100, true);
+            DockPanel dp_popSize = createSlider("Population size", "s_tab0_popSize", 12, 200, PopSize, true, new RoutedPropertyChangedEventHandler<double>(tab0_popSize_ValueChanged));
             border_popSize.Child = dp_popSize;
             sp.Children.Add(border_popSize);
 
+
             Border border_mutation = new Border();
             border_mutation.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab0_mutation", 0.00, 1.00, 0.10, false);
+            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab0_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(tab0_mutation_ValueChanged));
             border_mutation.Child = dp_mutation;
             sp.Children.Add(border_mutation);
 
@@ -468,7 +469,7 @@ namespace Biomorpher
 
 
         //Create slider control with label
-        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider)
+        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider, RoutedPropertyChangedEventHandler<double> handler)
         {
             //Container for slider + label
             DockPanel dp = new DockPanel();
@@ -491,6 +492,9 @@ namespace Biomorpher
                 slider.TickFrequency = 1.0;
                 format = "{0:0}";
             }
+
+            slider.ValueChanged += handler;
+
 
             //Add slider to control dictionary
             controls.Add(controlName, slider);
@@ -521,6 +525,23 @@ namespace Biomorpher
 
 
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
+
+        //Tab 0 Popsize event handler
+        private void tab0_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Slider s = (Slider) sender;
+            int val = (int) s.Value;
+            PopSize = val;
+        }
+
+        //Tab 0 MutateProbability event handler
+        private void tab0_mutation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Slider s = (Slider) sender;
+            double val = s.Value;
+            MutateProbability = val;
+        }
+
 
         //Handle event when the "GO!" button is clicked in tab 0       
         public void tab0_Go_Click(object sender, RoutedEventArgs e)
