@@ -98,6 +98,11 @@ namespace Biomorpher
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
         private Dictionary<string, FrameworkElement> controls;
 
+        //Font and spacing
+        int fontsize;
+        int margin_w;
+        int margin_h;
+
 
 
         // Constructor
@@ -120,6 +125,9 @@ namespace Biomorpher
             ParentCount = 0;
             GO = false;
             controls = new Dictionary<string, FrameworkElement>();
+            fontsize = 12;
+            margin_w = 20;
+            margin_h = 20;
 
             //Tab 0: Settings
             tab0_secondary_settings();
@@ -161,7 +169,7 @@ namespace Biomorpher
             tab2_primary_permanent();
             tab2_secondary_settings();
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
-            tab2_primary_variable(popMeshes);            
+            tab2_primary_update(popMeshes);            
         }
 
 
@@ -183,7 +191,7 @@ namespace Biomorpher
 
             // 4. Display meshes
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
-            tab2_primary_variable(popMeshes);
+            tab2_primary_update(popMeshes);
 
             // 5. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
@@ -223,10 +231,6 @@ namespace Biomorpher
 
         public void tab0_secondary_settings()
         {
-            int fontsize = 12;
-            int margin_w = 20;
-            int margin_h = 20;
-
             //Container for all the controls
             StackPanel sp = new StackPanel();
 
@@ -234,13 +238,14 @@ namespace Biomorpher
             //Create sliders with labels
             Border border_popSize = new Border();
             border_popSize.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-            DockPanel dp_popSize = createSlider("Population size", "s_tab0_popSize", 12, 500, 100, true);
+            DockPanel dp_popSize = createSlider("Population size", "s_tab0_popSize", 12, 100, PopSize, true, new RoutedPropertyChangedEventHandler<double>(tab0_popSize_ValueChanged));
             border_popSize.Child = dp_popSize;
             sp.Children.Add(border_popSize);
 
+
             Border border_mutation = new Border();
             border_mutation.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab0_mutation", 0.00, 1.00, 0.10, false);
+            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab0_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(tab0_mutation_ValueChanged));
             border_mutation.Child = dp_mutation;
             sp.Children.Add(border_mutation);
 
@@ -291,22 +296,34 @@ namespace Biomorpher
                 Border border = new Border();
                 border.Padding = new Thickness(5);
 
-                //Dock panel
+                //Master Dock panel
                 DockPanel dp = new DockPanel();
                 string dp_name = "dp_tab2_" + i;
                 dp.Name = dp_name;
+
+                //Sub Dock panel
+                DockPanel dp_sub = new DockPanel();
 
                 //Create checkbox with an event handler
                 string cb_name = "cb_tab2_" + i;
                 CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
- 
-                DockPanel.SetDock(cb, Dock.Top);
-                dp.Children.Add(cb);
+
+                DockPanel.SetDock(cb, Dock.Right);
+                dp_sub.Children.Add(cb);
+
+                //Label
+                Label l = new Label();
+                l.Content = i.ToString();
+                l.FontSize = fontsize;
+                l.HorizontalAlignment = HorizontalAlignment.Right;
+                dp_sub.Children.Add(l);
+
+                DockPanel.SetDock(dp_sub, Dock.Top);
+                dp.Children.Add(dp_sub);
 
                 //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
                 controls.Add(dp_name, dp);
-                controls.Add(cb_name, cb);
 
                 //Set the dockpanel as the child of the border element
                 border.Child = dp;
@@ -323,7 +340,7 @@ namespace Biomorpher
         }
 
 
-        public void tab2_primary_variable(List<Mesh> meshes)
+        public void tab2_primary_update(List<Mesh> meshes)
         {
             //Run through the list of meshes and create a viewport3d control for each
             for(int i=0; i<meshes.Count; i++)
@@ -347,15 +364,11 @@ namespace Biomorpher
         }
 
 
+
+
         public void tab2_secondary_settings()
         {
-            int fontsize = 12;
-
-            int margin_w = 20;
-            int margin_h = 20;
-
             StackPanel sp = new StackPanel();
-
 
             //Generation info
             Border border_gen = new Border();
@@ -410,9 +423,88 @@ namespace Biomorpher
             sp.Children.Add(border_evo);
 
 
+            //Design selection dropdown menu
+            Border border_cbox = new Border();
+            border_cbox.Margin = new Thickness(margin_w, margin_h*3, margin_w, 0);
+
+            List<string> comboboxItems = new List<string>();
+            for(int i=0; i<12; i++)
+            {
+                string itemName = "Design " + i;
+                comboboxItems.Add(itemName);
+            }
+            DockPanel dropdown = createComboBox("SELECT DESIGN", "cbox_tab2_selectDesign", comboboxItems, tab2_Combobox_SelectionChanged);
+
+            border_cbox.Child = dropdown;
+            sp.Children.Add(border_cbox);
+
+
+            //Selected design properties
+            Border border_prop = new Border();
+            border_prop.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+            ComboBox cbox = (ComboBox)controls["cbox_tab2_selectDesign"];
+            int selItem = cbox.SelectedIndex;
+            DockPanel dp_properties = tab2_secondary_genesCreate(population, selItem);              //TODO: Send chromosome ID not the grid ID
+
+            border_prop.Child = dp_properties;
+            sp.Children.Add(border_prop);
+
+
             //Add the stackpanel to the secondary area of Tab 2
             Tab2_secondary.Child = sp;
         }
+
+        private DockPanel tab2_secondary_genesCreate(Population pop, int chromoID)
+        {
+            DockPanel dp = new DockPanel();
+
+            double[] genes = pop.chromosomes[chromoID].GetGenes();
+            double fitness = pop.chromosomes[chromoID].GetFitness();
+
+            for (int i=0; i<genes.Length; i++)
+            {
+                string controlName = "tab2_s_gene" + i;
+                DockPanel dp_sliderG = createSlider("sliderName", controlName, 0.0, 1.0, genes[i], false);
+
+                Slider sliderG = (Slider) controls[controlName];
+                sliderG.IsEnabled = false;
+
+                DockPanel.SetDock(dp_sliderG, Dock.Top);
+                dp.Children.Add(dp_sliderG);
+            }
+
+            DockPanel dp_sliderF = createSlider("Fitness", "tab2_s_fitness", 0.0, 1.0, fitness, false);
+
+            Slider sliderF = (Slider) controls["tab2_s_fitness"];
+            sliderF.IsEnabled = false;
+
+            dp.Children.Add(dp_sliderF);
+
+            return dp;
+        }
+
+        private void tab2_secondary_genesUpdate(Population pop, int chromoID)
+        {
+            double[] genes = pop.chromosomes[chromoID].GetGenes();
+            double fitness = pop.chromosomes[chromoID].GetFitness();
+
+            for (int i = 0; i < genes.Length; i++)
+            {
+                string controlName = "tab2_s_gene" + i;
+                Slider sliderG = (Slider) controls[controlName];
+                sliderG.IsEnabled = true;
+                sliderG.Value = genes[i];
+                sliderG.IsEnabled = false;
+            }
+
+            Slider sliderF = (Slider) controls["tab2_s_fitness"];
+            sliderF.IsEnabled = true;
+            sliderF.Value = fitness;
+            sliderF.IsEnabled = false;
+        }
+
+
 
 
         //-------------------------------------------------------------------------------CREATE CONTROLS------------------------------------------------------------------------//
@@ -448,6 +540,8 @@ namespace Biomorpher
             cb.Checked += handler;
             cb.Unchecked += handler;
             cb.Tag = chromoID;
+
+            controls.Add(name, cb);
             return cb;
         }
 
@@ -463,6 +557,7 @@ namespace Biomorpher
 
             b.Click += handler;
 
+            controls.Add(name, b);
             return b;
         }
 
@@ -472,7 +567,6 @@ namespace Biomorpher
         {
             //Container for slider + label
             DockPanel dp = new DockPanel();
-
 
             //Create slider
             Slider slider = new Slider();
@@ -493,6 +587,7 @@ namespace Biomorpher
                 format = "{0:0}";
             }
 
+            
             //Add slider to control dictionary
             controls.Add(controlName, slider);
 
@@ -505,7 +600,6 @@ namespace Biomorpher
             DockPanel.SetDock(label_name, Dock.Top);
             dp.Children.Add(label_name);
 
-
             //Create a label with the current value of the slider
             Label label_val = new Label();
             Binding binding_val = new Binding("Value");
@@ -513,19 +607,71 @@ namespace Biomorpher
             binding_val.Source = slider;
             label_val.SetBinding(Label.ContentProperty, binding_val);
 
-
             DockPanel.SetDock(label_val, Dock.Right);
             dp.Children.Add(label_val);
 
-
             dp.Children.Add(slider);
 
+            return dp;
+        }
+
+        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider, RoutedPropertyChangedEventHandler<double> handler)
+        {
+            DockPanel dp = createSlider(labelName, controlName, minVal, maxVal, val, isIntSlider);
+
+            Slider slider = (Slider) controls[controlName];
+            slider.ValueChanged += handler;
+
+            return dp;
+        }
+
+
+        //Create combobox (dropdown menu)
+        public DockPanel createComboBox(string label, string name, List<string> items, SelectionChangedEventHandler handler)
+        {
+            DockPanel dp = new DockPanel();
+
+
+            ComboBox cbox = new ComboBox();
+            cbox.Name = name;
+            cbox.ItemsSource = items;
+            cbox.SelectedIndex = 0;
+            cbox.SelectionChanged += handler;
+
+            controls.Add(name, cbox);
+
+
+            Label l = new Label();
+            l.Content = label;
+            l.FontSize = fontsize;
+            l.FontWeight = FontWeights.Bold;
+
+            DockPanel.SetDock(l, Dock.Top);
+            dp.Children.Add(l);
+            dp.Children.Add(cbox);
 
             return dp;
         }
 
 
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
+
+        //Tab 0 Popsize event handler
+        private void tab0_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Slider s = (Slider) sender;
+            int val = (int) s.Value;
+            PopSize = val;
+        }
+
+        //Tab 0 MutateProbability event handler
+        private void tab0_mutation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Slider s = (Slider) sender;
+            double val = s.Value;
+            MutateProbability = val;
+        }
+
 
         //Handle event when the "GO!" button is clicked in tab 0       
         public void tab0_Go_Click(object sender, RoutedEventArgs e)
@@ -581,7 +727,17 @@ namespace Biomorpher
 
             }
 
-            
+        }
+
+
+        //Event handler for dropdown menu in tab 2 to select a specific design
+        private void tab2_Combobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox cbox = (ComboBox) sender;
+            int selectedIndex = cbox.SelectedIndex;
+
+            //Change gene sliders according to selection
+            tab2_secondary_genesUpdate(population, selectedIndex);                          //TODO: Send chromosome ID not the grid ID
 
         }
 
@@ -598,9 +754,6 @@ namespace Biomorpher
             }
             else
             {
-                //Create list of selected parent indexes
-                //List<int> selectedParentIndexes = new List<int>(); (now not required... I think)
-
                 //Run now moved to before we start to uncheck checkboxes
                 //In order to maintin fitness values
                 Run();
@@ -616,7 +769,6 @@ namespace Biomorpher
 
                     if(cb.IsChecked == true)
                     {
-                        //selectedParentIndexes.Add(i);
                         cb.IsChecked = false;
                     }
                 }
@@ -624,6 +776,12 @@ namespace Biomorpher
 
                 //Set parent count to zero
                 ParentCount = 0;
+
+
+                //Reset selected item in dropdown menu to 0 and update slider properties
+                ComboBox cbox = (ComboBox)controls["cbox_tab2_selectDesign"];
+                cbox.SelectedIndex = 0;
+                tab2_secondary_genesUpdate(population, 0);                                      //TODO: Send chromosome ID not the grid ID
 
             }
    
