@@ -98,6 +98,11 @@ namespace Biomorpher
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation
         private Dictionary<string, FrameworkElement> controls;
 
+        //Font and spacing
+        int fontsize;
+        int margin_w;
+        int margin_h;
+
 
 
         // Constructor
@@ -120,6 +125,9 @@ namespace Biomorpher
             ParentCount = 0;
             GO = false;
             controls = new Dictionary<string, FrameworkElement>();
+            fontsize = 12;
+            margin_w = 20;
+            margin_h = 20;
 
             //Tab 0: Settings
             tab0_secondary_settings();
@@ -223,10 +231,6 @@ namespace Biomorpher
 
         public void tab0_secondary_settings()
         {
-            int fontsize = 12;
-            int margin_w = 20;
-            int margin_h = 20;
-
             //Container for all the controls
             StackPanel sp = new StackPanel();
 
@@ -306,7 +310,6 @@ namespace Biomorpher
 
                 //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
                 controls.Add(dp_name, dp);
-                controls.Add(cb_name, cb);
 
                 //Set the dockpanel as the child of the border element
                 border.Child = dp;
@@ -349,13 +352,7 @@ namespace Biomorpher
 
         public void tab2_secondary_settings()
         {
-            int fontsize = 12;
-
-            int margin_w = 20;
-            int margin_h = 20;
-
             StackPanel sp = new StackPanel();
-
 
             //Generation info
             Border border_gen = new Border();
@@ -448,6 +445,8 @@ namespace Biomorpher
             cb.Checked += handler;
             cb.Unchecked += handler;
             cb.Tag = chromoID;
+
+            controls.Add(name, cb);
             return cb;
         }
 
@@ -463,6 +462,7 @@ namespace Biomorpher
 
             b.Click += handler;
 
+            controls.Add(name, b);
             return b;
         }
 
@@ -472,7 +472,6 @@ namespace Biomorpher
         {
             //Container for slider + label
             DockPanel dp = new DockPanel();
-
 
             //Create slider
             Slider slider = new Slider();
@@ -505,7 +504,6 @@ namespace Biomorpher
             DockPanel.SetDock(label_name, Dock.Top);
             dp.Children.Add(label_name);
 
-
             //Create a label with the current value of the slider
             Label label_val = new Label();
             Binding binding_val = new Binding("Value");
@@ -513,13 +511,10 @@ namespace Biomorpher
             binding_val.Source = slider;
             label_val.SetBinding(Label.ContentProperty, binding_val);
 
-
             DockPanel.SetDock(label_val, Dock.Right);
             dp.Children.Add(label_val);
 
-
             dp.Children.Add(slider);
-
 
             return dp;
         }
@@ -581,8 +576,6 @@ namespace Biomorpher
 
             }
 
-            
-
         }
 
 
@@ -598,9 +591,6 @@ namespace Biomorpher
             }
             else
             {
-                //Create list of selected parent indexes
-                //List<int> selectedParentIndexes = new List<int>(); (now not required... I think)
-
                 //Run now moved to before we start to uncheck checkboxes
                 //In order to maintin fitness values
                 Run();
@@ -616,7 +606,6 @@ namespace Biomorpher
 
                     if(cb.IsChecked == true)
                     {
-                        //selectedParentIndexes.Add(i);
                         cb.IsChecked = false;
                     }
                 }
