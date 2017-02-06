@@ -296,18 +296,31 @@ namespace Biomorpher
                 Border border = new Border();
                 border.Padding = new Thickness(5);
 
-                //Dock panel
+                //Master Dock panel
                 DockPanel dp = new DockPanel();
                 string dp_name = "dp_tab2_" + i;
                 dp.Name = dp_name;
+
+                //Sub Dock panel
+                DockPanel dp_sub = new DockPanel();
 
                 //Create checkbox with an event handler
                 string cb_name = "cb_tab2_" + i;
                 CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
                 cb.HorizontalAlignment = HorizontalAlignment.Right;
- 
-                DockPanel.SetDock(cb, Dock.Top);
-                dp.Children.Add(cb);
+
+                DockPanel.SetDock(cb, Dock.Right);
+                dp_sub.Children.Add(cb);
+
+                //Label
+                Label l = new Label();
+                l.Content = i.ToString();
+                l.FontSize = fontsize;
+                l.HorizontalAlignment = HorizontalAlignment.Right;
+                dp_sub.Children.Add(l);
+
+                DockPanel.SetDock(dp_sub, Dock.Top);
+                dp.Children.Add(dp_sub);
 
                 //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
                 controls.Add(dp_name, dp);
