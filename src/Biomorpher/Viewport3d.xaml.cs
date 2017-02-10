@@ -43,7 +43,8 @@ namespace Biomorpher
             hVp3D.ViewCubeRightText = "N";
             hVp3D.ViewCubeLeftText = "S";
             hVp3D.ViewCubeBackText = "W";
-
+            hVp3D.ViewCubeHeight = 50;
+            hVp3D.ViewCubeWidth = 50;
             var lights = new DefaultLights();
             hVp3D.Children.Add(lights);
 
@@ -68,12 +69,13 @@ namespace Biomorpher
                     mesh_w.TriangleIndices.Add(mesh.Faces[i].A);
                     mesh_w.TriangleIndices.Add(mesh.Faces[i].B);
                     mesh_w.TriangleIndices.Add(mesh.Faces[i].C);
+
                 }
             }
 
 
             //Create material and add geometry to viewport
-            DiffuseMaterial material = new DiffuseMaterial(Brushes.GreenYellow);
+            DiffuseMaterial material = new DiffuseMaterial(Brushes.DarkGray);
             GeometryModel3D model = new GeometryModel3D(mesh_w, material);
             ModelVisual3D vis = new ModelVisual3D();
             vis.Content = model;

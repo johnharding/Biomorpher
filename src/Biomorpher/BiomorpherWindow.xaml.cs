@@ -118,7 +118,6 @@ namespace Biomorpher
             // Initial Window things
             InitializeComponent();
             Topmost = true;
-
             PopSize = 12;
             MutateProbability = 0.1;
             Generation = 0;
@@ -294,6 +293,8 @@ namespace Biomorpher
             {
                 //Border
                 Border border = new Border();
+                border.BorderBrush = Brushes.LightGray;
+                border.BorderThickness = new Thickness(0.3);
                 border.Padding = new Thickness(5);
 
                 //Master Dock panel
@@ -362,8 +363,6 @@ namespace Biomorpher
                 dp.Children.Add(vp3d);
             }
         }
-
-
 
 
         public void tab2_secondary_settings()
@@ -455,6 +454,7 @@ namespace Biomorpher
             Tab2_secondary.Child = sp;
         }
 
+
         private DockPanel tab2_secondary_genesCreate(Population pop, int chromoID)
         {
             DockPanel dp = new DockPanel();
@@ -484,6 +484,7 @@ namespace Biomorpher
             return dp;
         }
 
+
         private void tab2_secondary_genesUpdate(Population pop, int chromoID)
         {
             double[] genes = pop.chromosomes[chromoID].GetGenes();
@@ -505,8 +506,6 @@ namespace Biomorpher
         }
 
 
-
-
         //-------------------------------------------------------------------------------CREATE CONTROLS------------------------------------------------------------------------//
 
         //Create Grid control
@@ -515,8 +514,8 @@ namespace Biomorpher
             Grid grid = new Grid();
             grid.Width = width;
             grid.Height = height;
-            grid.ShowGridLines = true;
-
+            //grid.ShowGridLines = true;
+            
             for (int i = 0; i < rowCount; i++)
             {
                 grid.RowDefinitions.Add(new RowDefinition());

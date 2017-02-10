@@ -12,7 +12,7 @@
         Height="720" 
         Width="1280"
         BorderBrush="{DynamicResource AccentColorBrush}"
-        BorderThickness="1">
+        BorderThickness="0">
 
     <Grid Background="White">
         <Border Background="#FFF4F4F5" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
@@ -75,7 +75,7 @@
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
-             /MahApps.Metro;component/Styles/Accents/Green.xaml" />
+             /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>

@@ -19,6 +19,7 @@ namespace Biomorpher.IGA
         private double[] genes;
 
         // TODO: store the original slider values?
+        //private double[]
 
         // private double[] mapped_genes;
         private double fitness {get; set;}
