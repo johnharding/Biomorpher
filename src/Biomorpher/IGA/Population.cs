@@ -23,11 +23,11 @@ namespace Biomorpher.IGA
         /// Construct a new population of chromosomes
         /// </summary>
         /// <param name="popSize"></param>
-        public Population(int popSize, int sliderCount)
+        public Population(int popSize, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
             chromosomes = new Chromosome[popSize];
             generation = 0;
-            GenerateRandomPop(sliderCount);
+            GenerateRandomPop(sliders);
         }
 
         /// <summary>
@@ -48,11 +48,11 @@ namespace Biomorpher.IGA
         /// Generates a random population of new chromosomes. TODO: take away seed
         /// </summary>
         /// <param name="geneNumber"></param>
-        public void GenerateRandomPop(int geneNumber)
+        public void GenerateRandomPop(List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome(geneNumber);
+                chromosomes[i] = new Chromosome(sliders);
                 chromosomes[i].GenerateRandomGenes();
             }
         }

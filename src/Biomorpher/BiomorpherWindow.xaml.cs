@@ -158,7 +158,7 @@ namespace Biomorpher
             popHistory = new PopHistory();
 
             // 2. Create initial population and add to history
-            population = new Population(popSize, sliders.Count);
+            population = new Population(popSize, sliders);
             popHistory.AddPop(population);
 
             // 3. Get geometry for each chromosome
@@ -317,7 +317,8 @@ namespace Biomorpher
                 Label l = new Label();
                 l.Content = i.ToString();
                 l.FontSize = fontsize;
-                l.HorizontalAlignment = HorizontalAlignment.Right;
+                l.Foreground = Brushes.LightGray;
+                l.HorizontalAlignment = HorizontalAlignment.Left;
                 dp_sub.Children.Add(l);
 
                 DockPanel.SetDock(dp_sub, Dock.Top);
@@ -514,7 +515,6 @@ namespace Biomorpher
             Grid grid = new Grid();
             grid.Width = width;
             grid.Height = height;
-            //grid.ShowGridLines = true;
             
             for (int i = 0; i < rowCount; i++)
             {
@@ -699,8 +699,9 @@ namespace Biomorpher
             //Button b_clicked = (Button)sender;
 
             Exit();
-
+            
             this.Close();
+            
         }
 
 

@@ -29,9 +29,9 @@ namespace Biomorpher.IGA
         /// </summary>
         /// <param name="newLength"></param>
         /// <param name="randSeed"></param>
-        public Chromosome(int newLength)
+        public Chromosome(List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
-            genes = new double[newLength];
+            genes = new double[sliders.Count];
             fitness = 0.0;
         }
 
