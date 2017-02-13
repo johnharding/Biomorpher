@@ -58,7 +58,7 @@ namespace Biomorpher.IGA
                 double sliderMin = (double) chromoSliders[i].Slider.Minimum;
                 double sliderMax = (double) chromoSliders[i].Slider.Maximum;
 
-                realgenes[i] = genes[i] * (sliderMin - sliderMax) + sliderMin;
+                realgenes[i] = genes[i] * (sliderMax - sliderMin) + sliderMin;
             }
 
         }
@@ -108,6 +108,15 @@ namespace Biomorpher.IGA
         public double[] GetGenes()
         {
             return genes;
+        }
+
+        /// <summary>
+        /// Returns the real genes for this chromosome
+        /// </summary>
+        /// <returns></returns>
+        public double[] GetRealGenes()
+        {
+            return realgenes;
         }
 
         /// <summary>
