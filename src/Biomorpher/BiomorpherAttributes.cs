@@ -32,6 +32,7 @@ namespace Biomorpher
         }
 
 
+
         public override GH_ObjectResponse RespondToMouseDoubleClick(GH_Canvas sender, GH_CanvasMouseEvent e)
         {
             if ((ContentBox.Contains(e.CanvasLocation)))
@@ -63,30 +64,30 @@ namespace Biomorpher
 
             if (channel == GH_CanvasChannel.Objects)
             {
-                // 1. Component Render
+
+
+                SolidBrush johnBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 50));
+                
+                RectangleF myRect = new RectangleF(Bounds.X+16, Bounds.Y, Bounds.Width, Bounds.Height);
+                //graphics.FillRectangle(johnBrush, Rectangle.Ceiling(myRect));
+
+                Pen myPen = new Pen(johnBrush, 1);
+                graphics.DrawRectangle(myPen, Rectangle.Ceiling(myRect));
+
                 base.Render(canvas, graphics, channel);
 
-                // TODO: Make pink!
-
-                // 2. New upper tab
+                Font myFont = new Font("Tahoma", 5);
+                StringFormat format = new StringFormat();
+                format.FormatFlags = StringFormatFlags.DirectionVertical;
+                format.Alignment = StringAlignment.Center;
+                format.LineAlignment = StringAlignment.Center;
+                format.Trimming = StringTrimming.EllipsisCharacter;
+                //graphics.RotateTransform(90);
+                graphics.DrawString("(doubleclick)", myFont, johnBrush, (int)Bounds.Location.X + Bounds.Width+10, (int)Bounds.Location.Y+22, format);
                 
-                //Color myColor = Color.LightGray;
-                //Rectangle myRect = new Rectangle((int)Bounds.Location.X, (int)Bounds.Location.Y - 20, (int)Bounds.Size.Width, 10);
-                //Pen myPen = new Pen(Brushes.Black, 1);
-                //graphics.DrawRectangle(myPen, myRect);
-
-                // 3. Show combinations
-                
-                //Font ubuntuFont = new Font("ubuntu", 8);
-                //StringFormat format = new StringFormat();
-                //format.Alignment = StringAlignment.Near;
-                //format.LineAlignment = StringAlignment.Center;
-                //format.Trimming = StringTrimming.EllipsisCharacter;
-
-                //graphics.DrawString(MyOwner.sliderValues.Count + " generations", ubuntuFont, Brushes.Black, (int)Bounds.Location.X, (int)Bounds.Location.Y - 8, format);
-
             }
         }
 
     }
 }
+

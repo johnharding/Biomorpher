@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using Rhino.Geometry;
 using Biomorpher.IGA;
+using Grasshopper.Kernel.Special;
 
 namespace Biomorpher
 {
@@ -30,6 +31,7 @@ namespace Biomorpher
         {    
             solveinstanceCounter = 0;
             canvas = Instances.ActiveCanvas;
+            this.IconDisplayMode = GH_IconDisplayMode.icon;
         }
 
         /// <summary>
@@ -38,24 +40,25 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-            pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
+            pm.AddNumberParameter("Sliders", "Sliders", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here - currently only meshes", GH_ParamAccess.list);
+            pm.AddNumberParameter("Performs", "Performs", "List of performance measures for the design", GH_ParamAccess.list);
             //TODO: Measures.. input 'performance measures' 
             //TODO: Labels.. input string for external quantitative measures
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
-            //pm[2].Optional = true;
+            pm[2].Optional = true;
             //pm[3].Optional = true;
         }
-
+        
         /// <summary>
         /// Register outputs
         /// </summary>
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddIntegerParameter("SICount", "SICount", "solve instance counter", GH_ParamAccess.item);
+            //pm.AddIntegerParameter("SICount", "SICount", "solve instance counter", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -70,14 +73,14 @@ namespace Biomorpher
             }
 
             solveinstanceCounter++;
-            DA.SetData(0, solveinstanceCounter);
+            //DA.SetData(0, solveinstanceCounter);
         }
 
         
         /// <summary>
         /// Gets the current sliders in Input[0]
         /// </summary>
-        public void GetSliders(List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
+        public void GetSliders(List<GH_NumberSlider> sliders)
         {
             foreach (IGH_Param param in this.Params.Input[0].Sources)
             {
@@ -93,7 +96,7 @@ namespace Biomorpher
         /// Sets the current slider values for a geven input chromosome
         /// </summary>
         /// <param name="chromo"></param>
-        public void SetSliders(Chromosome chromo, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
+        public void SetSliders(Chromosome chromo, List<GH_NumberSlider> sliders)
         {
             double[] genes = chromo.GetGenes();
  
@@ -185,14 +188,46 @@ namespace Biomorpher
         protected override void AppendAdditionalComponentMenuItems(System.Windows.Forms.ToolStripDropDown menu)
         {
             base.AppendAdditionalComponentMenuItems(menu);
-            Menu_AppendItem(menu, @"github source", gotoGithub);
-            //Menu_AppendItem(menu, @"gh group page", gotoGrasshopperGroup);
-
+            Menu_AppendItem(menu, @"All Sliders", AddAllSliders);
+            Menu_AppendItem(menu, @"No Sliders", RemoveAllSliders);
+            Menu_AppendItem(menu, @"Github source", GotoGithub);
         }
 
-        private void gotoGithub(Object sender, EventArgs e)
+        private void GotoGithub(Object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(@"https://github.com/johnharding/Biomorpher");
+        }
+
+        private void AddAllSliders(Object sender, EventArgs e)
+        {
+            try
+	        {
+                IEnumerator<IGH_DocumentObject> enumerator = canvas.Document.Objects.GetEnumerator();
+		        while (enumerator.MoveNext())
+		        {
+			        IGH_DocumentObject current = enumerator.Current;
+			        if (current != null)
+			        {
+				        if (current is GH_NumberSlider)
+				        {
+                            this.Params.Input[0].AddSource((IGH_Param)current, 0);
+
+				        }
+			        }
+		        }
+	        }
+            catch
+            {
+
+            }
+
+            ExpireSolution(true);
+        }
+
+        private void RemoveAllSliders(Object sender, EventArgs e)
+        {
+            this.Params.Input[0].RemoveAllSources();
+            ExpireSolution(true);
         }
 
         //TODO: send to grasshopper group
