@@ -17,6 +17,7 @@ using Biomorpher.IGA;
 using Biomorpher;
 using Grasshopper.Kernel;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 
@@ -445,9 +446,10 @@ namespace Biomorpher
 
             ComboBox cbox = (ComboBox)controls["cbox_tab2_selectDesign"];
             int selItem = cbox.SelectedIndex;
-            DockPanel dp_properties = tab2_secondary_genesCreate(population, selItem);              //TODO: Send chromosome ID not the grid ID
+            //DockPanel dp_properties = tab2_secondary_genesCreate(population, selItem);              //TODO: Send chromosome ID not the grid ID
+            ScrollViewer sv_properties = tab2_secondary_genesCreate(population, selItem);              //TODO: Send chromosome ID not the grid ID
 
-            border_prop.Child = dp_properties;
+            border_prop.Child = sv_properties;
             sp.Children.Add(border_prop);
 
 
@@ -456,7 +458,7 @@ namespace Biomorpher
         }
 
 
-        private DockPanel tab2_secondary_genesCreate(Population pop, int chromoID)
+        private ScrollViewer tab2_secondary_genesCreate(Population pop, int chromoID)
         {
             DockPanel dp = new DockPanel();
 
@@ -482,7 +484,13 @@ namespace Biomorpher
 
             dp.Children.Add(dp_sliderF);
 
-            return dp;
+            //Create scroll view of sliders (useful in case there are many)
+            ScrollViewer sv = new ScrollViewer();
+            sv.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            sv.Height = 250;
+            sv.Content = dp;
+
+            return sv;
         }
 
 
@@ -755,6 +763,7 @@ namespace Biomorpher
             {
                 MessageBoxResult message = MessageBox.Show(this, "Select minimum one parent via the checkboxes");
             }
+
             else
             {
                 //Run now moved to before we start to uncheck checkboxes
