@@ -687,6 +687,9 @@ namespace Biomorpher
 
                 Slider s_mutation = (Slider)controls["s_tab0_mutation"];
                 s_mutation.IsEnabled = false;
+
+                //Automatically send user to the next tab
+                Tab1.IsSelected = true;
             }
 
             GO = true;

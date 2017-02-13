@@ -19,7 +19,7 @@
 
         <TabControl x:Name="tabControl">
 
-            <TabItem Header="Settings">
+            <TabItem Header="Settings" x:Name="Tab0">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab0_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
@@ -28,8 +28,8 @@
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab0_primary"/>
                 </DockPanel>
             </TabItem>
-            
-            <TabItem Header="K-means">
+
+            <TabItem Header="K-means" x:Name="Tab1">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
@@ -39,7 +39,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Designs">
+            <TabItem Header="Designs" x:Name="Tab2">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
@@ -49,7 +49,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="History">
+            <TabItem Header="History" x:Name="Tab3">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3_secondary"/>
                     <Border BorderThickness="0" DockPanel.Dock="Top" Width="Auto" Height="80">
