@@ -17,10 +17,10 @@ namespace Biomorpher.IGA
         
         // Normalised values used in the chromosome
         private double[] genes;
+        private List<Grasshopper.Kernel.Special.GH_NumberSlider> chromoSliders;
 
         // Actual slider values.. 
         private double[] realgenes;
-
 
         // Fitness used for elitism selection
         private double fitness {get; set;}
@@ -30,10 +30,11 @@ namespace Biomorpher.IGA
         /// </summary>
         /// <param name="newLength"></param>
         /// <param name="randSeed"></param>
-        public Chromosome()
+        public Chromosome(int geneCount, List<Grasshopper.Kernel.Special.GH_NumberSlider> s)
         {
-            genes = new double[TheSliders.sliders.Count];
-            realgenes = new double[TheSliders.sliders.Count];
+            chromoSliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>(s);
+            genes = new double[geneCount];
+            realgenes = new double[geneCount];
             fitness = 0.0;
         }
 
@@ -54,10 +55,10 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < genes.Length; i++)
             {
-                double min = (double) TheSliders.sliders[i].Slider.Minimum;
-                double max = (double) TheSliders.sliders[i].Slider.Maximum;
+                double sliderMin = (double) chromoSliders[i].Slider.Minimum;
+                double sliderMax = (double) chromoSliders[i].Slider.Maximum;
 
-                realgenes[i] = genes[i] * (min - max) + min;
+                realgenes[i] = genes[i] * (sliderMin - sliderMax) + sliderMin;
             }
 
         }
@@ -73,7 +74,7 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public Chromosome Clone()
         {
-            Chromosome clone = new Chromosome(); // Pass the original slider
+            Chromosome clone = new Chromosome(this.genes.Length, this.chromoSliders); // Pass the original slider
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
             clone.fitness = this.fitness;

@@ -87,11 +87,7 @@ namespace Biomorpher
                     sliders.Add(slider);
                 }
             }
-
-            TheSliders.setSliders(sliders);
-            
         }
-
 
         /// <summary>
         /// Sets the current slider values for a geven input chromosome

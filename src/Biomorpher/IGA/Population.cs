@@ -10,6 +10,9 @@ namespace Biomorpher.IGA
     {
         // the current generation
         int generation;
+
+        // List of sliders
+        private List<Grasshopper.Kernel.Special.GH_NumberSlider> popSliders;
         
         // the population of chromosomes
         public Chromosome[] chromosomes {get; set;}
@@ -23,10 +26,11 @@ namespace Biomorpher.IGA
         /// Construct a new population of chromosomes
         /// </summary>
         /// <param name="popSize"></param>
-        public Population(int popSize)
+        public Population(int popSize, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
             chromosomes = new Chromosome[popSize];
             generation = 0;
+            popSliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>(sliders);
             GenerateRandomPop();
         }
 
@@ -52,7 +56,7 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome();
+                chromosomes[i] = new Chromosome(popSliders.Count, popSliders);
                 chromosomes[i].GenerateRandomGenes();
             }
         }
@@ -68,7 +72,7 @@ namespace Biomorpher.IGA
 
             // Set up a fresh population  
             // TODO: Do we have to calculate new geometry for everything? Why not have flags if GetGeometry() needs to be called
-            Population newPop = new Population(this.chromosomes.Length);
+            Population newPop = new Population(this.chromosomes.Length, popSliders);
 
             // find the total fitness
             for (int i = 0; i < chromosomes.Length; i++)
