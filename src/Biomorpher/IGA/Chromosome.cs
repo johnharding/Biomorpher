@@ -18,10 +18,11 @@ namespace Biomorpher.IGA
         // Normalised values used in the chromosome
         private double[] genes;
 
-        // TODO: store the original slider values?
-        //private double[]
+        // Actual slider values.. 
+        private double[] realgenes;
 
-        // private double[] mapped_genes;
+
+        // Fitness used for elitism selection
         private double fitness {get; set;}
 
         /// <summary>
@@ -29,18 +30,36 @@ namespace Biomorpher.IGA
         /// </summary>
         /// <param name="newLength"></param>
         /// <param name="randSeed"></param>
-        public Chromosome(List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
+        public Chromosome()
         {
-            genes = new double[sliders.Count];
+            genes = new double[TheSliders.sliders.Count];
+            realgenes = new double[TheSliders.sliders.Count];
             fitness = 0.0;
         }
 
         public void GenerateRandomGenes()
         {
+            // Generates a random set of genes and real counterparts
             for (int i=0; i<genes.Length; i++)
             {
                 genes[i] = Friends.GetRandomDouble();
             }
+
+            // Update the real genes
+            UpdateRealGenes();
+        }
+
+
+        public void UpdateRealGenes()
+        {
+            for (int i = 0; i < genes.Length; i++)
+            {
+                double min = (double) TheSliders.sliders[i].Slider.Minimum;
+                double max = (double) TheSliders.sliders[i].Slider.Maximum;
+
+                realgenes[i] = genes[i] * (min - max) + min;
+            }
+
         }
 
         public double GetFitness()
@@ -54,12 +73,12 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public Chromosome Clone()
         {
-            Chromosome clone = new Chromosome(this.genes.Length);
+            Chromosome clone = new Chromosome(); // Pass the original slider
             Array.Copy(this.genes, clone.genes, this.genes.Length);
+            Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
             clone.fitness = this.fitness;
 
             // need to also clone the phenotype geometry and optional performance criteria?
-
             return clone;
         }
 

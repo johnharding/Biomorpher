@@ -23,11 +23,11 @@ namespace Biomorpher.IGA
         /// Construct a new population of chromosomes
         /// </summary>
         /// <param name="popSize"></param>
-        public Population(int popSize, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
+        public Population(int popSize)
         {
             chromosomes = new Chromosome[popSize];
             generation = 0;
-            GenerateRandomPop(sliders);
+            GenerateRandomPop();
         }
 
         /// <summary>
@@ -48,11 +48,11 @@ namespace Biomorpher.IGA
         /// Generates a random population of new chromosomes. TODO: take away seed
         /// </summary>
         /// <param name="geneNumber"></param>
-        public void GenerateRandomPop(List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
+        public void GenerateRandomPop()
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome(sliders);
+                chromosomes[i] = new Chromosome();
                 chromosomes[i].GenerateRandomGenes();
             }
         }
@@ -68,7 +68,7 @@ namespace Biomorpher.IGA
 
             // Set up a fresh population  
             // TODO: Do we have to calculate new geometry for everything? Why not have flags if GetGeometry() needs to be called
-            Population newPop = new Population(this.chromosomes.Length, this.chromosomes[0].GetGenes().Length);
+            Population newPop = new Population(this.chromosomes.Length);
 
             // find the total fitness
             for (int i = 0; i < chromosomes.Length; i++)

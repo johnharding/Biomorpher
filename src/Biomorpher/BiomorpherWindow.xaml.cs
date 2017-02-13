@@ -158,7 +158,7 @@ namespace Biomorpher
             popHistory = new PopHistory();
 
             // 2. Create initial population and add to history
-            population = new Population(popSize, sliders);
+            population = new Population(popSize);
             popHistory.AddPop(population);
 
             // 3. Get geometry for each chromosome

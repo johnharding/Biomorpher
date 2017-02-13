@@ -87,6 +87,9 @@ namespace Biomorpher
                     sliders.Add(slider);
                 }
             }
+
+            TheSliders.setSliders(sliders);
+            
         }
 
 
