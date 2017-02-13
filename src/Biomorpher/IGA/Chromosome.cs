@@ -89,16 +89,21 @@ namespace Biomorpher.IGA
         /// <param name="probability"></param>
         public void Mutate(double probability)
         {
+            bool flag = false;
             for(int i=0; i<genes.Length; i++)
             {
                 double tempRand = Friends.GetRandomDouble();
 
                 if (tempRand < probability)
                 {
-                    // int index = (int)(randMutate.NextDouble() * genes.Length);
                     genes[i] = Friends.GetRandomDouble();
+                    flag = true;
                 }
             }
+
+            // Only call this if the chromosome has changed
+            if (flag) UpdateRealGenes();
+
         }
 
         /// <summary>
