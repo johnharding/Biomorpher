@@ -35,6 +35,10 @@ namespace Biomorpher
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
         private BiomorpherComponent owner;
 
+        private double[] sliderValuesMin;
+        private double[] sliderValuesMax;
+        private string[] sliderNames;
+
 
         //UI properties
         private int popSize;
@@ -115,7 +119,20 @@ namespace Biomorpher
             // Get sliders
             sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
             owner.GetSliders(sliders);
- 
+
+            //Extract slider info
+            sliderValuesMin = new double[sliders.Count];
+            sliderValuesMax = new double[sliders.Count];
+            sliderNames = new string[sliders.Count];
+
+            for (int i = 0; i < sliders.Count; i++)
+            {
+                sliderValuesMin[i] = (double) sliders[i].Slider.Minimum;
+                sliderValuesMax[i] = (double) sliders[i].Slider.Maximum;
+                sliderNames[i] = sliders[i].NickName;
+            }
+
+
             // Initial Window things
             InitializeComponent();
             Topmost = true;
@@ -446,7 +463,6 @@ namespace Biomorpher
 
             ComboBox cbox = (ComboBox)controls["cbox_tab2_selectDesign"];
             int selItem = cbox.SelectedIndex;
-            //DockPanel dp_properties = tab2_secondary_genesCreate(population, selItem);              //TODO: Send chromosome ID not the grid ID
             ScrollViewer sv_properties = tab2_secondary_genesCreate(population, selItem);              //TODO: Send chromosome ID not the grid ID
 
             border_prop.Child = sv_properties;
@@ -462,13 +478,13 @@ namespace Biomorpher
         {
             DockPanel dp = new DockPanel();
 
-            double[] genes = pop.chromosomes[chromoID].GetGenes();
+            double[] realGenes = pop.chromosomes[chromoID].GetRealGenes();
             double fitness = pop.chromosomes[chromoID].GetFitness();
 
-            for (int i=0; i<genes.Length; i++)
+            for (int i=0; i<realGenes.Length; i++)
             {
                 string controlName = "tab2_s_gene" + i;
-                DockPanel dp_sliderG = createSlider("sliderName", controlName, 0.0, 1.0, genes[i], false);
+                DockPanel dp_sliderG = createSlider(sliderNames[i], controlName, sliderValuesMin[i], sliderValuesMax[i], realGenes[i], false);
 
                 Slider sliderG = (Slider) controls[controlName];
                 sliderG.IsEnabled = false;
@@ -496,15 +512,15 @@ namespace Biomorpher
 
         private void tab2_secondary_genesUpdate(Population pop, int chromoID)
         {
-            double[] genes = pop.chromosomes[chromoID].GetGenes();
+            double[] realGenes = pop.chromosomes[chromoID].GetRealGenes();
             double fitness = pop.chromosomes[chromoID].GetFitness();
 
-            for (int i = 0; i < genes.Length; i++)
+            for (int i = 0; i < realGenes.Length; i++)
             {
                 string controlName = "tab2_s_gene" + i;
                 Slider sliderG = (Slider) controls[controlName];
                 sliderG.IsEnabled = true;
-                sliderG.Value = genes[i];
+                sliderG.Value = realGenes[i];
                 sliderG.IsEnabled = false;
             }
 
