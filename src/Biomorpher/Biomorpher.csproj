@@ -171,6 +171,12 @@
   <ItemGroup>
     <None Include="Resources\BiomorpherIcon_24.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BiomorpherIcon2_24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BiomorpherIcon3.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)Biomorpher.gha"

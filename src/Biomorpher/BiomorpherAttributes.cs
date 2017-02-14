@@ -83,7 +83,7 @@ namespace Biomorpher
                 format.LineAlignment = StringAlignment.Center;
                 format.Trimming = StringTrimming.EllipsisCharacter;
                 //graphics.RotateTransform(90);
-                graphics.DrawString("(doubleclick)", myFont, johnBrush, (int)Bounds.Location.X + Bounds.Width+10, (int)Bounds.Location.Y+22, format);
+                graphics.DrawString("(doubleclick icon)", myFont, johnBrush, (int)Bounds.Location.X + Bounds.Width+10, (int)Bounds.Location.Y+32, format);
                 
             }
         }

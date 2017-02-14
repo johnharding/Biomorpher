@@ -42,12 +42,11 @@ namespace Biomorpher
         {
             pm.AddNumberParameter("Sliders", "Sliders", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here - currently only meshes", GH_ParamAccess.list);
-            pm.AddNumberParameter("Performs", "Performs", "List of performance measures for the design", GH_ParamAccess.list);
-            //TODO: Measures.. input 'performance measures' 
-            //TODO: Labels.. input string for external quantitative measures
+            pm.AddNumberParameter("Performas", "Performas", "List of performance measures for the design", GH_ParamAccess.list);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
+            pm[2].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].Optional = true;
             //pm[3].Optional = true;
         }
@@ -82,6 +81,8 @@ namespace Biomorpher
         /// </summary>
         public void GetSliders(List<GH_NumberSlider> sliders)
         {
+            //TODO: Get Gene Pools too
+
             foreach (IGH_Param param in this.Params.Input[0].Sources)
             {
                 Grasshopper.Kernel.Special.GH_NumberSlider slider = param as Grasshopper.Kernel.Special.GH_NumberSlider;
@@ -130,7 +131,7 @@ namespace Biomorpher
                     localObjs.Add(myObj);
                 }
             }
-            
+
             // Get only mesh geometry from the object list
             Mesh joinedMesh = new Mesh();
 
@@ -153,8 +154,23 @@ namespace Biomorpher
             List<Mesh> allGeometry = new List<Mesh>();
             allGeometry.Add(joinedMesh);
 
+
+
+            // Get performance data
+            List<double> performas = new List<double>();
+            foreach (IGH_Param param in Params.Input[2].Sources)
+            {
+                foreach (Object myObj in param.VolatileData.AllData(true))
+                {
+                    if (myObj is double)
+                    {
+                        performas.Add((double)myObj);
+                    }
+                }
+            }
+
             // Set the phenotype within the chromosome class
-            chromo.SetPhenotype(allGeometry);
+            chromo.SetPhenotype(allGeometry, performas);
         }
 
 
@@ -181,7 +197,7 @@ namespace Biomorpher
         {
             get
             {
-                return Properties.Resources.BiomorpherIcon_24;
+                return Properties.Resources.BiomorpherIcon2_24;
             }
         }
 
@@ -192,6 +208,8 @@ namespace Biomorpher
             Menu_AppendItem(menu, @"No Sliders", RemoveAllSliders);
             Menu_AppendItem(menu, @"Github source", GotoGithub);
         }
+
+       
 
         private void GotoGithub(Object sender, EventArgs e)
         {

@@ -365,6 +365,7 @@ namespace Biomorpher
                 Grid.SetRow(border, (int)(i / columnCount));
                 Grid.SetColumn(border, i % columnCount);
                 grid.Children.Add(border);
+
             }
 
 

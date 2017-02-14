@@ -8,8 +8,6 @@ namespace Biomorpher.IGA
 {
     class Population
     {
-        // the current generation
-        int generation;
 
         // List of sliders
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> popSliders;
@@ -20,8 +18,6 @@ namespace Biomorpher.IGA
         // IDs of (12) cluster representatives
         private List<int> clusterIDs {get; set;}
 
-        // TODO: Store the geometry phenotype here
-
         /// <summary>
         /// Construct a new population of chromosomes
         /// </summary>
@@ -29,7 +25,6 @@ namespace Biomorpher.IGA
         public Population(int popSize, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
         {
             chromosomes = new Chromosome[popSize];
-            generation = 0;
             popSliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>(sliders);
             GenerateRandomPop();
         }

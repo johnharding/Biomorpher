@@ -11,10 +11,6 @@ namespace Biomorpher.IGA
     /// </summary>
     class PopHistory
     {
-        /// <summary>
-        /// number of historic populations
-        /// </summary>
-        private int generations;
 
         /// <summary>
         /// Stores population at each generation

@@ -125,15 +125,25 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
+        /// Returns a list of performance values
+        /// </summary>
+        /// <returns></returns>
+        public List<double> GetPerformas()
+        {
+            return performance;
+        }
+
+        /// <summary>
         /// Sets the phenotype for this chromosome with some input geometry
         /// </summary>
         /// <param name="meshes"></param>
-        public void SetPhenotype(List<Mesh> meshes)
+        public void SetPhenotype(List<Mesh> meshes, List<double> performas)
         {
             // Reset the phenotype to some input meshes
             // TODO: in the future this should be generic geometry including curves, etc.
             //       the argument for this method will have to be updated also.
             phenotype = new List<Mesh>(meshes);
+            performance = new List<double>(performas);
 
             // TODO: Update performance criteria in this method.
         }
