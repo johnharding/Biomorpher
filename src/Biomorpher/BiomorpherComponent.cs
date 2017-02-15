@@ -252,10 +252,9 @@ namespace Biomorpher
 			        IGH_DocumentObject current = enumerator.Current;
 			        if (current != null)
 			        {
-				        if (current is GH_NumberSlider)
+                        if (current is GH_NumberSlider)
 				        {
                             this.Params.Input[0].AddSource((IGH_Param)current, 0);
-
 				        }
 			        }
 		        }
