@@ -34,21 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GeneticSharp.Domain, Version=1.0.5894.2743, Culture=neutral, PublicKeyToken=d63d2a65268366c6, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.1.0.100\lib\net35\GeneticSharp.Domain.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="GeneticSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f24c5e2578f0ecff, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.1.0.100\lib\net35\GeneticSharp.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="GeneticSharp.Infrastructure.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f24c5e2578f0ecff, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.1.0.100\lib\net35\GeneticSharp.Infrastructure.Framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="GeneticSharp.Infrastructure.Threading, Version=1.0.5894.2743, Culture=neutral, PublicKeyToken=f24c5e2578f0ecff, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.1.0.100\lib\net35\GeneticSharp.Infrastructure.Threading.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="GalapagosLibrary">
+      <HintPath>..\..\lib\GalapagosLibrary.dll</HintPath>
     </Reference>
     <Reference Include="GH_IO">
       <HintPath>..\..\lib\GH_IO.dll</HintPath>

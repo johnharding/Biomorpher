@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Biomorpher.IGA;
+using Grasshopper.Kernel.Special;
+using GalapagosComponents;
+
 
 namespace Biomorpher.IGA
 {
@@ -18,6 +21,7 @@ namespace Biomorpher.IGA
         // Normalised values used in the chromosome
         private double[] genes;
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> chromoSliders;
+        private List<GalapagosComponents.GalapagosGeneListObject> chromoGenePools;
 
         // Actual slider values.. 
         private double[] realgenes;
@@ -30,11 +34,19 @@ namespace Biomorpher.IGA
         /// </summary>
         /// <param name="newLength"></param>
         /// <param name="randSeed"></param>
-        public Chromosome(int geneCount, List<Grasshopper.Kernel.Special.GH_NumberSlider> s)
+        public Chromosome(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
-            chromoSliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>(s);
-            genes = new double[geneCount];
-            realgenes = new double[geneCount];
+            chromoSliders = new List<GH_NumberSlider>(sliders);
+            chromoGenePools = new List<GalapagosGeneListObject>(genePools);
+
+            int GenePoolCounter = 0;
+            for (int i = 0; i < chromoGenePools.Count; i++)
+            {
+                GenePoolCounter += chromoGenePools[i].Count;
+            }
+
+            genes = new double[chromoSliders.Count + GenePoolCounter];
+            realgenes = new double[chromoSliders.Count + GenePoolCounter];
             fitness = 0.0;
         }
 
@@ -53,13 +65,19 @@ namespace Biomorpher.IGA
 
         public void UpdateRealGenes()
         {
-            for (int i = 0; i < genes.Length; i++)
+            for (int i = 0; i < chromoSliders.Count; i++)
             {
                 double sliderMin = (double) chromoSliders[i].Slider.Minimum;
                 double sliderMax = (double) chromoSliders[i].Slider.Maximum;
 
                 realgenes[i] = genes[i] * (sliderMax - sliderMin) + sliderMin;
             }
+
+            for (int i = 0; i < chromoGenePools.Count; i++)
+            {
+
+            }
+
 
         }
 
@@ -74,7 +92,7 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public Chromosome Clone()
         {
-            Chromosome clone = new Chromosome(this.genes.Length, this.chromoSliders); // Pass the original slider
+            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools); // Pass the original slider
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
             clone.fitness = this.fitness;

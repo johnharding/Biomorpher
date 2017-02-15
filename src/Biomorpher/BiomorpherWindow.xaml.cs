@@ -19,6 +19,8 @@ using Grasshopper.Kernel;
 using MahApps.Metro.Controls;
 using System.Windows.Controls.Primitives;
 using System.ComponentModel;
+using Grasshopper.Kernel.Special;
+using GalapagosComponents;
 
 namespace Biomorpher
 {
@@ -31,7 +33,8 @@ namespace Biomorpher
         private bool GO;
         private Population population;
         private PopHistory popHistory;
-        private List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders;
+        private List<GH_NumberSlider> sliders;
+        private List<GalapagosGeneListObject> genePools;
         private BiomorpherComponent owner;
 
         private double[] sliderValuesMin;
@@ -108,18 +111,18 @@ namespace Biomorpher
         int margin_h;
 
 
-
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
         {
             // Set the component passed here to a field
             owner = Owner;
 
-            // Get sliders
-            sliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>();
-            owner.GetSliders(sliders);
+            // Get sliders and gene pools
+            sliders = new List<GH_NumberSlider>();
+            genePools = new List<GalapagosGeneListObject>();
+            owner.GetSliders(sliders, genePools);
 
-            //Extract slider info
+            // Extract slider info
             sliderValuesMin = new double[sliders.Count];
             sliderValuesMax = new double[sliders.Count];
             sliderNames = new string[sliders.Count];
@@ -159,7 +162,7 @@ namespace Biomorpher
             for (int i = 0; i < population.chromosomes.Length; i++)
             {
                 owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
-                owner.SetSliders(population.chromosomes[i], sliders);   // Change the sliders
+                owner.SetSliders(population.chromosomes[i], sliders, genePools);   // Change the sliders
                 owner.canvas.Document.Enabled = true;                   // Enable the solver again
                 owner.ExpireSolution(true);                             // Now expire the main component and recompute
                 owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
@@ -175,7 +178,7 @@ namespace Biomorpher
             popHistory = new PopHistory();
 
             // 2. Create initial population and add to history
-            population = new Population(popSize, sliders);
+            population = new Population(popSize, sliders, genePools);
             popHistory.AddPop(population);
 
             // 3. Get geometry for each chromosome
@@ -511,7 +514,8 @@ namespace Biomorpher
             double[] realGenes = pop.chromosomes[chromoID].GetRealGenes();
             double fitness = pop.chromosomes[chromoID].GetFitness();
 
-            for (int i=0; i<realGenes.Length; i++)
+            // Just the sliders, not gene pool
+            for (int i=0; i<sliders.Count; i++)
             {
                 string controlName = "tab2_s_gene" + i;
                 DockPanel dp_sliderG = createSlider(sliderNames[i], controlName, sliderValuesMin[i], sliderValuesMax[i], realGenes[i], false);
@@ -545,7 +549,7 @@ namespace Biomorpher
             double[] realGenes = pop.chromosomes[chromoID].GetRealGenes();
             double fitness = pop.chromosomes[chromoID].GetFitness();
 
-            for (int i = 0; i < realGenes.Length; i++)
+            for (int i = 0; i < sliders.Count; i++)
             {
                 string controlName = "tab2_s_gene" + i;
                 Slider sliderG = (Slider) controls[controlName];

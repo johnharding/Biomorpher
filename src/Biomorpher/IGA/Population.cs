@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Grasshopper.Kernel.Special;
+using GalapagosComponents;
 
 namespace Biomorpher.IGA
 {
@@ -10,7 +12,8 @@ namespace Biomorpher.IGA
     {
 
         // List of sliders
-        private List<Grasshopper.Kernel.Special.GH_NumberSlider> popSliders;
+        private List<GH_NumberSlider> popSliders;
+        private List<GalapagosGeneListObject> popGenePools;
         
         // the population of chromosomes
         public Chromosome[] chromosomes {get; set;}
@@ -22,10 +25,11 @@ namespace Biomorpher.IGA
         /// Construct a new population of chromosomes
         /// </summary>
         /// <param name="popSize"></param>
-        public Population(int popSize, List<Grasshopper.Kernel.Special.GH_NumberSlider> sliders)
+        public Population(int popSize, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             chromosomes = new Chromosome[popSize];
-            popSliders = new List<Grasshopper.Kernel.Special.GH_NumberSlider>(sliders);
+            popSliders = new List<GH_NumberSlider>(sliders);
+            popGenePools = new List<GalapagosGeneListObject>(genePools);
             GenerateRandomPop();
         }
 
@@ -40,7 +44,9 @@ namespace Biomorpher.IGA
 
             // clone the chromosomes
             for(int i=0; i<chromosomes.Length; i++)
+            {
                 chromosomes[i] = pop.chromosomes[i].Clone();
+            }
         }
 
         /// <summary>
@@ -51,7 +57,7 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome(popSliders.Count, popSliders);
+                chromosomes[i] = new Chromosome(popSliders, popGenePools);
                 chromosomes[i].GenerateRandomGenes();
             }
         }
@@ -67,7 +73,7 @@ namespace Biomorpher.IGA
 
             // Set up a fresh population  
             // TODO: Do we have to calculate new geometry for everything? Why not have flags if GetGeometry() needs to be called
-            Population newPop = new Population(this.chromosomes.Length, popSliders);
+            Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools);
 
             // find the total fitness
             for (int i = 0; i < chromosomes.Length; i++)

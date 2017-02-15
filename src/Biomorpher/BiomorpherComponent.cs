@@ -12,12 +12,12 @@ using System.Drawing;
 using Rhino.Geometry;
 using Biomorpher.IGA;
 using Grasshopper.Kernel.Special;
+using GalapagosComponents;
 
 namespace Biomorpher
 {
     public class BiomorpherComponent : GH_Component
     {
-
         public Grasshopper.GUI.Canvas.GH_Canvas canvas; 
         public bool GO = false;
         private IGH_DataAccess deej;
@@ -79,7 +79,7 @@ namespace Biomorpher
         /// <summary>
         /// Gets the current sliders in Input[0]
         /// </summary>
-        public void GetSliders(List<GH_NumberSlider> sliders)
+        public void GetSliders(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             //TODO: Get Gene Pools too
 
@@ -90,24 +90,50 @@ namespace Biomorpher
                 {
                     sliders.Add(slider);
                 }
+
+                GalapagosGeneListObject genepool = param as GalapagosGeneListObject;
+                if (genepool != null)
+                {
+                    genePools.Add(genepool);
+                }
+
             }
+
         }
 
         /// <summary>
         /// Sets the current slider values for a geven input chromosome
         /// </summary>
         /// <param name="chromo"></param>
-        public void SetSliders(Chromosome chromo, List<GH_NumberSlider> sliders)
+        public void SetSliders(Chromosome chromo, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             double[] genes = chromo.GetGenes();
- 
-            for (int i = 0; i < sliders.Count; i++)
+            int sCount = sliders.Count;
+
+            for (int i = 0; i < sCount; i++)
             {
                 double min = (double)sliders[i].Slider.Minimum;
                 double max = (double)sliders[i].Slider.Maximum;
                 double range = max - min;
 
                 sliders[i].Slider.Value = (decimal)(genes[i] * range + min);
+            }
+
+            // Set the gene pool values
+            // Note that we use the back end of the genes, beyond the slider count
+
+            int geneIndex = sCount;
+
+            for (int i = 0; i < genePools.Count; i++)
+            {
+                for (int j = 0; j < genePools[i].Count; j++)
+                {
+                    Decimal myDecimal = System.Convert.ToDecimal(genes[geneIndex]);
+                    genePools[i].set_NormalisedValue(j, myDecimal);
+
+                    geneIndex++;
+                }
+                genePools[i].ExpireSolution(false);
             }
         }
 
