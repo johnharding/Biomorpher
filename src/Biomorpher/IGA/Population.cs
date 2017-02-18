@@ -132,5 +132,234 @@ namespace Biomorpher.IGA
         }
 
 
+        //----------------------------------------------------------------- K-MEANS --------------------------------------------------------------//
+
+        //K-Means clustering of the chromosomes in this population
+        public void KMeansClustering(int numClusters)
+        {
+            //Initiliase clustering
+            initClustering(numClusters);
+
+            //Loop
+            bool go = true;
+            int count = 0;
+            int maxIter = 50;
+
+            while(go && count < maxIter)
+            {
+                //Calculate mean vectors based on current clustering
+                double[][] clusterMeanVectors = calcClusterMeans(numClusters);
+
+                //Update clustering
+                go = updateClustering(numClusters, clusterMeanVectors);
+
+                count++;
+            }
+
+            //Update chromosome info
+            calcKMeansRepresentatives(numClusters);
+        }
+
+
+        //Initialise random clustering (but ensure at least one chromosome in each cluster)
+        public void initClustering(int numClusters)
+        {
+            int seed = 0;
+            Random rnd = new Random(seed);
+
+            for(int i=0; i<numClusters; i++)
+            {
+                chromosomes[i].clusterId = i;
+            }
+
+            for (int i = numClusters; i < chromosomes.Length; i++)
+            {
+                chromosomes[i].clusterId = rnd.Next(0, numClusters);
+            }
+        }
+
+
+        //Calculate cluster mean vectors (same length as genes)
+        public double[][] calcClusterMeans(int numClusters)
+        {
+            int numGenes = chromosomes[0].GetGenes().Length;
+
+            //Initialise arrays
+            double[][] clusterMeanVectors = new double[numClusters][];
+            
+            for (int i=0; i<numClusters; i++)
+            {
+                clusterMeanVectors[i] = new double[numGenes];
+
+                for (int j = 0; j < numGenes; j++)
+                {
+                    clusterMeanVectors[i][j] = 0.0;
+                }
+            }
+
+            //Run through all the chromosomes
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                // get chromosome genes and sum each component
+                double[] genes = chromosomes[i].GetGenes();
+                for(int j=0; j<numGenes; j++)
+                {
+                    clusterMeanVectors[chromosomes[i].clusterId][j] += genes[j];
+                }
+            }
+
+            //Calculate average
+            int[] clusterCounts = calcClusterSizes(numClusters);
+
+            for (int i = 0; i < numClusters; i++)
+            {
+                for (int j = 0; j < numGenes; j++)
+                {
+                    clusterMeanVectors[i][j] /= clusterCounts[i];
+                }
+            }
+
+            return clusterMeanVectors;
+        }
+
+
+        //Calculate Euclidean distance between two n-dimensional vectors
+        public double calcDistance(double[] genes, double[] mean)
+        {
+            double dist = 0.0;
+
+            for(int i=0; i<genes.Length; i++)
+            {
+                dist += Math.Pow((genes[i] - mean[i]), 2);
+            }
+
+            return Math.Sqrt(dist);
+        }
+
+
+        //Identify clusterId by finding the index of the smallest distance
+        public int identifyClusterId(double[] distances)
+        {
+            int index = 0;
+            double distMin = distances[0];
+
+            for(int i=0; i<distances.Length; i++)
+            {
+                if(distances[i] < distMin)
+                {
+                    distMin = distances[i];
+                    index = i;
+                }
+            }
+
+            return index;
+        }
+
+        //Count the number of members in each cluster
+        public int[] calcClusterSizes(int numClusters)
+        {
+            int[] clusterCounts = new int[numClusters];
+            for (int i = 0; i < numClusters; i++)
+            {
+                clusterCounts[i] = 0;
+            }
+
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                clusterCounts[chromosomes[i].clusterId]++;
+            }
+
+            return clusterCounts;
+        }
+
+
+        //Update clustering by calculating the distance between the chromosome genes and the mean vectors for each cluster
+        public bool updateClustering(int numClusters, double[][] clusterMeanVectors)
+        {
+            bool go = true;
+            bool hasChanged = false;
+            bool hasZeroMembers = false;
+
+            //Run through all the chromosomes and compare its genes to all the mean vectors
+            for (int i=0; i<chromosomes.Length; i++)
+            {
+                double[] distances = new double[numClusters];
+
+                //Run through the clusters in order to compare to each mean vector
+                for(int j=0; j<numClusters; j++)
+                {
+                    distances[j] = calcDistance(chromosomes[i].GetGenes(), clusterMeanVectors[j]);
+                }
+
+                int newClusterId = identifyClusterId(distances);
+
+                //Update clusterId for chromosome
+                if (chromosomes[i].clusterId != newClusterId)
+                {
+                    chromosomes[i].clusterId = newClusterId;
+                    hasChanged = true;
+                }
+            }
+
+            //Check that each new cluster contains at least one chromosome
+            int[] clusterCounts = calcClusterSizes(numClusters);
+
+            for (int i=0; i<clusterCounts.Length; i++)
+            {
+                if (clusterCounts[i] == 0)
+                {
+                    hasZeroMembers = true;
+                }
+            }
+
+            //Check whether the cluster loop shall continue or not
+            if(!hasChanged || hasZeroMembers)
+            {
+                go = false;
+            }
+
+            return go;
+        }
+
+
+
+        //Update chromosome representatives and cluster distances after k-means clustering
+        public void calcKMeansRepresentatives(int numClusters)
+        {
+            double[][] clusterMeanVectors = calcClusterMeans(numClusters);
+
+            //Initialise lists
+            List<double>[] distances = new List<double>[numClusters];
+            List<int>[] distanceIndexes = new List<int>[numClusters];
+
+            //Run through each chromosome
+            for (int i=0; i<chromosomes.Length; i++)
+            {
+                distances[chromosomes[i].clusterId].Add(calcDistance(chromosomes[i].GetGenes(), clusterMeanVectors[chromosomes[i].clusterId]));
+                distanceIndexes[chromosomes[i].clusterId].Add(i);
+            }
+
+            //Find the chromosome in each cluster with the smallest distance to the cluster mean
+            int[] chromoRepresentatives = new int[numClusters];
+            for(int i=0; i<numClusters; i++)
+            {
+                double minDist = distances[i].Min();
+                int indexOfMin = distances[i].IndexOf(minDist);
+                int chromoRepId = distanceIndexes[i][indexOfMin];
+
+                chromosomes[chromoRepId].isRepresentative = true;
+                chromoRepresentatives[i] = chromoRepId;
+            }
+
+            //Calculate the distance between a chromosome and the chromosome closest to the cluster mean
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                int closestToMean = chromoRepresentatives[chromosomes[i].clusterId];
+                chromosomes[i].distToRepresentative = calcDistance(chromosomes[i].GetGenes(), chromosomes[closestToMean].GetGenes());
+            }
+        }
+
+
+
     }
 }

@@ -29,6 +29,11 @@ namespace Biomorpher.IGA
         // Fitness used for elitism selection
         private double fitness {get; set;}
 
+        //k-means
+        public bool isRepresentative;
+        public int clusterId;
+        public double distToRepresentative;
+
         /// <summary>
         /// Main chromosome constructor
         /// </summary>
@@ -48,6 +53,10 @@ namespace Biomorpher.IGA
             genes = new double[chromoSliders.Count + GenePoolCounter];
             realgenes = new double[chromoSliders.Count + GenePoolCounter];
             fitness = 0.0;
+
+            isRepresentative = false;
+            clusterId = -1;
+            distToRepresentative = -1.0;
         }
 
         public void GenerateRandomGenes()

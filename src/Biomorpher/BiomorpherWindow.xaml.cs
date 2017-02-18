@@ -177,14 +177,19 @@ namespace Biomorpher
             // 1. Initialise population history
             popHistory = new PopHistory();
 
-            // 2. Create initial population and add to history
+            // 2. Create initial population
             population = new Population(popSize, sliders, genePools);
-            popHistory.AddPop(population);
 
-            // 3. Get geometry for each chromosome
+            // 3. Perform K-means clustering
+            population.KMeansClustering(12);
+
+            // 4. Get geometry for each chromosome (To do: Only for representatives)
             GetPhenotypes();
 
-            // 4. Setup tab layout
+            // 5. Add population to history
+            popHistory.AddPop(population);
+
+            // 6. Setup tab layout
             tab2_primary_permanent();
             tab2_secondary_settings();
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
@@ -198,21 +203,23 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
-
             // 1. Create new populaltion using user selection
             population.RoulettePop();
 
             // 2. Mutate population using user preferences
             population.MutatePop(mutateProbability);
 
-            // 3. Get geometry for each chromosome
+            // 3. Perform K-means clustering
+            population.KMeansClustering(12);
+
+            // 4. Get geometry for each chromosome
             GetPhenotypes();
 
-            // 4. Display meshes
+            // 5. Display meshes
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);
 
-            // 5. Advance the generation counter and store the population historically.
+            // 6. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
             Generation++; 
         }
