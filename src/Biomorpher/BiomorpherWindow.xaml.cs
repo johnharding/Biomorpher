@@ -177,15 +177,23 @@ namespace Biomorpher
             // 1. Initialise population history
             popHistory = new PopHistory();
 
-            // 2. Create initial population and add to history
+            // 2. Create initial population
             population = new Population(popSize, sliders, genePools);
-            popHistory.AddPop(population);
 
-            // 3. Get geometry for each chromosome
+            // 3. Perform K-means clustering
+            population.KMeansClustering(12);
+
+            // 4. Get geometry for each chromosome (To do: Only for representatives)
             GetPhenotypes();
 
-            // 4. Setup tab layout
-            tab2_primary_permanent();
+            // 5. Add population to history
+            popHistory.AddPop(population);
+
+            // 6. Setup tab layout
+            tab12_primary_permanent(1);
+            tab1_primary_update();
+
+            tab12_primary_permanent(2);
             tab2_secondary_settings();
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);            
@@ -198,21 +206,25 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
-
             // 1. Create new populaltion using user selection
             population.RoulettePop();
 
             // 2. Mutate population using user preferences
             population.MutatePop(mutateProbability);
 
-            // 3. Get geometry for each chromosome
+            // 3. Perform K-means clustering
+            population.KMeansClustering(12);
+
+            // 4. Get geometry for each chromosome
             GetPhenotypes();
 
-            // 4. Display meshes
+            // 5. Display meshes
+            //tab1_primary_update();
+
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);
 
-            // 5. Advance the generation counter and store the population historically.
+            // 6. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
             Generation++; 
         }
@@ -249,6 +261,133 @@ namespace Biomorpher
 
 
         //-------------------------------------------------------------------------------TAB 1: START------------------------------------------------------------------------//
+
+        public void tab1_primary_update()
+        {
+            Color[] rgbs = new Color[12] {Color.FromArgb(255,192,255,255), Color.FromArgb(255,179,251,251), Color.FromArgb(255,132,235,235), Color.FromArgb(255,70,215,215), Color.FromArgb(255,18,198,198), Color.FromArgb(255,0,192,192), Color.FromArgb(255,7,182,189), Color.FromArgb(255,25,155,180), Color.FromArgb(255,51,116,167), Color.FromArgb(255,79,74,153), Color.FromArgb(255,104,36,140), Color.FromArgb(255,122,9,131)};
+
+            //Run through the 12 designs
+            for (int i = 0; i < 12; i++)
+            {
+                //Create canvas
+                SolidColorBrush brush = new SolidColorBrush();
+                brush.Color = rgbs[i];
+                Canvas canvas = createKMeansVisualisation(i, brush);
+
+                //The name of the control to add the canvas to
+                string dp_name = "dp_tab1_" + i;
+
+                //Get this control from the dictionary
+                DockPanel dp = (DockPanel) controls[dp_name];
+
+                //If there already is a canvas in the dockpanel then remove it
+                if (dp.Children.Count > 1)
+                {
+                    dp.Children.RemoveAt(dp.Children.Count - 1);
+                }
+
+                //Add the new canvas to the dockpanel
+                dp.Children.Add(canvas);
+            }
+        }
+
+
+        //Create canvas to visualise K-Means clustering
+        public Canvas createKMeansVisualisation(int clusterIndex, SolidColorBrush colour)
+        {
+            int width = 150;
+            int diameter = 10;
+
+            Canvas canvas = new Canvas();
+            canvas.Background = new SolidColorBrush(Colors.White);
+            //canvas.Width = width;
+            //canvas.Height = width;
+            string name = "canvas" + clusterIndex;
+            canvas.Name = name;
+            //canvas.HorizontalAlignment = HorizontalAlignment.Center;
+            //canvas.VerticalAlignment = VerticalAlignment.Center;
+
+
+            //Add outline circle
+            System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
+            outline.Height = width;
+            outline.Width = width;
+            outline.StrokeThickness = 1;
+            outline.Stroke = Brushes.LightGray;
+
+            Canvas.SetLeft(outline, 0);
+            Canvas.SetTop(outline, 0);
+            canvas.Children.Add(outline);
+
+
+            //Add chromosome dots
+            List<double> distances = new List<double>();
+            for(int i=0; i<population.chromosomes.Length; i++)
+            {
+                if(population.chromosomes[i].clusterId == clusterIndex)
+                {
+                    double d = Math.Abs(population.chromosomes[i].distToRepresentative);                //To do: remove abs when k-means work properly
+                    distances.Add(d);
+                }
+            }
+
+            int clusterItems = distances.Count;
+
+            //Map distances to width domain
+            double distMin = distances.Min();
+            double distMax = distances.Max();
+            double distRange = distMax - distMin;
+
+            List<double> distancesMapped = new List<double>();
+            for(int i=0; i<distances.Count; i++)
+            {
+                double d_normal = 1.0;
+                if(distRange != 0.0)
+                {
+                    d_normal = (distances[i] - distMin) / (distRange);
+                }
+                double d_map = d_normal * (width/2.0);
+                distancesMapped.Add(d_map);
+            }
+
+            //Create shapes and add to canvas
+            for(int i=0; i<clusterItems; i++)
+            {
+                //Circles
+                System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
+                circle.Height = diameter;
+                circle.Width = diameter;
+                circle.Fill = colour;
+
+                //Calculate angle
+                double angle = (2*Math.PI*i) / clusterItems;
+                double xCoord = distancesMapped[i] * Math.Cos(angle);
+                double yCoord = distancesMapped[i] * Math.Sin(angle);
+
+
+                //Lines
+                System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
+                ln.StrokeThickness = 1;
+                ln.Stroke = Brushes.LightGray;
+                ln.X1 = width / 2.0;
+                ln.Y1 = width / 2.0;
+                ln.X2 = (width / 2.0) + xCoord;
+                ln.Y2 = (width / 2.0) + yCoord;
+                canvas.Children.Add(ln);
+
+                //drawing order
+                Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0));
+                Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
+                canvas.Children.Add(circle);
+            }
+            
+            //Add canvas to control dictionary
+            controls.Add(name, canvas);
+
+            return canvas;
+        }
+
+
 
         public void tab1_secondary_settings()
         {
@@ -313,7 +452,7 @@ namespace Biomorpher
         //-------------------------------------------------------------------------------TAB 2: DESIGNS------------------------------------------------------------------------//
 
         //Create permanent grid layout with check boxes
-        public void tab2_primary_permanent()
+        public void tab12_primary_permanent(int tabIndex)
         {
             //Create grid 3x4 layout
             int rowCount = 3;
@@ -333,19 +472,11 @@ namespace Biomorpher
 
                 //Master Dock panel
                 DockPanel dp = new DockPanel();
-                string dp_name = "dp_tab2_" + i;
+                string dp_name = "dp_tab" + tabIndex + "_" + i;
                 dp.Name = dp_name;
 
                 //Sub Dock panel
                 DockPanel dp_sub = new DockPanel();
-
-                //Create checkbox with an event handler
-                string cb_name = "cb_tab2_" + i;
-                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
-                cb.HorizontalAlignment = HorizontalAlignment.Right;
-
-                DockPanel.SetDock(cb, Dock.Right);
-                dp_sub.Children.Add(cb);
 
                 //Label
                 Label l = new Label();
@@ -353,8 +484,18 @@ namespace Biomorpher
                 l.FontSize = fontsize;
                 l.Foreground = Brushes.LightGray;
                 l.HorizontalAlignment = HorizontalAlignment.Left;
+                DockPanel.SetDock(l, Dock.Left);
                 dp_sub.Children.Add(l);
 
+                if(tabIndex == 2)
+                {
+                    //Create checkbox with an event handler
+                    string cb_name = "cb_tab2_" + i;
+                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
+                    cb.HorizontalAlignment = HorizontalAlignment.Right;
+                    dp_sub.Children.Add(cb);
+                }
+                
                 DockPanel.SetDock(dp_sub, Dock.Top);
                 dp.Children.Add(dp_sub);
 
@@ -368,12 +509,18 @@ namespace Biomorpher
                 Grid.SetRow(border, (int)(i / columnCount));
                 Grid.SetColumn(border, i % columnCount);
                 grid.Children.Add(border);
-
             }
 
 
-            //Add the grid to the primary area of Tab 2
-            Tab2_primary.Child = grid;
+            //Add the grid to the primary area of Tab 1 or 2
+            if(tabIndex == 1)
+            {
+                Tab1_primary.Child = grid;
+            }
+            else
+            {
+                Tab2_primary.Child = grid;
+            }
         }
 
 
@@ -709,6 +856,7 @@ namespace Biomorpher
 
             return dp;
         }
+
 
 
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
