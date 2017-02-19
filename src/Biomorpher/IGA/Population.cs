@@ -139,7 +139,7 @@ namespace Biomorpher.IGA
         {
             //Initiliase clustering
             initClustering(numClusters);
- 
+            /*
             //Loop
             bool go = true;
             int count = 0;
@@ -157,7 +157,8 @@ namespace Biomorpher.IGA
             }
 
             //Update chromosome info
-            calcKMeansRepresentatives(numClusters);  
+            calcKMeansRepresentatives(numClusters); 
+            */
         }
 
 

@@ -191,6 +191,7 @@ namespace Biomorpher
 
             // 6. Setup tab layout
             tab12_primary_permanent(1);
+            tab1_primary_update();
 
             tab12_primary_permanent(2);
             tab2_secondary_settings();
@@ -218,6 +219,8 @@ namespace Biomorpher
             GetPhenotypes();
 
             // 5. Display meshes
+            //tab1_primary_update();
+
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);
 
@@ -258,6 +261,133 @@ namespace Biomorpher
 
 
         //-------------------------------------------------------------------------------TAB 1: START------------------------------------------------------------------------//
+
+        public void tab1_primary_update()
+        {
+            Color[] rgbs = new Color[12] {Color.FromArgb(255,192,255,255), Color.FromArgb(255,179,251,251), Color.FromArgb(255,132,235,235), Color.FromArgb(255,70,215,215), Color.FromArgb(255,18,198,198), Color.FromArgb(255,0,192,192), Color.FromArgb(255,7,182,189), Color.FromArgb(255,25,155,180), Color.FromArgb(255,51,116,167), Color.FromArgb(255,79,74,153), Color.FromArgb(255,104,36,140), Color.FromArgb(255,122,9,131)};
+
+            //Run through the 12 designs
+            for (int i = 0; i < 12; i++)
+            {
+                //Create canvas
+                SolidColorBrush brush = new SolidColorBrush();
+                brush.Color = rgbs[i];
+                Canvas canvas = createKMeansVisualisation(i, brush);
+
+                //The name of the control to add the canvas to
+                string dp_name = "dp_tab1_" + i;
+
+                //Get this control from the dictionary
+                DockPanel dp = (DockPanel) controls[dp_name];
+
+                //If there already is a canvas in the dockpanel then remove it
+                if (dp.Children.Count > 1)
+                {
+                    dp.Children.RemoveAt(dp.Children.Count - 1);
+                }
+
+                //Add the new canvas to the dockpanel
+                dp.Children.Add(canvas);
+            }
+        }
+
+
+        //Create canvas to visualise K-Means clustering
+        public Canvas createKMeansVisualisation(int clusterIndex, SolidColorBrush colour)
+        {
+            int width = 150;
+            int diameter = 10;
+
+            Canvas canvas = new Canvas();
+            canvas.Background = new SolidColorBrush(Colors.White);
+            //canvas.Width = width;
+            //canvas.Height = width;
+            string name = "canvas" + clusterIndex;
+            canvas.Name = name;
+            //canvas.HorizontalAlignment = HorizontalAlignment.Center;
+            //canvas.VerticalAlignment = VerticalAlignment.Center;
+
+
+            //Add outline circle
+            System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
+            outline.Height = width;
+            outline.Width = width;
+            outline.StrokeThickness = 1;
+            outline.Stroke = Brushes.LightGray;
+
+            Canvas.SetLeft(outline, 0);
+            Canvas.SetTop(outline, 0);
+            canvas.Children.Add(outline);
+
+
+            //Add chromosome dots
+            List<double> distances = new List<double>();
+            for(int i=0; i<population.chromosomes.Length; i++)
+            {
+                if(population.chromosomes[i].clusterId == clusterIndex)
+                {
+                    double d = Math.Abs(population.chromosomes[i].distToRepresentative);                //To do: remove abs when k-means work properly
+                    distances.Add(d);
+                }
+            }
+
+            int clusterItems = distances.Count;
+
+            //Map distances to width domain
+            double distMin = distances.Min();
+            double distMax = distances.Max();
+            double distRange = distMax - distMin;
+
+            List<double> distancesMapped = new List<double>();
+            for(int i=0; i<distances.Count; i++)
+            {
+                double d_normal = 1.0;
+                if(distRange != 0.0)
+                {
+                    d_normal = (distances[i] - distMin) / (distRange);
+                }
+                double d_map = d_normal * (width/2.0);
+                distancesMapped.Add(d_map);
+            }
+
+            //Create shapes and add to canvas
+            for(int i=0; i<clusterItems; i++)
+            {
+                //Circles
+                System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
+                circle.Height = diameter;
+                circle.Width = diameter;
+                circle.Fill = colour;
+
+                //Calculate angle
+                double angle = (2*Math.PI*i) / clusterItems;
+                double xCoord = distancesMapped[i] * Math.Cos(angle);
+                double yCoord = distancesMapped[i] * Math.Sin(angle);
+
+
+                //Lines
+                System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
+                ln.StrokeThickness = 1;
+                ln.Stroke = Brushes.LightGray;
+                ln.X1 = width / 2.0;
+                ln.Y1 = width / 2.0;
+                ln.X2 = (width / 2.0) + xCoord;
+                ln.Y2 = (width / 2.0) + yCoord;
+                canvas.Children.Add(ln);
+
+                //drawing order
+                Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0));
+                Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
+                canvas.Children.Add(circle);
+            }
+            
+            //Add canvas to control dictionary
+            controls.Add(name, canvas);
+
+            return canvas;
+        }
+
+
 
         public void tab1_secondary_settings()
         {
@@ -726,6 +856,7 @@ namespace Biomorpher
 
             return dp;
         }
+
 
 
         //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
