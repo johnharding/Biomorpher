@@ -190,7 +190,9 @@ namespace Biomorpher
             popHistory.AddPop(population);
 
             // 6. Setup tab layout
-            tab2_primary_permanent();
+            tab12_primary_permanent(1);
+
+            tab12_primary_permanent(2);
             tab2_secondary_settings();
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);            
@@ -320,7 +322,7 @@ namespace Biomorpher
         //-------------------------------------------------------------------------------TAB 2: DESIGNS------------------------------------------------------------------------//
 
         //Create permanent grid layout with check boxes
-        public void tab2_primary_permanent()
+        public void tab12_primary_permanent(int tabIndex)
         {
             //Create grid 3x4 layout
             int rowCount = 3;
@@ -340,19 +342,11 @@ namespace Biomorpher
 
                 //Master Dock panel
                 DockPanel dp = new DockPanel();
-                string dp_name = "dp_tab2_" + i;
+                string dp_name = "dp_tab" + tabIndex + "_" + i;
                 dp.Name = dp_name;
 
                 //Sub Dock panel
                 DockPanel dp_sub = new DockPanel();
-
-                //Create checkbox with an event handler
-                string cb_name = "cb_tab2_" + i;
-                CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
-                cb.HorizontalAlignment = HorizontalAlignment.Right;
-
-                DockPanel.SetDock(cb, Dock.Right);
-                dp_sub.Children.Add(cb);
 
                 //Label
                 Label l = new Label();
@@ -360,8 +354,18 @@ namespace Biomorpher
                 l.FontSize = fontsize;
                 l.Foreground = Brushes.LightGray;
                 l.HorizontalAlignment = HorizontalAlignment.Left;
+                DockPanel.SetDock(l, Dock.Left);
                 dp_sub.Children.Add(l);
 
+                if(tabIndex == 2)
+                {
+                    //Create checkbox with an event handler
+                    string cb_name = "cb_tab2_" + i;
+                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
+                    cb.HorizontalAlignment = HorizontalAlignment.Right;
+                    dp_sub.Children.Add(cb);
+                }
+                
                 DockPanel.SetDock(dp_sub, Dock.Top);
                 dp.Children.Add(dp_sub);
 
@@ -375,12 +379,18 @@ namespace Biomorpher
                 Grid.SetRow(border, (int)(i / columnCount));
                 Grid.SetColumn(border, i % columnCount);
                 grid.Children.Add(border);
-
             }
 
 
-            //Add the grid to the primary area of Tab 2
-            Tab2_primary.Child = grid;
+            //Add the grid to the primary area of Tab 1 or 2
+            if(tabIndex == 1)
+            {
+                Tab1_primary.Child = grid;
+            }
+            else
+            {
+                Tab2_primary.Child = grid;
+            }
         }
 
 
