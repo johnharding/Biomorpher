@@ -191,7 +191,7 @@ namespace Biomorpher
 
             // 6. Setup tab layout
             tab12_primary_permanent(1);
-            tab1_primary_update();
+            //tab1_primary_update();
 
             tab12_primary_permanent(2);
             tab2_secondary_settings();
