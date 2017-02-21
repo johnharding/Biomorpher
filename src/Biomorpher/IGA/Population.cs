@@ -14,12 +14,12 @@ namespace Biomorpher.IGA
         // List of sliders
         private List<GH_NumberSlider> popSliders;
         private List<GalapagosGeneListObject> popGenePools;
-        
+
         // the population of chromosomes
-        public Chromosome[] chromosomes {get; set;}
-        
+        public Chromosome[] chromosomes { get; set; }
+
         // IDs of (12) cluster representatives
-        private List<int> clusterIDs {get; set;}
+        private List<int> clusterIDs { get; set; }
 
         /// <summary>
         /// Construct a new population of chromosomes
@@ -43,7 +43,7 @@ namespace Biomorpher.IGA
             chromosomes = new Chromosome[pop.chromosomes.Length];
 
             // clone the chromosomes
-            for(int i=0; i<chromosomes.Length; i++)
+            for (int i = 0; i < chromosomes.Length; i++)
             {
                 chromosomes[i] = pop.chromosomes[i].Clone();
             }
@@ -84,7 +84,7 @@ namespace Biomorpher.IGA
             // Now for the roulette wheel selection for the new population
             for (int i = 0; i < newPop.chromosomes.Length; i++)
             {
-                double weightedRandom = Friends.GetRandomDouble()*totalFitness;
+                double weightedRandom = Friends.GetRandomDouble() * totalFitness;
                 fitSum = 0.0;
 
                 for (int j = 0; j < chromosomes.Length; j++)
@@ -97,7 +97,7 @@ namespace Biomorpher.IGA
                     }
                 }
             }
-            
+
             // Replace the current popultion of chromosomes with the newPop
             for (int i = 0; i < chromosomes.Length; i++)
             {
@@ -139,13 +139,13 @@ namespace Biomorpher.IGA
         {
             //Initiliase clustering
             initClustering(numClusters);
-            
+
             //Loop
             bool go = true;
             int count = 0;
             int maxIter = 20;
 
-            while(go && count < maxIter)
+            while (go && count < maxIter)
             {
                 //Calculate mean vectors based on current clustering
                 double[][] clusterMeanVectors = calcClusterMeans(numClusters);
@@ -156,10 +156,9 @@ namespace Biomorpher.IGA
                 count++;
             }
 
-            
             //Update chromosome info
-            calcKMeansRepresentatives(numClusters); 
-            
+            calcKMeansRepresentatives(numClusters);
+
         }
 
 
@@ -169,14 +168,15 @@ namespace Biomorpher.IGA
             int seed = 0;
             Random rnd = new Random(seed);
 
-            for(int i=0; i<numClusters; i++)
+            for (int i = 0; i < numClusters; i++)
             {
                 chromosomes[i].clusterId = i;
             }
 
             for (int i = numClusters; i < chromosomes.Length; i++)
             {
-                chromosomes[i].clusterId = rnd.Next(0, numClusters);
+                int r = rnd.Next(0, numClusters);
+                chromosomes[i].clusterId = r;
             }
         }
 
@@ -188,8 +188,8 @@ namespace Biomorpher.IGA
 
             //Initialise arrays
             double[][] clusterMeanVectors = new double[numClusters][];
-            
-            for (int i=0; i<numClusters; i++)
+
+            for (int i = 0; i < numClusters; i++)
             {
                 clusterMeanVectors[i] = new double[numGenes];
 
@@ -204,7 +204,7 @@ namespace Biomorpher.IGA
             {
                 // get chromosome genes and sum each component
                 double[] genes = chromosomes[i].GetGenes();
-                for(int j=0; j<numGenes; j++)
+                for (int j = 0; j < numGenes; j++)
                 {
                     clusterMeanVectors[chromosomes[i].clusterId][j] += genes[j];
                 }
@@ -230,7 +230,7 @@ namespace Biomorpher.IGA
         {
             double dist = 0.0;
 
-            for(int i=0; i<genes.Length; i++)
+            for (int i = 0; i < genes.Length; i++)
             {
                 dist += Math.Pow((genes[i] - mean[i]), 2);
             }
@@ -245,9 +245,9 @@ namespace Biomorpher.IGA
             int index = 0;
             double distMin = distances[0];
 
-            for(int i=0; i<distances.Length; i++)
+            for (int i = 0; i < distances.Length; i++)
             {
-                if(distances[i] < distMin)
+                if (distances[i] < distMin)
                 {
                     distMin = distances[i];
                     index = i;
@@ -282,40 +282,59 @@ namespace Biomorpher.IGA
             bool hasChanged = false;
             bool hasZeroMembers = false;
 
-            //Run through all the chromosomes and compare its genes to all the mean vectors
-            for (int i=0; i<chromosomes.Length; i++)
+            //Run through all the chromosomes and compare its genes to all the mean vectors. Store new temporary clusterIds
+            int[] tempClusterId = new int[chromosomes.Length];
+
+            for (int i = 0; i < chromosomes.Length; i++)
             {
                 double[] distances = new double[numClusters];
 
                 //Run through the clusters in order to compare to each mean vector
-                for(int j=0; j<numClusters; j++)
+                for (int j = 0; j < numClusters; j++)
                 {
                     distances[j] = calcDistance(chromosomes[i].GetGenes(), clusterMeanVectors[j]);
                 }
 
                 int newClusterId = identifyClusterId(distances);
+                tempClusterId[i] = newClusterId;
 
-                //Update clusterId for chromosome
                 if (chromosomes[i].clusterId != newClusterId)
                 {
-                    chromosomes[i].clusterId = newClusterId;
                     hasChanged = true;
                 }
             }
 
-            //Check that each new cluster contains at least one chromosome
-            int[] clusterCounts = calcClusterSizes(numClusters);
-
-            for (int i=0; i<clusterCounts.Length; i++)
+            //Check that each new cluster contains at least one chromosome before changing the clusterId property
+            int[] tempClusterCounts = new int[numClusters];
+            for (int i = 0; i < numClusters; i++)
             {
-                if (clusterCounts[i] == 0)
+                tempClusterCounts[i] = 0;
+            }
+
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                tempClusterCounts[tempClusterId[i]]++;
+            }
+
+            for (int i = 0; i < tempClusterCounts.Length; i++)
+            {
+                if (tempClusterCounts[i] == 0)
                 {
                     hasZeroMembers = true;
                 }
             }
 
+            //If no cluster has zero elements then update the chromosome clusterId property
+            if (!hasZeroMembers)
+            {
+                for (int i = 0; i < chromosomes.Length; i++)
+                {
+                    chromosomes[i].clusterId = tempClusterId[i];
+                }
+            }
+
             //Check whether the cluster loop shall continue or not
-            if(!hasChanged || hasZeroMembers)
+            if (!hasChanged || hasZeroMembers)
             {
                 go = false;
             }
@@ -328,31 +347,28 @@ namespace Biomorpher.IGA
         //Update chromosome representatives and cluster distances after k-means clustering
         public void calcKMeansRepresentatives(int numClusters)
         {
-            // Note: Why is this called again here?
             double[][] clusterMeanVectors = calcClusterMeans(numClusters);
 
             //Initialise lists
             List<double>[] distances = new List<double>[numClusters];
             List<int>[] distanceIndexes = new List<int>[numClusters];
 
-            for(int i=0; i<numClusters; i++)
+            for (int i = 0; i < numClusters; i++)
             {
                 distances[i] = new List<double>();
                 distanceIndexes[i] = new List<int>();
             }
 
             //Run through each chromosome
-            for (int i=0; i<chromosomes.Length; i++)
+            for (int i = 0; i < chromosomes.Length; i++)
             {
                 distances[chromosomes[i].clusterId].Add(calcDistance(chromosomes[i].GetGenes(), clusterMeanVectors[chromosomes[i].clusterId]));
                 distanceIndexes[chromosomes[i].clusterId].Add(i);
             }
-            
-            //DEBUG
-            
+
             //Find the chromosome in each cluster with the smallest distance to the cluster mean
             int[] chromoRepresentatives = new int[numClusters];
-            for(int i=0; i<numClusters; i++)
+            for (int i = 0; i < numClusters; i++)
             {
                 double minDist = distances[i].Min();
                 int indexOfMin = distances[i].IndexOf(minDist);
@@ -368,7 +384,7 @@ namespace Biomorpher.IGA
                 int closestToMean = chromoRepresentatives[chromosomes[i].clusterId];
                 chromosomes[i].distToRepresentative = calcDistance(chromosomes[i].GetGenes(), chromosomes[closestToMean].GetGenes());
             }
-               
+
         }
 
 
