@@ -139,7 +139,7 @@ namespace Biomorpher.IGA
         {
             //Initiliase clustering
             initClustering(numClusters);
-            /*
+            
             //Loop
             bool go = true;
             int count = 0;
@@ -156,9 +156,10 @@ namespace Biomorpher.IGA
                 count++;
             }
 
+            
             //Update chromosome info
             calcKMeansRepresentatives(numClusters); 
-            */
+            
         }
 
 
@@ -327,6 +328,7 @@ namespace Biomorpher.IGA
         //Update chromosome representatives and cluster distances after k-means clustering
         public void calcKMeansRepresentatives(int numClusters)
         {
+            // Note: Why is this called again here?
             double[][] clusterMeanVectors = calcClusterMeans(numClusters);
 
             //Initialise lists
@@ -347,7 +349,7 @@ namespace Biomorpher.IGA
             }
             
             //DEBUG
-            /*
+            
             //Find the chromosome in each cluster with the smallest distance to the cluster mean
             int[] chromoRepresentatives = new int[numClusters];
             for(int i=0; i<numClusters; i++)
@@ -366,7 +368,7 @@ namespace Biomorpher.IGA
                 int closestToMean = chromoRepresentatives[chromosomes[i].clusterId];
                 chromosomes[i].distToRepresentative = calcDistance(chromosomes[i].GetGenes(), chromosomes[closestToMean].GetGenes());
             }
-            */    
+               
         }
 
 
