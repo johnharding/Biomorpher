@@ -219,7 +219,7 @@ namespace Biomorpher
             GetPhenotypes();
 
             // 5. Display meshes
-            //tab1_primary_update();
+            tab1_primary_update();
 
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);
@@ -326,7 +326,7 @@ namespace Biomorpher
             {
                 if(population.chromosomes[i].clusterId == clusterIndex)
                 {
-                    double d = Math.Abs(population.chromosomes[i].distToRepresentative);                //To do: remove abs when k-means work properly
+                    double d = population.chromosomes[i].distToRepresentative;
                     distances.Add(d);
                 }
             }
@@ -341,7 +341,7 @@ namespace Biomorpher
             List<double> distancesMapped = new List<double>();
             for(int i=0; i<distances.Count; i++)
             {
-                double d_normal = 1.0;
+                double d_normal = 0.0;
                 if(distRange != 0.0)
                 {
                     d_normal = (distances[i] - distMin) / (distRange);
@@ -380,9 +380,6 @@ namespace Biomorpher
                 Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
                 canvas.Children.Add(circle);
             }
-            
-            //Add canvas to control dictionary
-            controls.Add(name, canvas);
 
             return canvas;
         }
