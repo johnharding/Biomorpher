@@ -6,7 +6,6 @@ As opposed to metaheuristic algorithms requiring an explicit objective function 
 This work is sponsored by the 2016/17 UWE VC Early Career Researcher Development Award and was initially inspired by Richard Dawkins' _Biomorphs_ from his 1986 book, The Blind Watchmaker: Why the Evidence of Evolution Reveals a Universe without Design.
 
 ##Dependencies
-* GeneticSharp:  https://github.com/giacomelli/GeneticSharp
 * HelixToolkit:  https://github.com/helix-toolkit
 * Mahapps.metro: http://mahapps.com/
 
