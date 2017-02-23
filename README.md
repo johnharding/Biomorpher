@@ -2,7 +2,7 @@
 Interactive Evolutionary Algorithms for Rhino Grasshopper.
 As opposed to metaheuristic algorithms requiring explicit objective functions (such as Galapagos), interactive evolutionary algorithms allow designers to engage with evolutionary development directly, forming a conversation with the machine. This allows for an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed!
 
-This work is sponsored by the 2016/17 UWE VC Early Career Researcher Development Award.
+This work is sponsored by the 2016/17 UWE VC Early Career Researcher Development Award. This project was initially inspired by Richard Dawkins' _Biomorphs_ from his 1986 book, The Blind Watchmaker: Why the Evidence of Evolution Reveals a Universe without Design.
 
 ##Dependencies
 * GeneticSharp:  https://github.com/giacomelli/GeneticSharp
