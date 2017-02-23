@@ -8,4 +8,6 @@ This work is sponsored by the 2016/17 UWE VC Early Career Researcher Development
 * Mahapps.metro: http://mahapps.com/
 
 ##Screenshots
+Screenshots of the application in development.
+
 ![Screenshot](biomorpher.png?raw=true "Screenshot")
