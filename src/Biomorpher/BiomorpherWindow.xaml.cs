@@ -161,11 +161,15 @@ namespace Biomorpher
             // Get geometry for each chromosome in the initial population
             for (int i = 0; i < population.chromosomes.Length; i++)
             {
-                owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
-                owner.SetSliders(population.chromosomes[i], sliders, genePools);   // Change the sliders
-                owner.canvas.Document.Enabled = true;                   // Enable the solver again
-                owner.ExpireSolution(true);                             // Now expire the main component and recompute
-                owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
+                if (population.chromosomes[i].isRepresentative)
+                {
+                    owner.canvas.Document.Enabled = false;                  // Disable the solver before tweaking sliders
+                    owner.SetSliders(population.chromosomes[i], sliders, genePools);   // Change the sliders
+                    owner.canvas.Document.Enabled = true;                   // Enable the solver again
+                    owner.SetComponentOut(population);
+                    owner.ExpireSolution(true);                             // Now expire the main component and recompute
+                    owner.GetGeometry(population.chromosomes[i]);           // Get the new geometry for this particular chromosome
+                }
             }
         }
 
@@ -197,6 +201,7 @@ namespace Biomorpher
             tab2_secondary_settings();
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);
+
         }
 
 
@@ -218,38 +223,37 @@ namespace Biomorpher
             // 4. Get geometry for each chromosome
             GetPhenotypes();
 
-            // 5. Display meshes
+            // 5. Display meshes and update windows
             tab1_primary_update();
-
             List<Mesh> popMeshes = getRepresentativePhenotypes(population);
             tab2_primary_update(popMeshes);
 
             // 6. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
             Generation++;
+
         }
 
 
         public void Exit()
         {
-            // To do: Set sliders and get geometry for a chosen chromosome
+            // TODO: Set sliders and get geometry for a chosen chromosome
 
 
             // Close the window
             this.Close();
         }
 
-
-
-        //To do: change to get centroids from K-means clustering (or 'closest to centroid')
+        //Get representative meshes
         private List<Mesh> getRepresentativePhenotypes(Population pop)
         {
             List<Mesh> phenotypes = new List<Mesh>();
 
             Chromosome[] chromosomes = pop.chromosomes;
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < chromosomes.Length; i++)
             {
-                phenotypes.Add(chromosomes[i].phenotype[0]);
+                if(chromosomes[i].isRepresentative)
+                    phenotypes.Add(chromosomes[i].phenotype[0]);
             }
 
             return phenotypes;
@@ -912,7 +916,15 @@ namespace Biomorpher
                 ParentCount++;
 
                 if (checkbox.Tag != null)
-                    population.chromosomes[(int)checkbox.Tag].SetFitness(1.0);
+                {
+                    // Cycle through the population. Tag any with this cluterId)
+                    int ID = (int)checkbox.Tag;
+                    foreach (Chromosome chromo in population.chromosomes)
+                    {
+                        if (chromo.clusterId == ID)
+                            chromo.SetFitness(1.0);
+                    }
+                }
 
             }
             else
@@ -920,7 +932,15 @@ namespace Biomorpher
                 ParentCount--;
 
                 if (checkbox.Tag != null)
-                    population.chromosomes[(int)checkbox.Tag].SetFitness(0.0);
+                {
+                    // Cycle through the population. Tag any with this cluterId)
+                    int ID = (int)checkbox.Tag;
+                    foreach (Chromosome chromo in population.chromosomes)
+                    {
+                        if (chromo.clusterId == ID)
+                            chromo.SetFitness(0.0);
+                    }
+                }
 
             }
 

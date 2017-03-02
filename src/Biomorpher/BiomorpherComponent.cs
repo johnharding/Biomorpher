@@ -13,6 +13,7 @@ using Rhino.Geometry;
 using Biomorpher.IGA;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
+using Grasshopper.Kernel.Data;
 
 namespace Biomorpher
 {
@@ -22,6 +23,7 @@ namespace Biomorpher
         public bool GO = false;
         private IGH_DataAccess deej;
         private int solveinstanceCounter;
+        private GH_Structure<GH_Number> myNumbers;
 
         /// <summary>
         /// Main constructor
@@ -35,7 +37,7 @@ namespace Biomorpher
         }
 
         /// <summary>
-        /// Register inputs
+        /// Register component inputs
         /// </summary>
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
@@ -52,12 +54,12 @@ namespace Biomorpher
         }
         
         /// <summary>
-        /// Register outputs
+        /// Register component outputs
         /// </summary>
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            //pm.AddIntegerParameter("SICount", "SICount", "solve instance counter", GH_ParamAccess.item);
+            pm.AddGenericParameter("Clusters", "Clusters", "Cluster data", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -66,13 +68,19 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+
+            // Make the DA global
             if (solveinstanceCounter == 0)
             {
                 deej = DA;
             }
 
+            // Output cluster info
+            if(solveinstanceCounter>0)
+             DA.SetDataTree(0, myNumbers);
+
             solveinstanceCounter++;
-            //DA.SetData(0, solveinstanceCounter);
+
         }
 
         
@@ -197,6 +205,39 @@ namespace Biomorpher
 
             // Set the phenotype within the chromosome class
             chromo.SetPhenotype(allGeometry, performas);
+        }
+
+
+        public void SetComponentOut(Population pop)
+        {
+            myNumbers = new GH_Structure<GH_Number>();
+
+            for (int i = 0; i < 12; i++)
+            {
+                GH_Path myPath = new GH_Path(i);
+                int localCounter = 0;
+
+                // Go through all the chromosomes. If cluster ID of it equals 'i', then stick it in the branch.
+                for (int j = 0; j < pop.chromosomes.Length; j++)
+                {
+                    List<GH_Number> myList = new List<GH_Number>();
+                    
+
+                    if (pop.chromosomes[j].clusterId == i)
+                    {
+                        for (int k = 0; k < pop.chromosomes[j].GetGenes().Length; k++)
+                        {
+                            GH_Number myGHNumber = new GH_Number(pop.chromosomes[j].GetGenes()[k]);
+                            myList.Add(myGHNumber);
+                        }
+
+                        //myNumbers.AppendRange(myList, myPath.AppendElement(j));
+                        myNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
+                        localCounter++;
+
+                    }
+                }
+            }
         }
 
 

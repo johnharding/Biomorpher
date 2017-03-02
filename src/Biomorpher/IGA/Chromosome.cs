@@ -31,7 +31,13 @@ namespace Biomorpher.IGA
 
         //k-means
         public bool isRepresentative;
+
+        /// <summary>
+        /// The associated cluster centroid representative ID (could be itself)
+        /// </summary>
         public int clusterId;
+
+
         public double distToRepresentative;
 
         /// <summary>

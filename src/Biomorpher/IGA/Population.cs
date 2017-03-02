@@ -8,7 +8,7 @@ using GalapagosComponents;
 
 namespace Biomorpher.IGA
 {
-    class Population
+    public class Population
     {
 
         // List of sliders
@@ -50,7 +50,7 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
-        /// Generates a random population of new chromosomes. TODO: take away seed
+        /// Generates a random population of new chromosomes.
         /// </summary>
         /// <param name="geneNumber"></param>
         public void GenerateRandomPop()
@@ -274,7 +274,6 @@ namespace Biomorpher.IGA
             return clusterCounts;
         }
 
-
         //Update clustering by calculating the distance between the chromosome genes and the mean vectors for each cluster
         public bool updateClustering(int numClusters, double[][] clusterMeanVectors)
         {
@@ -342,8 +341,6 @@ namespace Biomorpher.IGA
             return go;
         }
 
-
-
         //Update chromosome representatives and cluster distances after k-means clustering
         public void calcKMeansRepresentatives(int numClusters)
         {
@@ -386,7 +383,6 @@ namespace Biomorpher.IGA
             }
 
         }
-
 
 
     }
