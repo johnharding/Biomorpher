@@ -76,7 +76,7 @@ namespace Biomorpher
             }
 
             // Output cluster info
-            if(solveinstanceCounter>0)
+            if(myNumbers!=null)
              DA.SetDataTree(0, myNumbers);
 
             solveinstanceCounter++;
