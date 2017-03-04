@@ -12,7 +12,7 @@ namespace Biomorpher.IGA
     public static class Friends
     {
         //Function to get random number
-        private static readonly Random getrandom = new Random();
+        private static readonly Random getrandom = new Random(21);
         private static readonly object syncLock = new object();
         
         /// <summary>
