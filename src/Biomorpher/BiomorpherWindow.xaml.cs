@@ -247,16 +247,44 @@ namespace Biomorpher
         //Get representative meshes
         private List<Mesh> getRepresentativePhenotypes(Population pop)
         {
-            List<Mesh> phenotypes = new List<Mesh>();
+            Mesh[] phenotypes = new Mesh[12];
+
+            Chromosome[] chromosomes = pop.chromosomes;
+
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                if (chromosomes[i].isRepresentative)
+                {
+                    phenotypes[chromosomes[i].clusterId] = chromosomes[i].phenotype[0];
+                }
+                    
+            }
+
+            return phenotypes.ToList();
+        }
+
+        //Get representative performas
+        private double[][] getRepresentativePerformas(Population pop)
+        {
+            double[][] performas = new double[12][];
 
             Chromosome[] chromosomes = pop.chromosomes;
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                if(chromosomes[i].isRepresentative)
-                    phenotypes.Add(chromosomes[i].phenotype[0]);
+                if (chromosomes[i].isRepresentative)
+                {
+                    int performasCount = chromosomes[i].GetPerformas().Count;
+
+                    performas[chromosomes[i].clusterId] = new double[performasCount];
+                    for(int j=0; j< performasCount; j++)
+                    {
+                        performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
+                    }
+                }
+                    
             }
 
-            return phenotypes;
+            return performas;
         }
 
 
@@ -488,7 +516,7 @@ namespace Biomorpher
                 {
                     //Create checkbox with an event handler
                     string cb_name = "cb_tab2_" + i;
-                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i); // TODO: Send chromosome ID not the grid ID 
+                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i);
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
                     dp_sub.Children.Add(cb);
                 }
@@ -707,6 +735,144 @@ namespace Biomorpher
             sliderF.Value = fitness;
             sliderF.IsEnabled = false;
         }
+
+
+        private void tab2_primary_showPerformance()
+        {
+            Color[] rgbs = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
+            int alfaMin = 20;
+            int alfaMax = 255;
+
+            double[][] performas = getRepresentativePerformas(population);
+            int performasCount = performas[0].Length;
+
+            //Extract min/max values of each performance measure
+            List<double> minValues = new List<double>();
+            List<double> maxValues = new List<double>();
+
+            for(int i=0; i< performasCount; i++)
+            {
+                double min = performas[0][i];
+                double max = performas[0][i];
+
+                for (int j = 0; j < 12; j++)
+                {
+                    if (performas[j][i] < min)
+                    {
+                        min = performas[j][i];
+                    }
+
+                    if (performas[j][i] > max)
+                    {
+                        max = performas[j][i];
+                    }
+                }
+
+                minValues.Add(min);
+                maxValues.Add(max);
+            }
+
+
+            //Create a performance canvas for each representative design
+            List<Canvas> performanceCanvas = new List<Canvas>();
+
+            for(int i=0; i<12; i++)
+            {
+                List<Color> colours = new List<Color>();
+                List<bool> isExtrema = new List<bool>();
+
+                for (int j = 0; j < performasCount; j++)
+                {
+                    //map performance value to alpha value
+                    double range = maxValues[j] - minValues[j];
+
+                    double t_normal = 1.0;
+                    if (range != 0.0)
+                    {
+                        t_normal = (performas[i][j] - minValues[j]) / range;
+                    }
+
+                    double t_map = alfaMin + (t_normal * (alfaMax - alfaMin));
+
+                    //change alpha value
+                    Color c = rgbs[j];
+                    c.ChangeAlpha(Convert.ToByte(t_map));
+                    colours.Add(c);
+
+                    //detect if the performance is an extrema value
+                    if(performas[i][j] == minValues[j] || performas[i][j] == maxValues[j])
+                    {
+                        isExtrema.Add(true);
+                    }
+                    else
+                    {
+                        isExtrema.Add(false);
+                    }
+                }
+
+                //Create canvas
+                Canvas canvas = tab2_primary_performasCanvas(colours, isExtrema);
+                performanceCanvas.Add(canvas);
+            }
+
+
+            //ADD PERFORMANCE CANVAS TO WINDOW SUB-DOCKPANELS
+
+
+        }
+
+
+        //Create performas canvas with coloured circles
+        private Canvas tab2_primary_performasCanvas(List<Color> colours, List<bool> isExtrema)
+        {
+            int numCircles = colours.Count;
+            int dOuter = 10;
+            int dOffset = 2;
+
+            Canvas canvas = new Canvas();
+            canvas.Background = new SolidColorBrush(Colors.White);
+
+            //Add circles
+            for(int i=0; i<numCircles; i++)
+            {
+                int distFromLeft = dOuter * (i * 2);
+
+                //Extrema circle
+                System.Windows.Shapes.Ellipse extremaCircle = new System.Windows.Shapes.Ellipse();
+                extremaCircle.Height = dOuter;
+                extremaCircle.Width = dOuter;
+                extremaCircle.StrokeThickness = 1;
+                if (isExtrema[i])
+                {
+                    extremaCircle.Stroke = Brushes.LightGray;
+                }
+                else
+                {
+                    extremaCircle.Stroke = Brushes.White;
+                }                
+
+                Canvas.SetLeft(extremaCircle, distFromLeft);
+                Canvas.SetTop(extremaCircle, 0);
+                canvas.Children.Add(extremaCircle);
+
+
+                //Performance circle
+                System.Windows.Shapes.Ellipse performanceCircle = new System.Windows.Shapes.Ellipse();
+                performanceCircle.Height = dOuter - dOffset;
+                performanceCircle.Width = dOuter - dOffset;
+                SolidColorBrush brush = new SolidColorBrush();
+                brush.Color = colours[i];
+                performanceCircle.Fill = brush;
+
+                Canvas.SetLeft(performanceCircle, (distFromLeft - dOffset));
+                Canvas.SetTop(performanceCircle, 0);
+                canvas.Children.Add(performanceCircle);
+            }
+
+            return canvas;
+        }
+
+
 
 
         //-------------------------------------------------------------------------------CREATE CONTROLS------------------------------------------------------------------------//
