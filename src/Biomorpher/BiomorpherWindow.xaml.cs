@@ -138,7 +138,7 @@ namespace Biomorpher
             // Initial Window things
             InitializeComponent();
             Topmost = true;
-            PopSize = 30;
+            PopSize = 100;
             MutateProbability = 0.1;
             Generation = 0;
             ParentCount = 0;
@@ -304,12 +304,8 @@ namespace Biomorpher
 
             Canvas canvas = new Canvas();
             canvas.Background = new SolidColorBrush(Colors.White);
-            //canvas.Width = width;
-            //canvas.Height = width;
             string name = "canvas" + clusterIndex;
             canvas.Name = name;
-            //canvas.HorizontalAlignment = HorizontalAlignment.Center;
-            //canvas.VerticalAlignment = VerticalAlignment.Center;
 
 
             //Add outline circle
@@ -411,7 +407,7 @@ namespace Biomorpher
             //Create sliders with labels
             Border border_popSize = new Border();
             border_popSize.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-            DockPanel dp_popSize = createSlider("Population size", "s_tab1_popSize", 12, 100, PopSize, true, new RoutedPropertyChangedEventHandler<double>(tab1_popSize_ValueChanged));
+            DockPanel dp_popSize = createSlider("Population size", "s_tab1_popSize", 12, 200, PopSize, true, new RoutedPropertyChangedEventHandler<double>(tab1_popSize_ValueChanged));
             border_popSize.Child = dp_popSize;
             sp.Children.Add(border_popSize);
 
