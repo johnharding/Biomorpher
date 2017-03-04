@@ -165,9 +165,6 @@ namespace Biomorpher.IGA
         //Initialise random clustering (but ensure at least one chromosome in each cluster)
         public void initClustering(int numClusters)
         {
-            int seed = 0;
-            Random rnd = new Random(seed);
-
             for (int i = 0; i < numClusters; i++)
             {
                 chromosomes[i].clusterId = i;
@@ -175,7 +172,7 @@ namespace Biomorpher.IGA
 
             for (int i = numClusters; i < chromosomes.Length; i++)
             {
-                int r = rnd.Next(0, numClusters);
+                int r = Friends.GetRandomInt (0, numClusters);
                 chromosomes[i].clusterId = r;
             }
         }
