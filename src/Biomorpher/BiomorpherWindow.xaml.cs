@@ -187,7 +187,7 @@ namespace Biomorpher
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
 
-            // 4. Get geometry for each chromosome (To do: Only for representatives)
+            // 4. Get geometry for each chromosome
             GetPhenotypes();
 
             // 5. Add population to history
@@ -199,9 +199,8 @@ namespace Biomorpher
 
             tab12_primary_permanent(2);
             tab2_secondary_settings();
-            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+            List<Mesh> popMeshes = getRepresentativePhenotypes();
             tab2_primary_update(popMeshes);
-
         }
 
 
@@ -225,7 +224,7 @@ namespace Biomorpher
 
             // 5. Display meshes and update windows
             tab1_primary_update();
-            List<Mesh> popMeshes = getRepresentativePhenotypes(population);
+            List<Mesh> popMeshes = getRepresentativePhenotypes();
             tab2_primary_update(popMeshes);
 
             // 6. Advance the generation counter and store the population historically.
@@ -245,11 +244,11 @@ namespace Biomorpher
         }
 
         //Get representative meshes
-        private List<Mesh> getRepresentativePhenotypes(Population pop)
+        private List<Mesh> getRepresentativePhenotypes()
         {
             Mesh[] phenotypes = new Mesh[12];
 
-            Chromosome[] chromosomes = pop.chromosomes;
+            Chromosome[] chromosomes = population.chromosomes;
 
             for (int i = 0; i < chromosomes.Length; i++)
             {
@@ -264,26 +263,27 @@ namespace Biomorpher
         }
 
         //Get representative performas
-        private double[][] getRepresentativePerformas(Population pop)
+        private double[][] getRepresentativePerformas()
         {
             double[][] performas = new double[12][];
 
-            Chromosome[] chromosomes = pop.chromosomes;
+            Chromosome[] chromosomes = population.chromosomes;
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 if (chromosomes[i].isRepresentative)
                 {
-                    int performasCount = chromosomes[i].GetPerformas().Count;
+                    //int performasCount = chromosomes[i].GetPerformas().Count;
+                    int performasCount = 3;             //temporary
 
                     performas[chromosomes[i].clusterId] = new double[performasCount];
                     for(int j=0; j< performasCount; j++)
                     {
-                        performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
+                        //performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
+                        performas[chromosomes[i].clusterId][j] = Friends.GetRandomInt(0, 100);        //temporary
                     }
                 }
                     
             }
-
             return performas;
         }
 
@@ -502,6 +502,8 @@ namespace Biomorpher
 
                 //Sub Dock panel
                 DockPanel dp_sub = new DockPanel();
+                string dp_sub_name = "dp_sub_tab" + tabIndex + "_" + i;
+                dp_sub.Name = dp_sub_name;
 
                 //Label
                 Label l = new Label();
@@ -518,6 +520,7 @@ namespace Biomorpher
                     string cb_name = "cb_tab2_" + i;
                     CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i);
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
+                    DockPanel.SetDock(cb, Dock.Right);
                     dp_sub.Children.Add(cb);
                 }
 
@@ -526,6 +529,7 @@ namespace Biomorpher
 
                 //Add dockpanel to controls dictionary in order to access and update meshes afterwards (and not recreate the entire grid with checkboxes)
                 controls.Add(dp_name, dp);
+                controls.Add(dp_sub_name, dp_sub);
 
                 //Set the dockpanel as the child of the border element
                 border.Child = dp;
@@ -551,24 +555,44 @@ namespace Biomorpher
 
         public void tab2_primary_update(List<Mesh> meshes)
         {
-            //Run through the list of meshes and create a viewport3d control for each
+            List<Canvas> performanceCanvas = tab2_primary_showPerformance();
+
+            //Run through the design windows and add a viewport3d control and performance display to each
             for (int i = 0; i < meshes.Count; i++)
             {
-                //The name of the control to add the viewport3d to
+                //The name of the control to add to
                 string dp_name = "dp_tab2_" + i;
+                string dp_sub_name = "dp_sub_tab2_" + i;
 
                 //Get this control from the dictionary
                 DockPanel dp = (DockPanel)controls[dp_name];
+                DockPanel dp_sub = (DockPanel)controls[dp_sub_name];
 
-                //If there already is a viewport3d control in the dockpanel then remove it
+                //Viewport update
                 if (dp.Children.Count > 1)
                 {
                     dp.Children.RemoveAt(dp.Children.Count - 1);
                 }
-
-                //Add the new viewport3d control to the dockpanel
                 Viewport3d vp3d = new Viewport3d(meshes[i]);
                 dp.Children.Add(vp3d);
+
+
+                //Performance display update
+                if (dp_sub.Children.Count > 2)
+                {
+                    dp_sub.Children.RemoveAt(dp_sub.Children.Count - 1);
+                }
+                /*
+                Color[] colours = new Color[4] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215) };
+                bool[] isExtrema = new bool[4] { true, true, false, false };
+                Canvas c = tab2_primary_performasCanvas(colours.ToList(), isExtrema.ToList());
+                dp_sub.Children.Add(c);
+                */
+
+                Canvas c = performanceCanvas[i];
+                dp_sub.Children.Add(c);
+
+
             }
         }
 
@@ -737,13 +761,13 @@ namespace Biomorpher
         }
 
 
-        private void tab2_primary_showPerformance()
+        private List<Canvas> tab2_primary_showPerformance()
         {
-            Color[] rgbs = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
-            int alfaMin = 20;
+            Color[] rgbs = new Color[6] { Color.FromArgb(255,0,174,239), Color.FromArgb(255, 0, 231, 239), Color.FromArgb(255,0,239,191), Color.FromArgb(255,0,135,239), Color.FromArgb(255,84,0,239), Color.FromArgb(255,152,0,239) };
+            int alfaMin = 100;
             int alfaMax = 255;
 
-            double[][] performas = getRepresentativePerformas(population);
+            double[][] performas = getRepresentativePerformas();
             int performasCount = performas[0].Length;
 
             //Extract min/max values of each performance measure
@@ -794,9 +818,9 @@ namespace Biomorpher
 
                     double t_map = alfaMin + (t_normal * (alfaMax - alfaMin));
 
+
                     //change alpha value
-                    Color c = rgbs[j];
-                    c.ChangeAlpha(Convert.ToByte(t_map));
+                    Color c = Color.FromArgb(Convert.ToByte(t_map),rgbs[j].R, rgbs[j].G, rgbs[j].B);
                     colours.Add(c);
 
                     //detect if the performance is an extrema value
@@ -815,10 +839,7 @@ namespace Biomorpher
                 performanceCanvas.Add(canvas);
             }
 
-
-            //ADD PERFORMANCE CANVAS TO WINDOW SUB-DOCKPANELS
-
-
+            return performanceCanvas;
         }
 
 
@@ -826,8 +847,9 @@ namespace Biomorpher
         private Canvas tab2_primary_performasCanvas(List<Color> colours, List<bool> isExtrema)
         {
             int numCircles = colours.Count;
-            int dOuter = 10;
-            int dOffset = 2;
+            int dOuter = 16;
+            int dOffset = 3;
+            int topOffset = 5;
 
             Canvas canvas = new Canvas();
             canvas.Background = new SolidColorBrush(Colors.White);
@@ -835,13 +857,13 @@ namespace Biomorpher
             //Add circles
             for(int i=0; i<numCircles; i++)
             {
-                int distFromLeft = dOuter * (i * 2);
+                int distFromLeft = dOuter + ((dOuter + dOffset) * i);
 
                 //Extrema circle
                 System.Windows.Shapes.Ellipse extremaCircle = new System.Windows.Shapes.Ellipse();
                 extremaCircle.Height = dOuter;
                 extremaCircle.Width = dOuter;
-                extremaCircle.StrokeThickness = 1;
+                extremaCircle.StrokeThickness = 0.5;
                 if (isExtrema[i])
                 {
                     extremaCircle.Stroke = Brushes.LightGray;
@@ -852,20 +874,20 @@ namespace Biomorpher
                 }                
 
                 Canvas.SetLeft(extremaCircle, distFromLeft);
-                Canvas.SetTop(extremaCircle, 0);
+                Canvas.SetTop(extremaCircle, topOffset);
                 canvas.Children.Add(extremaCircle);
 
 
                 //Performance circle
                 System.Windows.Shapes.Ellipse performanceCircle = new System.Windows.Shapes.Ellipse();
-                performanceCircle.Height = dOuter - dOffset;
-                performanceCircle.Width = dOuter - dOffset;
+                performanceCircle.Height = dOuter - (2*dOffset);
+                performanceCircle.Width = dOuter - (2*dOffset);
                 SolidColorBrush brush = new SolidColorBrush();
                 brush.Color = colours[i];
                 performanceCircle.Fill = brush;
 
-                Canvas.SetLeft(performanceCircle, (distFromLeft - dOffset));
-                Canvas.SetTop(performanceCircle, 0);
+                Canvas.SetLeft(performanceCircle, (distFromLeft+dOffset) );
+                Canvas.SetTop(performanceCircle, (topOffset + dOffset));
                 canvas.Children.Add(performanceCircle);
             }
 
