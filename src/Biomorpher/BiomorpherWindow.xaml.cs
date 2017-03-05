@@ -102,7 +102,7 @@ namespace Biomorpher
         }
 
 
-        //A dictionary, which contains the controls that need to be accessible from other methods after their creation
+        //A dictionary, which contains the controls that need to be accessible from other methods after their creation (key to update controls)
         private Dictionary<string, FrameworkElement> controls;
 
         //Font and spacing
