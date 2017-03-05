@@ -37,10 +37,6 @@ namespace Biomorpher
         private List<GalapagosGeneListObject> genePools;
         private BiomorpherComponent owner;
 
-        private double[] sliderValuesMin;
-        private double[] sliderValuesMax;
-        private string[] sliderNames;
-
 
         //UI properties
         private int popSize;
@@ -105,10 +101,12 @@ namespace Biomorpher
         //A dictionary, which contains the controls that need to be accessible from other methods after their creation (key to update controls)
         private Dictionary<string, FrameworkElement> controls;
 
-        //Font and spacing
+        //Font, spacing and colours
         int fontsize;
         int margin_w;
         int margin_h;
+        Color[] rgb_performance;
+        Color[] rgb_kmeans;
 
 
         // Constructor
@@ -131,12 +129,14 @@ namespace Biomorpher
             Generation = 0;
             ParentCount = 0;
             GO = false;
+
             controls = new Dictionary<string, FrameworkElement>();
             fontsize = 12;
             margin_w = 20;
             margin_h = 20;
-
-
+            rgb_performance = new Color[6] { Color.FromArgb(255, 0, 174, 239), Color.FromArgb(255, 0, 231, 239), Color.FromArgb(255, 0, 239, 191), Color.FromArgb(255, 0, 135, 239), Color.FromArgb(255, 84, 0, 239), Color.FromArgb(255, 152, 0, 239) };
+            rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
+            
             //Initialise Tab 1 Start settings
             tab1_secondary_settings();
         }
@@ -286,14 +286,12 @@ namespace Biomorpher
         //Update display of K-Means clustering
         public void tab1_primary_update()
         {
-            Color[] rgbs = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
-
             //Run through the 12 designs
             for (int i = 0; i < 12; i++)
             {
                 //Create canvas
                 SolidColorBrush brush = new SolidColorBrush();
-                brush.Color = rgbs[i];
+                brush.Color = rgb_kmeans[i];
                 Canvas canvas = createKMeansVisualisation(i, brush);
 
                 //The name of the control to add the canvas to
@@ -585,8 +583,7 @@ namespace Biomorpher
         //Create performance canvas for all representative designs
         private List<Canvas> createPerformanceCanvasAll()
         {
-            Color[] rgbs = new Color[6] { Color.FromArgb(255,0,174,239), Color.FromArgb(255, 0, 231, 239), Color.FromArgb(255,0,239,191), Color.FromArgb(255,0,135,239), Color.FromArgb(255,84,0,239), Color.FromArgb(255,152,0,239) };
-            int alfaMin = 100;
+            int alfaMin = 50;
             int alfaMax = 255;
 
             double[][] performas = getRepresentativePerformas();
@@ -642,7 +639,7 @@ namespace Biomorpher
 
 
                     //change alpha value
-                    Color c = Color.FromArgb(Convert.ToByte(t_map),rgbs[j].R, rgbs[j].G, rgbs[j].B);
+                    Color c = Color.FromArgb(Convert.ToByte(t_map), rgb_performance[j].R, rgb_performance[j].G, rgb_performance[j].B);
                     colours.Add(c);
 
                     //detect if the performance is an extrema value
@@ -688,7 +685,7 @@ namespace Biomorpher
                 extremaCircle.StrokeThickness = 0.5;
                 if (isExtrema[i])
                 {
-                    extremaCircle.Stroke = Brushes.LightGray;
+                    extremaCircle.Stroke = Brushes.Gray;
                 }
                 else
                 {
@@ -783,7 +780,7 @@ namespace Biomorpher
 
             //Evolve button
             Border border_evo = new Border();
-            border_evo.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            border_evo.Margin = new Thickness(margin_w, margin_h, margin_w, margin_h*2);
 
             Button button_evo = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.5, new RoutedEventHandler(tab2_Evolve_Click));
 
@@ -791,11 +788,64 @@ namespace Biomorpher
             sp.Children.Add(border_evo);
 
 
-            //ADD PERFORMANCE COLOUR CODING
+            //Add performance label
+            //int performanceCount = population.chromosomes[0].GetPerformas().Count;
+            int performanceCount = 3;               //OBS! Temporary
+            for(int i=0; i<performanceCount; i++)
+            {
+                Border border_p = new Border();
+                border_p.Margin = new Thickness(margin_w, margin_h*0.5, margin_w, 0);
+                string label_p = "Performance value " + i;
+                DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
 
+                border_p.Child = dp_p;
+                sp.Children.Add(border_p);
+            }
 
             //Add the stackpanel to the secondary area of Tab 2
             Tab2_secondary.Child = sp;
+        }
+
+
+        //Create colour-coded label for a performance value
+        private DockPanel createColourCodedLabel(string text, Color c)
+        {
+            DockPanel dp = new DockPanel();
+
+            //Create filled circle
+            int diameter = 8;
+            int topOffset = 8;
+
+            Canvas canvas = new Canvas();
+            canvas.Background = new SolidColorBrush(Colors.Transparent);
+
+            System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
+            circle.Height = diameter;
+            circle.Width = diameter;
+            SolidColorBrush brush = new SolidColorBrush();
+            brush.Color = c;
+            circle.Fill = brush;
+
+            Canvas.SetLeft(circle, 0);
+            Canvas.SetTop(circle, topOffset);
+            canvas.Children.Add(circle);
+
+            Border border_c = new Border();
+            border_c.Margin = new Thickness(0, 0, margin_w, 0);
+            border_c.Child = canvas;
+
+            DockPanel.SetDock(border_c, Dock.Left);
+            dp.Children.Add(border_c);
+
+
+            //Create performance label
+            Label l = new Label();
+            l.Content = text;
+            l.FontSize = fontsize;
+
+            dp.Children.Add(l);
+
+            return dp;
         }
 
 
