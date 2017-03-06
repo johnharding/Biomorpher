@@ -36,6 +36,7 @@ namespace Biomorpher
         private List<GH_NumberSlider> sliders;
         private List<GalapagosGeneListObject> genePools;
         private BiomorpherComponent owner;
+        private int performanceCount;
 
 
         //UI properties
@@ -128,6 +129,7 @@ namespace Biomorpher
             MutateProbability = 0.1;
             Generation = 0;
             ParentCount = 0;
+            performanceCount = 0;
             GO = false;
 
             controls = new Dictionary<string, FrameworkElement>();
@@ -159,7 +161,7 @@ namespace Biomorpher
                     owner.canvas.Document.Enabled = true;                               // Enable the solver again
                     owner.SetComponentOut(population);
                     owner.ExpireSolution(true);                                         // Now expire the main component and recompute
-                    owner.GetGeometry(population.chromosomes[i]);                       // Get the new geometry for this particular chromosome
+                    performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
                 }
             }
         }
@@ -261,14 +263,13 @@ namespace Biomorpher
             {
                 if (chromosomes[i].isRepresentative)
                 {
-                    //int performasCount = chromosomes[i].GetPerformas().Count;
-                    int performasCount = 3;             //OBS! temporary
+                    int performasCount = chromosomes[i].GetPerformas().Count;
 
                     performas[chromosomes[i].clusterId] = new double[performasCount];
                     for(int j=0; j< performasCount; j++)
                     {
-                        //performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
-                        performas[chromosomes[i].clusterId][j] = Friends.GetRandomInt(0, 100);        //OBS! temporary
+                        performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
+                        //performas[chromosomes[i].clusterId][j] = Friends.GetRandomInt(0, 100);        //OBS! temporary
                     }
                 }
                     
@@ -335,7 +336,6 @@ namespace Biomorpher
             Canvas.SetTop(outline, 0);
             canvas.Children.Add(outline);
 
-
             //Add chromosome dots
             List<double> distances = new List<double>();
             for (int i = 0; i < population.chromosomes.Length; i++)
@@ -379,7 +379,6 @@ namespace Biomorpher
                 double angle = (2 * Math.PI * i) / clusterItems;
                 double xCoord = distancesMapped[i] * Math.Cos(angle);
                 double yCoord = distancesMapped[i] * Math.Sin(angle);
-
 
                 //Lines
                 System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
@@ -789,8 +788,6 @@ namespace Biomorpher
 
 
             //Add performance label
-            //int performanceCount = population.chromosomes[0].GetPerformas().Count;
-            int performanceCount = 3;               //OBS! Temporary
             for(int i=0; i<performanceCount; i++)
             {
                 Border border_p = new Border();

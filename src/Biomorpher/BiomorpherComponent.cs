@@ -152,7 +152,7 @@ namespace Biomorpher
         /// <param name="chromo"></param>
         /// <param name="da"></param>
         /// <returns></returns>
-        public void GetGeometry(Chromosome chromo)
+        public int GetGeometry(Chromosome chromo)
         {
 
             // Collect the object at the current instance
@@ -197,15 +197,19 @@ namespace Biomorpher
             {
                 foreach (Object myObj in param.VolatileData.AllData(true))
                 {
-                    if (myObj is double)
+                    if (myObj is GH_Number)
                     {
-                        performas.Add((double)myObj);
+                        GH_Number temp = (GH_Number)myObj;
+                        performas.Add(temp.Value);
                     }
                 }
             }
 
             // Set the phenotype within the chromosome class
             chromo.SetPhenotype(allGeometry, performas);
+
+            // Return the number of performance criteria
+            return performas.Count;
         }
 
 

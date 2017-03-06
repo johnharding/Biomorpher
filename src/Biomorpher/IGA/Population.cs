@@ -18,9 +18,6 @@ namespace Biomorpher.IGA
         // the population of chromosomes
         public Chromosome[] chromosomes { get; set; }
 
-        // IDs of (12) cluster representatives
-        private List<int> clusterIDs { get; set; }
-
         /// <summary>
         /// Construct a new population of chromosomes
         /// </summary>
@@ -132,6 +129,11 @@ namespace Biomorpher.IGA
         }
 
 
+
+
+
+
+
         //----------------------------------------------------------------- K-MEANS --------------------------------------------------------------//
 
         //K-Means clustering of the chromosomes in this population (overall method that calls the sub-methods)
@@ -162,6 +164,7 @@ namespace Biomorpher.IGA
         }
 
 
+
         //K-Means++ method to create a better initial clustering
         public double[][] calcClusterCentroidsInit(int numClusters)
         {
@@ -170,7 +173,6 @@ namespace Biomorpher.IGA
             //Initialise array
             double[][] centroidVectorsInit = new double[numClusters][];
             List<int> centroidChromoIndexes = new List<int>();
-
 
             // 1. Choose random initial centroid
             int rndCentroidChromo = Friends.GetRandomInt(0, chromosomes.Length);
@@ -195,7 +197,7 @@ namespace Biomorpher.IGA
                         distances.Add(calcDistance(chromosomes[i].GetGenes(), chromosomes[centroidIndex].GetGenes()));
                     }
 
-                    chromoDistances.Add(distances.Min());               //if the chromosome compares to itself and is chosen as a centroid, the distance will be zero (fine as we choose the largest distance for all chromosomes afterwards)
+                    chromoDistances.Add(distances.Min());  //if the chromosome compares to itself and is chosen as a centroid, the distance will be zero (fine as we choose the largest distance for all chromosomes afterwards)
                 }
 
                 //3. Choose next centroid furthest away from the already selected ones
@@ -372,6 +374,8 @@ namespace Biomorpher.IGA
             }
 
         }
+
+
 
 
         //Helper methods

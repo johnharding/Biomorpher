@@ -37,7 +37,6 @@ namespace Biomorpher.IGA
         /// </summary>
         public int clusterId;
 
-
         public double distToRepresentative;
 
         /// <summary>
@@ -90,7 +89,7 @@ namespace Biomorpher.IGA
 
             for (int i = 0; i < chromoGenePools.Count; i++)
             {
-
+                // TODO??
             }
 
 
@@ -178,7 +177,6 @@ namespace Biomorpher.IGA
             phenotype = new List<Mesh>(meshes);
             performance = new List<double>(performas);
 
-            // TODO: Update performance criteria in this method.
         }
 
         /// <summary>
