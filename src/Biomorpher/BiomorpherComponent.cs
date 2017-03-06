@@ -190,16 +190,16 @@ namespace Biomorpher
             allGeometry.Add(joinedMesh);
 
 
+
             // Get performance data
             List<double> performas = new List<double>();
             foreach (IGH_Param param in Params.Input[2].Sources)
             {
                 foreach (Object myObj in param.VolatileData.AllData(true))
                 {
-                    if (myObj is GH_Number)
+                    if (myObj is double)
                     {
-                        GH_Number temp = (GH_Number)myObj;
-                        performas.Add(temp.Value);
+                        performas.Add((double)myObj);
                     }
                 }
             }

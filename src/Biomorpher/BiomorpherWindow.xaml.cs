@@ -120,6 +120,7 @@ namespace Biomorpher
             genePools = new List<GalapagosGeneListObject>();
             owner.GetSliders(sliders, genePools);
 
+
             // Initial Window things
             InitializeComponent();
             Topmost = true;
@@ -134,8 +135,7 @@ namespace Biomorpher
             margin_w = 20;
             margin_h = 20;
             rgb_performance = new Color[6] { Color.FromArgb(255, 0, 174, 239), Color.FromArgb(255, 0, 231, 239), Color.FromArgb(255, 0, 239, 191), Color.FromArgb(255, 0, 135, 239), Color.FromArgb(255, 84, 0, 239), Color.FromArgb(255, 152, 0, 239) };
-            //rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
-            rgb_kmeans = new Color[12] { Color.FromArgb(243, 57, 0, 255), Color.FromArgb(236, 28, 59, 255), Color.FromArgb(212, 2, 113, 255), Color.FromArgb(121, 0, 120, 255), Color.FromArgb(58, 51, 149, 255), Color.FromArgb(17, 141, 200, 255), Color.FromArgb(8, 186, 169, 255), Color.FromArgb(36, 180, 66, 255), Color.FromArgb(103, 195, 12, 255), Color.FromArgb(222, 231, 31, 255), Color.FromArgb(247, 157, 20, 255), Color.FromArgb(243, 57, 0, 255) };
+            rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
             
             //Initialise Tab 1 Start settings
             tab1_secondary_settings();
@@ -236,6 +236,7 @@ namespace Biomorpher
         private List<Mesh> getRepresentativePhenotypes()
         {
             Mesh[] phenotypes = new Mesh[12];
+
             Chromosome[] chromosomes = population.chromosomes;
 
             for (int i = 0; i < chromosomes.Length; i++)
@@ -260,12 +261,14 @@ namespace Biomorpher
             {
                 if (chromosomes[i].isRepresentative)
                 {
-                    int performasCount = chromosomes[i].GetPerformas().Count;
+                    //int performasCount = chromosomes[i].GetPerformas().Count;
+                    int performasCount = 3;             //OBS! temporary
 
                     performas[chromosomes[i].clusterId] = new double[performasCount];
                     for(int j=0; j< performasCount; j++)
                     {
-                        performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
+                        //performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
+                        performas[chromosomes[i].clusterId][j] = Friends.GetRandomInt(0, 100);        //OBS! temporary
                     }
                 }
                     
@@ -411,7 +414,7 @@ namespace Biomorpher
             Label label_head = new Label();
             label_head.FontSize = fontsize;
             label_head.FontWeight = FontWeights.Bold;
-            label_head.Content = "Settings";
+            label_head.Content = "EVOLUTIONARY SETTINGS";
 
             border_head.Child = label_head;
             sp.Children.Add(border_head);
@@ -723,7 +726,7 @@ namespace Biomorpher
             Label label_head = new Label();
             label_head.FontSize = fontsize;
             label_head.FontWeight = FontWeights.Bold;
-            label_head.Content = "Cluster Representatives";
+            label_head.Content = "CLUSTER REPRESENTATIVES";
 
             border_head.Child = label_head;
             sp.Children.Add(border_head);
