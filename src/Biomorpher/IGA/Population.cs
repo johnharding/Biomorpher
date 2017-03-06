@@ -130,16 +130,12 @@ namespace Biomorpher.IGA
 
 
 
-
-
-
-
         //----------------------------------------------------------------- K-MEANS --------------------------------------------------------------//
 
         //K-Means clustering of the chromosomes in this population (overall method that calls the sub-methods)
         public void KMeansClustering(int numClusters)
         {
-            //Initiliase clustering
+            // a) Initiliase clustering
             double[][] clusterCentroidsInit = calcClusterCentroidsInit(numClusters);
             updateClustering(numClusters, clusterCentroidsInit);
 
@@ -150,22 +146,22 @@ namespace Biomorpher.IGA
 
             while (go && count < maxIter)
             {
-                //Calculate mean vectors based on current clustering
+                // b) Calculate mean vectors based on current clustering
                 double[][] clusterMeanVectors = calcClusterMeans(numClusters);
 
-                //Update clustering
+                // c) Update clustering
                 go = updateClustering(numClusters, clusterMeanVectors);
 
                 count++;
             }
-
-            //Update chromosome info
+            
+            // d) Update chromosome info
             calcKMeansRepresentatives(numClusters);
         }
 
 
 
-        //K-Means++ method to create a better initial clustering
+        // a) K-Means++ method to create a better initial clustering
         public double[][] calcClusterCentroidsInit(int numClusters)
         {
             int numGenes = chromosomes[0].GetGenes().Length;
@@ -220,7 +216,7 @@ namespace Biomorpher.IGA
         }
 
 
-        //Calculate cluster mean vectors (same length as genes)
+        // b) Calculate cluster mean vectors (same length as genes)
         public double[][] calcClusterMeans(int numClusters)
         {
             int numGenes = chromosomes[0].GetGenes().Length;
@@ -264,7 +260,7 @@ namespace Biomorpher.IGA
         }
 
 
-        //Update clustering by calculating the distance between the chromosome genes and the mean vectors for each cluster
+        // c) Update clustering by calculating the distance between the chromosome genes and the mean vectors for each cluster
         public bool updateClustering(int numClusters, double[][] clusterMeanVectors)
         {
             bool go = true;
@@ -332,7 +328,7 @@ namespace Biomorpher.IGA
         }
 
 
-        //Update chromosome representatives and cluster distances after k-means clustering
+        // d) Update chromosome representatives and cluster distances after k-means clustering
         public void calcKMeansRepresentatives(int numClusters)
         {
             double[][] clusterMeanVectors = calcClusterMeans(numClusters);

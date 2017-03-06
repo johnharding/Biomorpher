@@ -269,7 +269,6 @@ namespace Biomorpher
                     for(int j=0; j< performasCount; j++)
                     {
                         performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
-                        //performas[chromosomes[i].clusterId][j] = Friends.GetRandomInt(0, 100);        //OBS! temporary
                     }
                 }
                     
