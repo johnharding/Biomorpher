@@ -112,6 +112,7 @@
     <Compile Include="IGA\PopHistory.cs" />
     <Compile Include="IGA\Population.cs" />
     <Compile Include="IGA\Friends.cs" />
+    <Compile Include="RoundedRectangle.cs" />
     <Compile Include="Viewport3d.xaml.cs">
       <DependentUpon>Viewport3d.xaml</DependentUpon>
     </Compile>

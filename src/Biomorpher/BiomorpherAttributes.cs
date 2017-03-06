@@ -7,6 +7,7 @@ using Grasshopper.Kernel.Types;
 using Grasshopper.Kernel.Attributes;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
 
 namespace Biomorpher
 {
@@ -65,26 +66,28 @@ namespace Biomorpher
             if (channel == GH_CanvasChannel.Objects)
             {
 
-
                 SolidBrush johnBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 50));
-                
-                RectangleF myRect = new RectangleF(Bounds.X+16, Bounds.Y, Bounds.Width, Bounds.Height);
-                //graphics.FillRectangle(johnBrush, Rectangle.Ceiling(myRect));
-
+              
                 Pen myPen = new Pen(johnBrush, 1);
-                graphics.DrawRectangle(myPen, Rectangle.Ceiling(myRect));
+                
+                GraphicsPath path = RoundedRectangle.Create((int)(Bounds.Location.X), (int)Bounds.Y - 13, (int)Bounds.Width, 24, 3);
+                graphics.DrawPath(myPen, path);
 
-                base.Render(canvas, graphics, channel);
 
-                Font myFont = new Font("Tahoma", 5);
+                //Tahoma
+                Font myFont = new Font(Grasshopper.Kernel.GH_FontServer.Standard.FontFamily, 5, FontStyle.Italic);
                 StringFormat format = new StringFormat();
-                format.FormatFlags = StringFormatFlags.DirectionVertical;
+
                 format.Alignment = StringAlignment.Center;
                 format.LineAlignment = StringAlignment.Center;
                 format.Trimming = StringTrimming.EllipsisCharacter;
-                //graphics.RotateTransform(90);
-                graphics.DrawString("(doubleclick icon)", myFont, johnBrush, (int)Bounds.Location.X + Bounds.Width+10, (int)Bounds.Location.Y+32, format);
-                
+                ;
+                graphics.DrawString("doubleclick icon to launch window", myFont, johnBrush, (int)(Bounds.Location.X+(Bounds.Width/2)), (int)Bounds.Location.Y-6, format);
+
+                format.Dispose();
+
+                base.Render(canvas, graphics, channel);
+
             }
         }
 

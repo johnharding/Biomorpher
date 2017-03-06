@@ -22,8 +22,9 @@ namespace Biomorpher
         public Grasshopper.GUI.Canvas.GH_Canvas canvas; 
         public bool GO = false;
         private IGH_DataAccess deej;
-        private int solveinstanceCounter;
+        public int solveinstanceCounter;
         private GH_Structure<GH_Number> myNumbers;
+        private static readonly object syncLock = new object();
 
         /// <summary>
         /// Main constructor
@@ -42,15 +43,14 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-            pm.AddNumberParameter("Sliders", "Sliders", "(genotype) Connect slider here (currently only one)", GH_ParamAccess.list);
-            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here - currently only meshes", GH_ParamAccess.list);
-            pm.AddNumberParameter("Performas", "Performas", "List of performance measures for the design", GH_ParamAccess.list);
+            pm.AddNumberParameter("Genotype", "Genotype", "(genotype) Connect sliders and genepools here", GH_ParamAccess.list);
+            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here: currently meshes only please", GH_ParamAccess.list);
+            pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design", GH_ParamAccess.list);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].Optional = true;
-            //pm[3].Optional = true;
         }
         
         /// <summary>
@@ -89,24 +89,25 @@ namespace Biomorpher
         /// </summary>
         public void GetSliders(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
-            //TODO: Get Gene Pools too
+            lock (syncLock)
+            { // synchronize
 
-            foreach (IGH_Param param in this.Params.Input[0].Sources)
-            {
-                Grasshopper.Kernel.Special.GH_NumberSlider slider = param as Grasshopper.Kernel.Special.GH_NumberSlider;
-                if (slider != null)
+                foreach (IGH_Param param in this.Params.Input[0].Sources)
                 {
-                    sliders.Add(slider);
-                }
+                    Grasshopper.Kernel.Special.GH_NumberSlider slider = param as Grasshopper.Kernel.Special.GH_NumberSlider;
+                    if (slider != null)
+                    {
+                        sliders.Add(slider);
+                    }
 
-                GalapagosGeneListObject genepool = param as GalapagosGeneListObject;
-                if (genepool != null)
-                {
-                    genePools.Add(genepool);
+                    GalapagosGeneListObject genepool = param as GalapagosGeneListObject;
+                    if (genepool != null)
+                    {
+                        genePools.Add(genepool);
+                    }
+                
                 }
-
             }
-
         }
 
         /// <summary>
