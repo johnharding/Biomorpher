@@ -134,11 +134,12 @@ namespace Biomorpher.IGA
 
         //----------------------------------------------------------------- K-MEANS --------------------------------------------------------------//
 
-        //K-Means clustering of the chromosomes in this population
+        //K-Means clustering of the chromosomes in this population (overall method that calls the sub-methods)
         public void KMeansClustering(int numClusters)
         {
             //Initiliase clustering
-            initClustering(numClusters);
+            double[][] clusterCentroidsInit = calcClusterCentroidsInit(numClusters);
+            updateClustering(numClusters, clusterCentroidsInit);
 
             //Loop
             bool go = true;
@@ -158,23 +159,62 @@ namespace Biomorpher.IGA
 
             //Update chromosome info
             calcKMeansRepresentatives(numClusters);
-
         }
 
 
-        //Initialise random clustering (but ensure at least one chromosome in each cluster)
-        public void initClustering(int numClusters)
+        //K-Means++ method to create a better initial clustering
+        public double[][] calcClusterCentroidsInit(int numClusters)
         {
-            for (int i = 0; i < numClusters; i++)
+            int numGenes = chromosomes[0].GetGenes().Length;
+
+            //Initialise array
+            double[][] centroidVectorsInit = new double[numClusters][];
+            List<int> centroidChromoIndexes = new List<int>();
+
+
+            // 1. Choose random initial centroid
+            int rndCentroidChromo = Friends.GetRandomInt(0, chromosomes.Length);
+            centroidChromoIndexes.Add(rndCentroidChromo);
+
+
+            while(centroidChromoIndexes.Count < numClusters)
             {
-                chromosomes[i].clusterId = i;
+                // 2. Calculate distance from each chromo to the nearest centroid that has already been chosen
+
+                //the distance to the nearest centroid for each chromosome
+                List<double> chromoDistances = new List<double>();
+
+                for (int i = 0; i < chromosomes.Length; i++)
+                {
+                    //distances from one chromo to all of the already chosen centroids
+                    List<double> distances = new List<double>();
+
+                    for (int j = 0; j < centroidChromoIndexes.Count; j++)
+                    {
+                        int centroidIndex = centroidChromoIndexes[j];
+                        distances.Add(calcDistance(chromosomes[i].GetGenes(), chromosomes[centroidIndex].GetGenes()));
+                    }
+
+                    chromoDistances.Add(distances.Min());               //if the chromosome compares to itself and is chosen as a centroid, the distance will be zero (fine as we choose the largest distance for all chromosomes afterwards)
+                }
+
+                //3. Choose next centroid furthest away from the already selected ones
+                int indexOfMaxDist = chromoDistances.IndexOf(chromoDistances.Max());
+                centroidChromoIndexes.Add(indexOfMaxDist);
             }
 
-            for (int i = numClusters; i < chromosomes.Length; i++)
+            //Update array
+            for (int i = 0; i < numClusters; i++)
             {
-                int r = Friends.GetRandomInt (0, numClusters);
-                chromosomes[i].clusterId = r;
+                centroidVectorsInit[i] = new double[numGenes];
+
+                for (int j = 0; j < numGenes; j++)
+                {
+                    centroidVectorsInit[i][j] = chromosomes[centroidChromoIndexes[i]].GetGenes()[j];
+                }
             }
+
+            return centroidVectorsInit;
         }
 
 
@@ -221,55 +261,6 @@ namespace Biomorpher.IGA
             return clusterMeanVectors;
         }
 
-
-        //Calculate Euclidean distance between two n-dimensional vectors
-        public double calcDistance(double[] genes, double[] mean)
-        {
-            double dist = 0.0;
-
-            for (int i = 0; i < genes.Length; i++)
-            {
-                dist += Math.Pow((genes[i] - mean[i]), 2);
-            }
-
-            return Math.Sqrt(dist);
-        }
-
-
-        //Identify clusterId by finding the index of the smallest distance
-        public int identifyClusterId(double[] distances)
-        {
-            int index = 0;
-            double distMin = distances[0];
-
-            for (int i = 0; i < distances.Length; i++)
-            {
-                if (distances[i] < distMin)
-                {
-                    distMin = distances[i];
-                    index = i;
-                }
-            }
-
-            return index;
-        }
-
-        //Count the number of members in each cluster
-        public int[] calcClusterSizes(int numClusters)
-        {
-            int[] clusterCounts = new int[numClusters];
-            for (int i = 0; i < numClusters; i++)
-            {
-                clusterCounts[i] = 0;
-            }
-
-            for (int i = 0; i < chromosomes.Length; i++)
-            {
-                clusterCounts[chromosomes[i].clusterId]++;
-            }
-
-            return clusterCounts;
-        }
 
         //Update clustering by calculating the distance between the chromosome genes and the mean vectors for each cluster
         public bool updateClustering(int numClusters, double[][] clusterMeanVectors)
@@ -338,6 +329,7 @@ namespace Biomorpher.IGA
             return go;
         }
 
+
         //Update chromosome representatives and cluster distances after k-means clustering
         public void calcKMeansRepresentatives(int numClusters)
         {
@@ -380,6 +372,59 @@ namespace Biomorpher.IGA
             }
 
         }
+
+
+        //Helper methods
+
+        //Calculate Euclidean distance between two n-dimensional vectors
+        public double calcDistance(double[] genes, double[] mean)
+        {
+            double dist = 0.0;
+
+            for (int i = 0; i < genes.Length; i++)
+            {
+                dist += Math.Pow((genes[i] - mean[i]), 2);
+            }
+
+            return Math.Sqrt(dist);
+        }
+
+        //Identify clusterId by finding the index of the smallest distance
+        public int identifyClusterId(double[] distances)
+        {
+            int index = 0;
+            double distMin = distances[0];
+
+            for (int i = 0; i < distances.Length; i++)
+            {
+                if (distances[i] < distMin)
+                {
+                    distMin = distances[i];
+                    index = i;
+                }
+            }
+
+            return index;
+        }
+
+        //Count the number of members in each cluster
+        public int[] calcClusterSizes(int numClusters)
+        {
+            int[] clusterCounts = new int[numClusters];
+            for (int i = 0; i < numClusters; i++)
+            {
+                clusterCounts[i] = 0;
+            }
+
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                clusterCounts[chromosomes[i].clusterId]++;
+            }
+
+            return clusterCounts;
+        }
+
+
 
 
     }
