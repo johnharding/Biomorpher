@@ -110,7 +110,7 @@ namespace Biomorpher.IGA
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
             clone.fitness = this.fitness;
-            clone.clusterId = this.clusterId;
+            //clone.clusterId = this.clusterId;
 
             // need to also clone the phenotype geometry and optional performance criteria?
             return clone;
@@ -190,6 +190,20 @@ namespace Biomorpher.IGA
             fitness = value;
         }
 
+
+        /// <summary>
+        /// Shakes the genes a little
+        /// </summary>
+        /// <param name="t"></param>
+        public void JiggleGenes(double t)
+        {
+            for(int i=0; i<genes.Length; i++)
+            {
+                genes[i] += (0.5*t - Friends.GetRandomDouble() * t);
+                if (genes[i] < 0.0) genes[i] = 0.0;
+                if (genes[i] > 1.0) genes[i] = 1.0;
+            }
+        }
     }
  
 }

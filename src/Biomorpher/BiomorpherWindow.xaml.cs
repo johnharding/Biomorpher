@@ -208,6 +208,9 @@ namespace Biomorpher
             // 2. Mutate population using user preferences
             population.MutatePop(mutateProbability);
 
+            // 2a. Jiggle the population a little to avoid repeats
+            population.JigglePop(0.02);
+
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
 

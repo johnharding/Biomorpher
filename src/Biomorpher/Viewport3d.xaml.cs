@@ -36,15 +36,15 @@ namespace Biomorpher
 
             //Settings
             hVp3D.ShowFrameRate = false;
-            hVp3D.ViewCubeOpacity = 0.2;
+            hVp3D.ViewCubeOpacity = 0.1;
             hVp3D.ViewCubeTopText = "T";
             hVp3D.ViewCubeBottomText = "B";
             hVp3D.ViewCubeFrontText = "E";
             hVp3D.ViewCubeRightText = "N";
             hVp3D.ViewCubeLeftText = "S";
             hVp3D.ViewCubeBackText = "W";
-            hVp3D.ViewCubeHeight = 50;
-            hVp3D.ViewCubeWidth = 50;
+            hVp3D.ViewCubeHeight = 40;
+            hVp3D.ViewCubeWidth = 40;
             var lights = new DefaultLights();
             hVp3D.Children.Add(lights);
 

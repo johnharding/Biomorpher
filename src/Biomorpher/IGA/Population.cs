@@ -128,6 +128,21 @@ namespace Biomorpher.IGA
             }
         }
 
+        /// <summary>
+        /// Jiggles everychromosome slightly by multiplying by Rand(0, t)
+        /// </summary>
+        /// <param name="amount"></param>
+        public void JigglePop(double t)
+        {
+            if (t < 0.0) t = 0.0;
+            if (t > 1.0) t = 1.0;
+
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                chromosomes[i].JiggleGenes(t);
+            }
+        }
+
 
 
         //----------------------------------------------------------------- K-MEANS --------------------------------------------------------------//
