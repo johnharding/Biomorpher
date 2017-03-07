@@ -22,21 +22,21 @@
             <TabItem Header="Start" x:Name="Tab1">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
+                    <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
                 </DockPanel>
             </TabItem>
 
             <TabItem Header="Designs" x:Name="Tab2">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
-                    <Border BorderThickness="0" Padding ="20" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
+                    <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
                 </DockPanel>
             </TabItem>
 
             <TabItem Header="History" x:Name="Tab3">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3_secondary"/>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary"/>
+                    <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab3_primary"/>
                 </DockPanel>
             </TabItem>
 
@@ -56,7 +56,7 @@
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
-             /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+             /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
