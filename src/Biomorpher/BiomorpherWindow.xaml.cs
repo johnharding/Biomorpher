@@ -38,6 +38,10 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private int performanceCount;
 
+        /// <summary>
+        /// indicates the particular cluster that is in focus (i.e. with performance values shown)
+        /// </summary>
+        public int highlightedCluster;
 
         //UI properties
         private int popSize;
@@ -132,13 +136,14 @@ namespace Biomorpher
             ParentCount = 0;
             performanceCount = 0;
             GO = false;
+            highlightedCluster = 0;
 
             controls = new Dictionary<string, FrameworkElement>();
             fontsize = 16;
             fontsize2 = 12;
             margin_w = 20;
             margin_h = 10;
-            rgb_performance = new Color[6] { Color.FromArgb(255, 0, 174, 239), Color.FromArgb(255, 0, 231, 239), Color.FromArgb(255, 0, 239, 191), Color.FromArgb(255, 0, 135, 239), Color.FromArgb(255, 84, 0, 239), Color.FromArgb(255, 152, 0, 239) };
+            rgb_performance = new Color[6] { Color.FromArgb(255, 236, 28, 59), Color.FromArgb(255, 121, 0, 120), Color.FromArgb(255, 17, 141, 200), Color.FromArgb(255, 36, 180, 66), Color.FromArgb(255, 222, 231, 31), Color.FromArgb(255, 243, 57, 0) };
             rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
             
             //Initialise Tab 1 Start settings
@@ -161,12 +166,29 @@ namespace Biomorpher
                     owner.canvas.Document.Enabled = false;                              // Disable the solver before tweaking sliders
                     owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders
                     owner.canvas.Document.Enabled = true;                               // Enable the solver again
-                    owner.SetComponentOut(population);
                     owner.ExpireSolution(true);                                         // Now expire the main component and recompute
                     performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
                 }
             }
+
+            // Now set the cluster outputs
+            owner.SetComponentOut(population);                                 
+            owner.ExpireSolution(true);        
         }
+
+
+        /// <summary>
+        /// Sets the Grasshopper instance to this chromosome (does not get any data)
+        /// </summary>
+        /// <param name="chromo"></param>
+        public void SetInstance(Chromosome chromo)
+        {
+            owner.canvas.Document.Enabled = false;                       
+            owner.SetSliders(chromo, sliders, genePools);    
+            owner.canvas.Document.Enabled = true;                            
+            owner.ExpireSolution(true);                    
+        }
+
 
         /// <summary>
         /// Instantiate the population and intialise the window
@@ -211,7 +233,7 @@ namespace Biomorpher
             population.MutatePop(mutateProbability);
 
             // 2a. Jiggle the population a little to avoid repeats
-            population.JigglePop(0.02);
+            population.JigglePop(0.01);
 
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
@@ -229,6 +251,9 @@ namespace Biomorpher
         }
 
 
+        /// <summary>
+        /// Exits the window
+        /// </summary>
         public void Exit()
         {
             // TODO: Set sliders and get geometry for a chosen chromosome
@@ -239,7 +264,17 @@ namespace Biomorpher
         }
 
 
-        //Get representative meshes
+        /// <summary>
+        /// Gets the current population
+        /// </summary>
+        /// <returns></returns>
+        public Population GetPopulation()
+        {
+            return population;
+        }
+
+
+        //Gets representative meshes
         private List<Mesh> getRepresentativePhenotypes()
         {
             Mesh[] phenotypes = new Mesh[12];
@@ -255,10 +290,11 @@ namespace Biomorpher
                     
             }
 
+            // List is now ordered according to cluster IDs
             return phenotypes.ToList();
         }
 
-        //Get representative performance values
+        //Gets representative performance values
         private double[][] getRepresentativePerformas()
         {
             double[][] performas = new double[12][];
@@ -286,7 +322,7 @@ namespace Biomorpher
         //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
 
 
-        //-------------------------------------------------------------------------------TAB 1: START------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------TAB 1: POPULATION------------------------------------------------------------------------//
         
         //Update display of K-Means clustering
         public void tab1_primary_update()
@@ -377,7 +413,7 @@ namespace Biomorpher
                 System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
                 circle.Height = diameter;
                 circle.Width = diameter;
-                circle.Fill = Brushes.SlateGray; //colour
+                circle.Fill = Brushes.Orange; //colour
 
                 //Calculate angle
                 double angle = (2 * Math.PI * i) / clusterItems;
@@ -552,6 +588,7 @@ namespace Biomorpher
             List<Canvas> performanceCanvas = createPerformanceCanvasAll();
 
             //Run through the design windows and add a viewport3d control and performance display to each
+            // TODO: Is using the meshes count cool here???
             for (int i = 0; i < meshes.Count; i++)
             {
                 //The name of the control to add to
@@ -567,7 +604,7 @@ namespace Biomorpher
                 {
                     dp.Children.RemoveAt(dp.Children.Count - 1);
                 }
-                Viewport3d vp3d = new Viewport3d(meshes[i]);
+                Viewport3d vp3d = new Viewport3d(meshes[i], i, this);
                 dp.Children.Add(vp3d);
 
 
@@ -844,7 +881,7 @@ namespace Biomorpher
             //Create performance label
             Label l = new Label();
             l.Content = text;
-            l.FontSize = fontsize;
+            l.FontSize = fontsize2;
 
             dp.Children.Add(l);
 

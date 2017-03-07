@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using HelixToolkit.Wpf;
 using System.Windows.Media.Media3D;
 using Rhino.Geometry;
+using Biomorpher.IGA;
 
 namespace Biomorpher
 {
@@ -23,8 +24,13 @@ namespace Biomorpher
     /// </summary>
     public partial class Viewport3d : UserControl
     {
-        public Viewport3d(Mesh mesh)
+        private int ID;
+        BiomorpherWindow W;
+
+        public Viewport3d(Mesh mesh, int id, BiomorpherWindow w)
         {
+            ID = id;
+            W = w;
             InitializeComponent();
             create3DViewPort(mesh);
         }
@@ -85,8 +91,25 @@ namespace Biomorpher
 
             //Add viewport to user control
             this.AddChild(hVp3D);
+ 
         }
 
+
+        protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
+        {
+            base.OnMouseDoubleClick(e);
+
+            Population pop = W.GetPopulation();
+
+            foreach (Chromosome jimmy in pop.chromosomes)
+            {
+                if(jimmy.isRepresentative && jimmy.clusterId==ID)
+                {
+                    W.SetInstance(jimmy);
+                    break;
+                }
+            }
+        }
 
     }
 }

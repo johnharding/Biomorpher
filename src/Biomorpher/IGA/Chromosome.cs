@@ -199,9 +199,12 @@ namespace Biomorpher.IGA
         {
             for(int i=0; i<genes.Length; i++)
             {
+                // Note, you can't risk having two chromosomes with the same genes, even 0.0 and 1.0
                 genes[i] += (0.5*t - Friends.GetRandomDouble() * t);
-                if (genes[i] < 0.0) genes[i] = 0.0;
-                if (genes[i] > 1.0) genes[i] = 1.0;
+                if (genes[i] < 0.0) 
+                    genes[i] = 0.0 + Friends.GetRandomDouble()*0.001;
+                if (genes[i] > 1.0) 
+                    genes[i] = 1.0 - Friends.GetRandomDouble()*0.001;
             }
         }
     }

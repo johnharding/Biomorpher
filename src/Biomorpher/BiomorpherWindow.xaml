@@ -19,7 +19,7 @@
 
         <TabControl x:Name="tabControl">
 
-            <TabItem Header="Start" x:Name="Tab1">
+            <TabItem Header="Population" x:Name="Tab1">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
                     <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
@@ -58,7 +58,7 @@
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
-             /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+             /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </controls:MetroWindow.Resources>

@@ -43,14 +43,17 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-            pm.AddNumberParameter("Genotype", "Genotype", "(genotype) Connect sliders and genepools here", GH_ParamAccess.list);
-            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here: currently meshes only please", GH_ParamAccess.list);
-            pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design", GH_ParamAccess.list);
+            pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
+            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here: currently meshes only please", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design", GH_ParamAccess.tree);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].Optional = true;
+            //pm[0].DataMapping = GH_DataMapping.Flatten;
+            //pm[1].DataMapping = GH_DataMapping.Flatten;
+            //pm[2].DataMapping = GH_DataMapping.Flatten;
         }
         
         /// <summary>
@@ -161,7 +164,7 @@ namespace Biomorpher
             // Thank you Dimitrie :)
             foreach (IGH_Param param in Params.Input[1].Sources)
             {
-                foreach (Object myObj in param.VolatileData.AllData(true))
+                foreach (Object myObj in param.VolatileData.AllData(true)) // AllData flattens the tree
                 {
                     localObjs.Add(myObj);
                 }
