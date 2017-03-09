@@ -39,6 +39,11 @@ namespace Biomorpher
         private int performanceCount;
 
         /// <summary>
+        /// List of performance criteria names
+        /// </summary>
+        private List<string> criteria;
+
+        /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown)
         /// </summary>
         public int highlightedCluster;
@@ -124,6 +129,7 @@ namespace Biomorpher
             // Get sliders and gene pools
             sliders = new List<GH_NumberSlider>();
             genePools = new List<GalapagosGeneListObject>();
+            criteria = new List<string>();
             owner.GetSliders(sliders, genePools);
 
 
@@ -177,6 +183,12 @@ namespace Biomorpher
         }
 
 
+        private void GetCriteria()
+        {
+            owner.GetCriteria(criteria);
+        }
+
+
         /// <summary>
         /// Sets the Grasshopper instance to this chromosome (does not get any data)
         /// </summary>
@@ -204,8 +216,11 @@ namespace Biomorpher
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
 
-            // 4. Get geometry for each chromosome
+            // 4. Get geometry and performance for each chromosome
             GetPhenotypes();
+
+            // 4a. Get performance criteria names
+            GetCriteria();
 
             // 5. Add population to history
             popHistory.AddPop(population);
@@ -413,7 +428,7 @@ namespace Biomorpher
                 System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
                 circle.Height = diameter;
                 circle.Width = diameter;
-                circle.Fill = Brushes.Orange; //colour
+                circle.Fill = Brushes.SlateGray; //colour
 
                 //Calculate angle
                 double angle = (2 * Math.PI * i) / clusterItems;
@@ -435,6 +450,17 @@ namespace Biomorpher
                 Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
                 canvas.Children.Add(circle);
             }
+
+            // centre circle
+            System.Windows.Shapes.Ellipse circle2 = new System.Windows.Shapes.Ellipse();
+            circle2.Height = diameter;
+            circle2.Width = diameter;
+            circle2.Fill = Brushes.White; //colour
+            circle2.Stroke = Brushes.SlateGray;
+            circle2.StrokeThickness = 1;
+            Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0));
+            Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0));
+            canvas.Children.Add(circle2);
 
             return canvas;
         }
@@ -835,7 +861,16 @@ namespace Biomorpher
                     border_p.Margin = new Thickness(margin_w, margin_h+20, margin_w, 0);
                 else
                     border_p.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-                string label_p = "Performance value " + i;
+
+                // Herein lies a problem.....
+                string label_p;
+                //if (i < criteria.Count)
+                    //label_p = criteria[i];
+                //else
+                    //label_p = "Performance value " + i;
+
+                label_p = criteria.Count.ToString();
+
                 DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
 
                 border_p.Child = dp_p;

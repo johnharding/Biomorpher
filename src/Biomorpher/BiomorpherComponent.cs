@@ -204,8 +204,11 @@ namespace Biomorpher
                     {
                         GH_Number temp = (GH_Number)myObj;
                         performas.Add(temp.Value);
+
                     }
                 }
+
+                
             }
 
             // Set the phenotype within the chromosome class
@@ -213,6 +216,34 @@ namespace Biomorpher
 
             // Return the number of performance criteria
             return performas.Count;
+        }
+
+
+        /// <summary>
+        /// Get the names of the performance criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        public void GetCriteria(List<string> criteria)
+        {
+            try
+            {
+                IEnumerator<IGH_ActiveObject> enumerator = canvas.Document.ActiveObjects().GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    IGH_ActiveObject current = enumerator.Current;
+                    if (current != null)
+                    {
+                        if (Params.Input[2].DependsOn(current))
+                        {
+                            criteria.Add(current.Name);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
         }
 
 

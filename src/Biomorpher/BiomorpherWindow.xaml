@@ -40,6 +40,13 @@
                 </DockPanel>
             </TabItem>
 
+            <TabItem Header="About" x:Name="Tab4">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab4_secondary"/>
+                    <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab4_primary"/>
+                </DockPanel>
+            </TabItem>
+
         </TabControl>
 
     </Grid>
@@ -58,7 +65,7 @@
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
-             /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
+             /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </controls:MetroWindow.Resources>
