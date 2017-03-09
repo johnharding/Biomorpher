@@ -198,7 +198,8 @@ namespace Biomorpher
             owner.canvas.Document.Enabled = false;                       
             owner.SetSliders(chromo, sliders, genePools);    
             owner.canvas.Document.Enabled = true;                            
-            owner.ExpireSolution(true);                    
+            owner.ExpireSolution(true);
+            highlightedCluster = chromo.clusterId;    
         }
 
 
@@ -862,14 +863,15 @@ namespace Biomorpher
                 else
                     border_p.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
 
-                // Herein lies a problem.....
-                string label_p;
-                //if (i < criteria.Count)
-                    //label_p = criteria[i];
-                //else
-                    //label_p = "Performance value " + i;
 
-                label_p = criteria.Count.ToString();
+                // Try to catch if we just don't have the criteria info
+                string label_p;
+                if (i < criteria.Count)
+                    label_p = criteria[i] + highlightedCluster;
+                else
+                    label_p = "Performance value " + i;
+
+                //label_p = criteria.Count.ToString();
 
                 DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
 
