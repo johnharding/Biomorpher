@@ -193,26 +193,27 @@ namespace Biomorpher
             allGeometry.Add(joinedMesh);
 
 
-
             // Get performance data
             List<double> performas = new List<double>();
+            List<string> criteria = new List<string>();
+
             foreach (IGH_Param param in Params.Input[2].Sources)
             {
+
                 foreach (Object myObj in param.VolatileData.AllData(true))
                 {
                     if (myObj is GH_Number)
                     {
                         GH_Number temp = (GH_Number)myObj;
                         performas.Add(temp.Value);
-
+                        criteria.Add(param.NickName);
                     }
                 }
-
                 
             }
 
             // Set the phenotype within the chromosome class
-            chromo.SetPhenotype(allGeometry, performas);
+            chromo.SetPhenotype(allGeometry, performas, criteria);
 
             // Return the number of performance criteria
             return performas.Count;
@@ -220,7 +221,7 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Get the names of the performance criteria
+        /// Get the names of the performance criteria (DEPRECIATED)
         /// </summary>
         /// <param name="criteria"></param>
         public void GetCriteria(List<string> criteria)

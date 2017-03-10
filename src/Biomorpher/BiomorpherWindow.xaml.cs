@@ -39,12 +39,7 @@ namespace Biomorpher
         private int performanceCount;
 
         /// <summary>
-        /// List of performance criteria names
-        /// </summary>
-        private List<string> criteria;
-
-        /// <summary>
-        /// indicates the particular cluster that is in focus (i.e. with performance values shown)
+        /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
         /// </summary>
         public int highlightedCluster;
 
@@ -129,7 +124,6 @@ namespace Biomorpher
             // Get sliders and gene pools
             sliders = new List<GH_NumberSlider>();
             genePools = new List<GalapagosGeneListObject>();
-            criteria = new List<string>();
             owner.GetSliders(sliders, genePools);
 
 
@@ -183,12 +177,6 @@ namespace Biomorpher
         }
 
 
-        private void GetCriteria()
-        {
-            owner.GetCriteria(criteria);
-        }
-
-
         /// <summary>
         /// Sets the Grasshopper instance to this chromosome (does not get any data)
         /// </summary>
@@ -219,9 +207,6 @@ namespace Biomorpher
 
             // 4. Get geometry and performance for each chromosome
             GetPhenotypes();
-
-            // 4a. Get performance criteria names
-            GetCriteria();
 
             // 5. Add population to history
             popHistory.AddPop(population);
@@ -310,7 +295,8 @@ namespace Biomorpher
             return phenotypes.ToList();
         }
 
-        //Gets representative performance values
+
+        //Gets *representative* performance values
         private double[][] getRepresentativePerformas()
         {
             double[][] performas = new double[12][];
@@ -332,6 +318,35 @@ namespace Biomorpher
             }
             return performas;
         }
+
+
+
+        //Gets *representative* criteria names
+        private string[][] getRepresentativeCriteria()
+        {
+            string[][] crit = new string[12][];
+
+            Chromosome[] chromosomes = population.chromosomes;
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                if (chromosomes[i].isRepresentative)
+                {
+                    int critCount = chromosomes[i].GetCriteria().Count;
+
+                    crit[chromosomes[i].clusterId] = new string[critCount];
+                    for (int j = 0; j < critCount; j++)
+                    {
+                        crit[chromosomes[i].clusterId][j] = chromosomes[i].GetCriteria()[j];
+                    }
+                }
+
+            }
+            return crit;
+        }
+
+
+
+
 
 
 
@@ -829,10 +844,6 @@ namespace Biomorpher
             border_sel.Child = label_sel;
             sp.Children.Add(border_sel);
 
-
-
-
-
             DockPanel dp_buttons = new DockPanel();
             dp_buttons.LastChildFill = false;
 
@@ -854,6 +865,10 @@ namespace Biomorpher
             sp.Children.Add(border_buttons);
 
 
+            double[][] performas = getRepresentativePerformas();
+            string[][] criteria = getRepresentativeCriteria();
+
+
             //Add performance label
             for(int i=0; i<performanceCount; i++)
             {
@@ -866,12 +881,16 @@ namespace Biomorpher
 
                 // Try to catch if we just don't have the criteria info
                 string label_p;
-                if (i < criteria.Count)
-                    label_p = criteria[i] + highlightedCluster;
-                else
-                    label_p = "Performance value " + i;
 
-                //label_p = criteria.Count.ToString();
+                // CAREFUL!!
+                try
+                {
+                    label_p = criteria[highlightedCluster][i].ToString() + "   =   " + performas[highlightedCluster][i].ToString();
+                }
+                catch
+                {
+                    label_p = "data not found!";
+                }
 
                 DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
 

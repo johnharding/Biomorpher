@@ -166,17 +166,24 @@ namespace Biomorpher.IGA
             return performance;
         }
 
+
+        public List<string> GetCriteria()
+        {
+            return criteria;
+        }
+
         /// <summary>
         /// Sets the phenotype for this chromosome with some input geometry
         /// </summary>
         /// <param name="meshes"></param>
-        public void SetPhenotype(List<Mesh> meshes, List<double> performas)
+        public void SetPhenotype(List<Mesh> meshes, List<double> performas, List<string> crit)
         {
             // Reset the phenotype to some input meshes
             // TODO: in the future this should be generic geometry including curves, etc.
             //       the argument for this method will have to be updated also.
             phenotype = new List<Mesh>(meshes);
             performance = new List<double>(performas);
+            criteria = new List<string>(crit);
 
         }
 
