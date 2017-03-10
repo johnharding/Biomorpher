@@ -62,7 +62,7 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddGenericParameter("Clusters", "Clusters", "Cluster data", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Clusters", "Clusters", "Cluster data (k-means++)", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -208,6 +208,14 @@ namespace Biomorpher
                         performas.Add(temp.Value);
                         criteria.Add(param.NickName);
                     }
+
+                    else if (myObj is GH_Integer)
+                    {
+                        GH_Integer temp = (GH_Integer)myObj;
+                        performas.Add((double)temp.Value);
+                        criteria.Add(param.NickName);
+                    }
+                    
                 }
                 
             }
@@ -221,33 +229,9 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Get the names of the performance criteria (DEPRECIATED)
+        /// Cluster tree data for the output
         /// </summary>
-        /// <param name="criteria"></param>
-        public void GetCriteria(List<string> criteria)
-        {
-            try
-            {
-                IEnumerator<IGH_ActiveObject> enumerator = canvas.Document.ActiveObjects().GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    IGH_ActiveObject current = enumerator.Current;
-                    if (current != null)
-                    {
-                        if (Params.Input[2].DependsOn(current))
-                        {
-                            criteria.Add(current.Name);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-
-            }
-        }
-
-
+        /// <param name="pop"></param>
         public void SetComponentOut(Population pop)
         {
             myNumbers = new GH_Structure<GH_Number>();

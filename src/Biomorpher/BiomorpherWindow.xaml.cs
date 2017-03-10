@@ -38,10 +38,25 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private int performanceCount;
 
+
         /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
         /// </summary>
-        public int highlightedCluster;
+        private int highlightedCluster;
+        public int HighlightedCluster
+        {
+            get { return highlightedCluster; }
+            set
+            {
+                if (value != highlightedCluster)
+                {
+                    highlightedCluster = value;
+                    OnPropertyChanged("HighlightedCluster");
+                }
+            }
+        }
+
+
 
         //UI properties
         private int popSize;
@@ -136,7 +151,7 @@ namespace Biomorpher
             ParentCount = 0;
             performanceCount = 0;
             GO = false;
-            highlightedCluster = 0;
+            HighlightedCluster = 0;
 
             controls = new Dictionary<string, FrameworkElement>();
             fontsize = 16;
@@ -187,7 +202,10 @@ namespace Biomorpher
             owner.SetSliders(chromo, sliders, genePools);    
             owner.canvas.Document.Enabled = true;                            
             owner.ExpireSolution(true);
-            highlightedCluster = chromo.clusterId;    
+            HighlightedCluster = chromo.clusterId;
+
+            // Update performance tab
+            tab2_updatePerforms();
         }
 
 
@@ -245,6 +263,7 @@ namespace Biomorpher
             // 5. Update display of K-Means and representative meshes
             tab1_primary_update();
             tab2_primary_update();
+            tab2_updatePerforms(); 
 
             // 6. Advance the generation counter and store the population historically.
             popHistory.AddPop(population);
@@ -800,6 +819,7 @@ namespace Biomorpher
         public void tab2_secondary_settings()
         {
             StackPanel sp = new StackPanel();
+            controls.Add("SP", sp);
 
             //Header
             Border border_head = new Border();
@@ -812,7 +832,6 @@ namespace Biomorpher
 
             border_head.Child = label_head;
             sp.Children.Add(border_head);
-
 
             //Generation info
             Border border_gen = new Border();
@@ -865,41 +884,20 @@ namespace Biomorpher
             sp.Children.Add(border_buttons);
 
 
-            double[][] performas = getRepresentativePerformas();
-            string[][] criteria = getRepresentativeCriteria();
-
-
-            //Add performance label
-            for(int i=0; i<performanceCount; i++)
+            // borders
+            for (int i = 0; i < performanceCount; i++)
             {
                 Border border_p = new Border();
-                if(i==0)
-                    border_p.Margin = new Thickness(margin_w, margin_h+20, margin_w, 0);
-                else
-                    border_p.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-
-
-                // Try to catch if we just don't have the criteria info
-                string label_p;
-
-                // CAREFUL!!
-                try
-                {
-                    label_p = criteria[highlightedCluster][i].ToString() + "   =   " + performas[highlightedCluster][i].ToString();
-                }
-                catch
-                {
-                    label_p = "data not found!";
-                }
-
-                DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
-
-                border_p.Child = dp_p;
+                controls.Add("PERFBORDER" + i, border_p);
                 sp.Children.Add(border_p);
             }
 
-            //Add the stackpanel to the secondary area of Tab 2
+            // Performance labels
+            tab2_updatePerforms();
+
+            //Add the stackpanels to the secondary area of Tab 2
             Tab2_secondary.Child = sp;
+
         }
 
 
@@ -933,7 +931,6 @@ namespace Biomorpher
             DockPanel.SetDock(border_c, Dock.Left);
             dp.Children.Add(border_c);
 
-
             //Create performance label
             Label l = new Label();
             l.Content = text;
@@ -943,6 +940,52 @@ namespace Biomorpher
 
             return dp;
         }
+
+
+
+        /// <summary>
+        /// Updates the list of performance 'borders'
+        /// </summary>
+        private void tab2_updatePerforms()
+        {
+
+            // Get the performance borders from the dictionary
+            List<Border> myBorders = new List<Border>();
+            for (int i = 0; i < performanceCount; i++)
+            {
+                myBorders.Add((Border)controls["PERFBORDER" + i]);
+            }
+
+            // Performance labels
+            double[][] performas = getRepresentativePerformas();
+            string[][] criteria = getRepresentativeCriteria();
+
+
+            //Add performance label
+            for (int i = 0; i < performanceCount; i++)
+            {
+                if(i==0) myBorders[i].Margin = new Thickness(margin_w, margin_h+30, margin_w, 0);
+                else myBorders[i].Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+                // Try to catch if we just don't have the criteria info
+                string label_p;
+
+                // CAREFUL!!
+                try
+                {
+                    label_p = criteria[HighlightedCluster][i].ToString() + "   =   " + performas[HighlightedCluster][i].ToString();
+                }
+                catch
+                {
+                    label_p = "data not found!";
+                }
+
+                DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
+                myBorders[i].Child = dp_p;
+            }
+        }
+
+
 
 
 
@@ -1130,8 +1173,9 @@ namespace Biomorpher
                 Slider s_popSize = (Slider)controls["s_tab1_popSize"];
                 s_popSize.IsEnabled = false;
 
-                Slider s_mutation = (Slider)controls["s_tab1_mutation"];
-                s_mutation.IsEnabled = false;
+                //(Keep mutation enabled?)
+                //Slider s_mutation = (Slider)controls["s_tab1_mutation"];
+                //s_mutation.IsEnabled = false;
             }
 
             GO = true;
