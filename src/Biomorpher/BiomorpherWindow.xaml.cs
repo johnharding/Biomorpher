@@ -595,7 +595,7 @@ namespace Biomorpher
 
                 //Label
                 Label l = new Label();
-                int index = i + 1;
+                int index = i;
                 l.Content = index.ToString();
                 l.FontSize = fontsize;
                 l.Foreground = Brushes.LightGray;
@@ -739,8 +739,8 @@ namespace Biomorpher
                     double t_map = alfaMin + (t_normal * (alfaMax - alfaMin));
 
 
-                    //change alpha value
-                    Color c = Color.FromArgb(Convert.ToByte(t_map), rgb_performance[j].R, rgb_performance[j].G, rgb_performance[j].B);
+                    //change alpha value. MODULO 6 MAXIMUM?
+                    Color c = Color.FromArgb(Convert.ToByte(t_map), rgb_performance[j % 6].R, rgb_performance[j % 6].G, rgb_performance[j % 6].B);
                     colours.Add(c);
 
                     //detect if the performance is an extrema value
@@ -884,7 +884,12 @@ namespace Biomorpher
             sp.Children.Add(border_buttons);
 
 
-            // borders
+            // Display the highlighted design
+            Border border_cluster = new Border();
+            controls.Add("CLUSTER", border_cluster);
+            sp.Children.Add(border_cluster);
+
+            // Add the performance borders
             for (int i = 0; i < performanceCount; i++)
             {
                 Border border_p = new Border();
@@ -949,6 +954,18 @@ namespace Biomorpher
         private void tab2_updatePerforms()
         {
 
+            //Generation info
+            Border border_clus = (Border) controls["CLUSTER"];
+            border_clus.Margin = new Thickness(margin_w, margin_h + 30, margin_w, 0);
+            
+            Label label_gen = new Label();
+            label_gen.Content = "Design " + HighlightedCluster;
+            label_gen.FontSize = fontsize; // fontsize;
+            label_gen.FontWeight = FontWeights.Bold;
+
+            border_clus.Child = label_gen;
+
+
             // Get the performance borders from the dictionary
             List<Border> myBorders = new List<Border>();
             for (int i = 0; i < performanceCount; i++)
@@ -964,8 +981,7 @@ namespace Biomorpher
             //Add performance label
             for (int i = 0; i < performanceCount; i++)
             {
-                if(i==0) myBorders[i].Margin = new Thickness(margin_w, margin_h+30, margin_w, 0);
-                else myBorders[i].Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+                myBorders[i].Margin = new Thickness(margin_w+5, margin_h, margin_w, 0);
 
                 // Try to catch if we just don't have the criteria info
                 string label_p;
@@ -980,7 +996,8 @@ namespace Biomorpher
                     label_p = "data not found!";
                 }
 
-                DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i]);
+                // 6 colours MAX!
+                DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i%6]);
                 myBorders[i].Child = dp_p;
             }
         }

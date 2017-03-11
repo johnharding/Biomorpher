@@ -51,9 +51,6 @@ namespace Biomorpher
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].Optional = true;
-            //pm[0].DataMapping = GH_DataMapping.Flatten;
-            //pm[1].DataMapping = GH_DataMapping.Flatten;
-            //pm[2].DataMapping = GH_DataMapping.Flatten;
         }
         
         /// <summary>
@@ -300,7 +297,6 @@ namespace Biomorpher
             Menu_AppendItem(menu, @"Github source", GotoGithub);
         }
 
-       
 
         private void GotoGithub(Object sender, EventArgs e)
         {
@@ -338,7 +334,7 @@ namespace Biomorpher
             ExpireSolution(true);
         }
 
-        //TODO: send to grasshopper group
+        //TODO: send to grasshopper group from a window link (in About)
         //private void gotoGrasshopperGroup(Object sender, EventArgs e)
         //{
         //System.Diagnostics.Process.Start(@"http://www.????");
