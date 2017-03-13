@@ -989,7 +989,8 @@ namespace Biomorpher
                 // CAREFUL!!
                 try
                 {
-                    label_p = criteria[HighlightedCluster][i].ToString() + "   =   " + performas[HighlightedCluster][i].ToString();
+                    double roundedPerf = Math.Round(performas[HighlightedCluster][i], 3);
+                    label_p = criteria[HighlightedCluster][i].ToString() + "   =   " + roundedPerf.ToString();
                 }
                 catch
                 {
