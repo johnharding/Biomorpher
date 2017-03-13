@@ -83,7 +83,9 @@ namespace Biomorpher
             //Create material and add geometry to viewport
             var brush = new SolidColorBrush(Color.FromArgb(220, (byte)51, (byte)188, (byte)188));
             DiffuseMaterial material = new DiffuseMaterial(brush);
+            DiffuseMaterial backmaterial = new DiffuseMaterial(Brushes.LightGray);
             GeometryModel3D model = new GeometryModel3D(mesh_w, material);
+            model.BackMaterial = backmaterial;
             ModelVisual3D vis = new ModelVisual3D();
             vis.Content = model;
 

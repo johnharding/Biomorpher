@@ -11,6 +11,17 @@ namespace Biomorpher.IGA
     /// </summary>
     public static class Friends
     {
+
+        /// <summary>
+        /// Biomorpher version
+        /// </summary>
+        /// <returns></returns>
+        public static string VerionInfo()
+        {
+            return "0.1.0";
+        }
+
+
         //Function to get random number
         private static readonly Random getrandom = new Random(21);
         private static readonly object syncLock = new object();
@@ -40,6 +51,9 @@ namespace Biomorpher.IGA
                 return getrandom.NextDouble();
             }
         }
+
+
+
     }
 
 }

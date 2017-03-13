@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Biomorpher.IGA;
 
 namespace Biomorpher
 {
@@ -22,7 +23,7 @@ namespace Biomorpher
         }
         public override string Version
         {
-            get { return "0.0.1"; }
+            get { return Friends.VerionInfo(); }
         }
         public override Guid Id
         {

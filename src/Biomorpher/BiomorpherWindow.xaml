@@ -46,6 +46,7 @@
                     <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab4_primary"/>
                 </DockPanel>
             </TabItem>
+            
 
         </TabControl>
 

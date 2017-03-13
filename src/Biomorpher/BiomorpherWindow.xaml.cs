@@ -163,6 +163,9 @@ namespace Biomorpher
             
             //Initialise Tab 1 Start settings
             tab1_secondary_settings();
+
+            // Show info
+            Tab4_primary_permanent();
         }
 
 
@@ -235,7 +238,8 @@ namespace Biomorpher
 
             tab12_primary_permanent(2);
             tab2_primary_update();
-            tab2_secondary_settings(); 
+            tab2_secondary_settings();
+            
         }
 
 
@@ -422,7 +426,7 @@ namespace Biomorpher
             outline.StrokeThickness = 1;
             outline.Stroke = Brushes.SlateGray;
 
-            Canvas.SetLeft(outline, 0);
+            Canvas.SetLeft(outline, 40);
             Canvas.SetTop(outline, 0);
             canvas.Children.Add(outline);
 
@@ -474,14 +478,14 @@ namespace Biomorpher
                 System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
                 ln.StrokeThickness = 1;
                 ln.Stroke = Brushes.SlateGray;
-                ln.X1 = width / 2.0;
+                ln.X1 = width / 2.0 + 40;
                 ln.Y1 = width / 2.0;
-                ln.X2 = (width / 2.0) + xCoord;
+                ln.X2 = (width / 2.0) + xCoord + 40;
                 ln.Y2 = (width / 2.0) + yCoord;
                 canvas.Children.Add(ln);
 
                 //drawing order
-                Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0));
+                Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0) + 40);
                 Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
                 canvas.Children.Add(circle);
             }
@@ -493,7 +497,7 @@ namespace Biomorpher
             circle2.Fill = Brushes.White; //colour
             circle2.Stroke = Brushes.SlateGray;
             circle2.StrokeThickness = 1;
-            Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0));
+            Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0) + 40);
             Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0));
             canvas.Children.Add(circle2);
 
@@ -884,7 +888,23 @@ namespace Biomorpher
             sp.Children.Add(border_buttons);
 
 
-            // Display the highlighted design
+            // Doubleclick description
+            Border border_dcl = new Border();
+            border_dcl.Margin = new Thickness(margin_w, margin_h + 5, margin_w, 0);
+
+            TextBlock txt_dcl = new TextBlock();
+            txt_dcl.TextWrapping = TextWrapping.Wrap;
+            txt_dcl.FontSize = fontsize2;
+            txt_dcl.Inlines.Add("\nDouble click a design to diplay its Rhino/Grasshopper instance and review performance data");
+
+            Label label_dcl = new Label();
+            label_dcl.Content = txt_dcl;
+
+            border_dcl.Child = label_dcl;
+            sp.Children.Add(border_dcl);
+
+
+            // Display the highlighted design (made elsewhere)
             Border border_cluster = new Border();
             controls.Add("CLUSTER", border_cluster);
             sp.Children.Add(border_cluster);
@@ -954,9 +974,9 @@ namespace Biomorpher
         private void tab2_updatePerforms()
         {
 
-            //Generation info
+            //Design info
             Border border_clus = (Border) controls["CLUSTER"];
-            border_clus.Margin = new Thickness(margin_w, margin_h + 30, margin_w, 0);
+            border_clus.Margin = new Thickness(margin_w, margin_h + 10, margin_w, 0);
             
             Label label_gen = new Label();
             label_gen.Content = "Design " + HighlightedCluster;
@@ -1012,7 +1032,72 @@ namespace Biomorpher
 
 
 
+        //-------------------------------------------------------------------------------TAB 4: ABOUT------------------------------------------------------------------------//
+        //HERE GOES THE CODE FOR TAB 4
 
+        void Tab4_primary_permanent()
+        {
+            StackPanel sp = new StackPanel();
+            Border border_dcl = new Border();
+            border_dcl.Margin = new Thickness(10, 10, 40, 20);
+            sp.Children.Add(border_dcl);
+            
+            //TextBox fish = new TextBox();
+            //fish.Text = "Sauce";
+
+            BitmapImage b = new BitmapImage();
+            b.BeginInit();
+            b.UriSource = new Uri(@"Images\BioIcon2_240.png", UriKind.Relative);
+            b.EndInit();
+
+            Image myImage = new Image();
+            myImage.Source = b;
+            myImage.Width = 100;
+            myImage.Height = 100;
+            sp.Children.Add(myImage);
+
+            TextBlock txt_dcl = new TextBlock();
+            txt_dcl.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            txt_dcl.FontSize = 24;
+            txt_dcl.Inlines.Add("\nBiomorpher  (v"+Friends.VerionInfo()+")");
+            sp.Children.Add(txt_dcl);
+
+            Border border_dcl2 = new Border();
+            border_dcl2.Margin = new Thickness(10, 10, 16, 20);
+            sp.Children.Add(border_dcl2);
+
+            TextBlock txt_dcl2 = new TextBlock();
+            txt_dcl2.TextWrapping = TextWrapping.Wrap;
+            txt_dcl2.FontSize = 14;
+            txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed.");
+            txt_dcl2.Inlines.Add("\n\nThis work is sponsored by the 2016/17 UWE VC Early Career Researcher Development Award and was initially inspired by Richard Dawkins' Biomorphs from his 1986 book, The Blind Watchmaker: Why the Evidence of Evolution Reveals a Universe without Design.");
+            txt_dcl2.Inlines.Add("\n\n\nDevelopment:\tJohn Harding & Cecilie Brandt Olsen");
+            txt_dcl2.Inlines.Add("\nCopyright:\t2017 John Harding & UWE");
+            txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
+            txt_dcl2.Inlines.Add("\nLicence:\t\tMIT");
+            txt_dcl2.Inlines.Add("\nSource:\t\t http://github.com/johnharding/Biomorpher");
+            txt_dcl2.Inlines.Add("\nGHgroup:\tn/a");
+            txt_dcl2.Inlines.Add("\n\nDependencies:\tHelixToolkit: https://github.com/helix-toolkit");
+            txt_dcl2.Inlines.Add("\n\t\tMahapps.metro: http://mahapps.com/");
+            sp.Children.Add(txt_dcl2);
+
+            Tab4_primary.Child = sp;
+        }
+        /*
+
+        Biomorpher
+
+        
+        
+
+        Dependencies
+
+        HelixToolkit: https://github.com/helix-toolkit
+        Mahapps.metro: http://mahapps.com/
+  
+        Licence: MIT
+         
+        */
 
 
 
