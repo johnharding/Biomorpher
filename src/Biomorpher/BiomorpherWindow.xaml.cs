@@ -21,6 +21,8 @@ using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
+using Grasshopper.Kernel.Data;
+using Grasshopper;
 
 namespace Biomorpher
 {
@@ -32,7 +34,7 @@ namespace Biomorpher
         // Fields
         private bool GO;
         private Population population;
-        private PopHistory popHistory;
+        private DataTree<Population> popTree;
         private List<GH_NumberSlider> sliders;
         private List<GalapagosGeneListObject> genePools;
         private BiomorpherComponent owner;
@@ -146,7 +148,7 @@ namespace Biomorpher
             InitializeComponent();
             Topmost = true;
             PopSize = 100;
-            MutateProbability = 0.1;
+            MutateProbability = 0.01;
             Generation = 0;
             ParentCount = 0;
             performanceCount = 0;
@@ -218,7 +220,7 @@ namespace Biomorpher
         public void RunInit()
         {
             // 1. Initialise population history
-            popHistory = new PopHistory();
+            popTree = new DataTree<Population>();
 
             // 2. Create initial population
             population = new Population(popSize, sliders, genePools);
@@ -229,16 +231,15 @@ namespace Biomorpher
             // 4. Get geometry and performance for each chromosome
             GetPhenotypes();
 
-            // 5. Add population to history
-            popHistory.AddPop(population);
-
-            // 6. Setup tab layout
+            // 5. Setup tab layout
             tab12_primary_permanent(1);
             tab1_primary_update();
 
             tab12_primary_permanent(2);
             tab2_primary_update();
             tab2_secondary_settings();
+
+            tab3_primary_update();
             
         }
 
@@ -249,13 +250,18 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
-            // 1. Create new populaltion using user selection
-            population.RoulettePop();
+            
+            // 0. AFTER selections have been made, add initial population to history when we have fitness values!
+            AddPop(population, Generation);
 
+            // 1. Create new populaltion using user selection (resets fitnesses)
+            Generation++;
+            population.RoulettePop();
+            
             // 2. Mutate population using user preferences
             population.MutatePop(mutateProbability);
 
-            // 2a. Jiggle the population a little to avoid repeats
+            // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
             population.JigglePop(0.01);
 
             // 3. Perform K-means clustering
@@ -267,11 +273,19 @@ namespace Biomorpher
             // 5. Update display of K-Means and representative meshes
             tab1_primary_update();
             tab2_primary_update();
-            tab2_updatePerforms(); 
+            tab2_updatePerforms();
 
-            // 6. Advance the generation counter and store the population historically.
-            popHistory.AddPop(population);
-            Generation++;
+            tab3_primary_update();
+            
+        }
+
+
+        /// <summary>
+        /// Advances pop using a performance criteria.
+        /// </summary>
+        public void RunAuto()
+        {
+            //TODO: Advances pop using a performance criteria.
         }
 
 
@@ -403,6 +417,7 @@ namespace Biomorpher
 
                 //Add the new canvas to the dockpanel
                 dp.Children.Add(canvas);
+                dp.ClipToBounds = true;
             }
         }
 
@@ -1030,6 +1045,64 @@ namespace Biomorpher
         //-------------------------------------------------------------------------------TAB 3: DESIGN HISTORY------------------------------------------------------------------------//
         //HERE GOES THE CODE FOR TAB 3
 
+        //Updates the display of the representative meshes and their performance values
+        public void tab3_primary_update()
+        {
+
+            Canvas canvas = new Canvas();
+            canvas.Background = new SolidColorBrush(Colors.White);
+            //string name = "canvas" + clusterIndex;
+            canvas.Name = "jim";
+
+
+            //Add outline circle
+            System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
+            outline.Height = 2300;
+            outline.Width = 2300;
+            outline.StrokeThickness = 1;
+            outline.Stroke = Brushes.SlateGray;
+
+            Canvas.SetLeft(outline, 40);
+            Canvas.SetTop(outline, 0);
+            canvas.Children.Add(outline);
+
+
+            Path myPath = new Path();
+            myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
+            myPath.Stroke = Brushes.SlateGray;
+            myPath.StrokeThickness = 3;
+            canvas.Children.Add(myPath);
+
+
+            //Tab3_primary.Child = canvas;
+            Tab3_primary.ClipToBounds = true;
+
+            HistoryCanvas.Children.Add(canvas);
+
+            Mesh myMesh = new Mesh();
+            
+            Viewport3d vp3d = new Viewport3d(Friends.SampleMesh(), 999, this); 
+            DockPanel myPanel = new DockPanel();
+            myPanel.Width = 240;
+            myPanel.Height = 200;
+            myPanel.Children.Add(vp3d);
+            HistoryCanvas.Children.Add(myPanel);
+
+        }
+
+
+        /// <summary>
+        /// Add a population to the history
+        /// </summary>
+        /// <param name="pop"></param>
+        /// <param name="generation"></param>
+        public void AddPop(Population pop, int generation)
+        {
+            GH_Path myPath = new GH_Path();
+            myPath.AppendElement(generation);
+            myPath.AppendElement(0);
+            popTree.Add(new Population(pop), myPath); //Note we have to make a copy here.
+        }
 
 
         //-------------------------------------------------------------------------------TAB 4: ABOUT------------------------------------------------------------------------//
@@ -1075,7 +1148,7 @@ namespace Biomorpher
             txt_dcl2.Inlines.Add("\nCopyright:\t2017 John Harding & UWE");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
             txt_dcl2.Inlines.Add("\nLicence:\t\tMIT");
-            txt_dcl2.Inlines.Add("\nSource:\t\t http://github.com/johnharding/Biomorpher");
+            txt_dcl2.Inlines.Add("\nSource:\t\thttp://github.com/johnharding/Biomorpher");
             txt_dcl2.Inlines.Add("\nGHgroup:\tn/a");
             txt_dcl2.Inlines.Add("\n\nDependencies:\tHelixToolkit: https://github.com/helix-toolkit");
             txt_dcl2.Inlines.Add("\n\t\tMahapps.metro: http://mahapps.com/");

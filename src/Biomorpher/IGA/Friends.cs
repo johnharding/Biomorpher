@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Rhino.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Biomorpher.IGA
 {
@@ -52,8 +55,42 @@ namespace Biomorpher.IGA
             }
         }
 
+        /// <summary>
+        /// Makes an open bezier curve pathgeometry with 4 points
+        /// </summary>
+        /// <param name="P1x"></param>
+        /// <param name="P1y"></param>
+        /// <param name="P2x"></param>
+        /// <param name="P2y"></param>
+        /// <param name="P3x"></param>
+        /// <param name="P3y"></param>
+        /// <param name="P4x"></param>
+        /// <param name="P4y"></param>
+        /// <returns></returns>
+        public static PathGeometry MakeBezierGeometry(double P1x, double P1y, double P2x, double P2y, double P3x, double P3y, double P4x, double P4y)
+        {
+            BezierSegment myBezier = new BezierSegment(new System.Windows.Point(P2x, P2y), new System.Windows.Point(P3x, P3y), new System.Windows.Point(P4x, P4y), true);
+            PathFigure myPathFigure = new PathFigure();
+            myPathFigure.StartPoint = new System.Windows.Point(P1x, P1y);
+            myPathFigure.Segments.Add(myBezier);
+            PathGeometry myPathGeometry = new PathGeometry();
+            myPathGeometry.Figures.Add(myPathFigure);
+            return myPathGeometry;
+        }
 
-
+        /// <summary>
+        /// A default Rhino Mesh object
+        /// </summary>
+        /// <returns></returns>
+        public static Mesh SampleMesh()
+        {
+            Mesh sampleMesh = new Mesh();
+            sampleMesh.Vertices.Add(200, 200, 200);
+            sampleMesh.Vertices.Add(200, 600, 200);
+            sampleMesh.Vertices.Add(400, 300, 400);
+            sampleMesh.Faces.AddFace(0, 1, 2);
+            return sampleMesh;
+        }
     }
 
 }

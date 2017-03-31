@@ -99,7 +99,6 @@
     <Compile Include="IGA\Chromosome.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IGA\PopHistory.cs" />
     <Compile Include="IGA\Population.cs" />
     <Compile Include="IGA\Friends.cs" />
     <Compile Include="RoundedRectangle.cs" />
