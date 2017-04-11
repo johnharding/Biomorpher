@@ -143,7 +143,6 @@ namespace Biomorpher
             genePools = new List<GalapagosGeneListObject>();
             owner.GetSliders(sliders, genePools);
 
-
             // Initial Window things
             InitializeComponent();
             Topmost = true;
@@ -296,7 +295,6 @@ namespace Biomorpher
         {
             // TODO: Set sliders and get geometry for a chosen chromosome
 
-
             // Close the window
             this.Close();
         }
@@ -380,11 +378,6 @@ namespace Biomorpher
             }
             return crit;
         }
-
-
-
-
-
 
 
         //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
@@ -1081,6 +1074,8 @@ namespace Biomorpher
 
             Mesh myMesh = new Mesh();
             
+            //
+
             Viewport3d vp3d = new Viewport3d(Friends.SampleMesh(), 999, this); 
             DockPanel myPanel = new DockPanel();
             myPanel.Width = 240;
@@ -1098,10 +1093,9 @@ namespace Biomorpher
         /// <param name="generation"></param>
         public void AddPop(Population pop, int generation)
         {
-            GH_Path myPath = new GH_Path();
-            myPath.AppendElement(generation);
-            myPath.AppendElement(0);
-            popTree.Add(new Population(pop), myPath); //Note we have to make a copy here.
+            pop.popPath.AppendElement(generation);
+            //pop.popPath.AppendElement(0);
+            popTree.Add(new Population(pop), pop.popPath); //Note we have to make a copy here.
         }
 
 
@@ -1149,7 +1143,7 @@ namespace Biomorpher
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
             txt_dcl2.Inlines.Add("\nLicence:\t\tMIT");
             txt_dcl2.Inlines.Add("\nSource:\t\thttp://github.com/johnharding/Biomorpher");
-            txt_dcl2.Inlines.Add("\nGHgroup:\tn/a");
+            txt_dcl2.Inlines.Add("\nGHgroup:\thttp://www.grasshopper3d.com/group/biomorpher");
             txt_dcl2.Inlines.Add("\n\nDependencies:\tHelixToolkit: https://github.com/helix-toolkit");
             txt_dcl2.Inlines.Add("\n\t\tMahapps.metro: http://mahapps.com/");
             sp.Children.Add(txt_dcl2);

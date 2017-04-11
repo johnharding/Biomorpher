@@ -60,6 +60,7 @@ namespace Biomorpher
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
             pm.AddGenericParameter("Clusters", "Clusters", "Cluster data (k-means++)", GH_ParamAccess.tree);
+            //pm.AddGenericParameter("PopTree", "PopTree", "Historic population data", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -259,6 +260,9 @@ namespace Biomorpher
                     }
                 }
             }
+
+            
+
         }
 
 

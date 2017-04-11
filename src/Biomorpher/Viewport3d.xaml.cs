@@ -58,6 +58,16 @@ namespace Biomorpher
             //Windows geometry objects
             MeshGeometry3D mesh_w = new MeshGeometry3D();
             Point3DCollection pts_w = new Point3DCollection();
+            //GradientStopCollection gsp = new GradientStopCollection();
+            //int vertexCount = mesh.Vertices.Count;
+            double aveA = 0;
+            double aveR = 0;
+            double aveG = 0;
+            double aveB = 0;
+
+            // TODO: Use Helix own meshgeometry wrap
+            //MeshGeometryVisual3D jimmy = new MeshGeometryVisual3D();
+           
 
             if (mesh != null)
             {
@@ -65,25 +75,83 @@ namespace Biomorpher
                 for (int i = 0; i < mesh.Vertices.Count; i++)
                 {
                     pts_w.Add(new Point3D(mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z));
+                    
                 }
 
                 mesh_w.Positions = pts_w;
 
-                //define faces
+                //gsp.Clear();
+                //gsp.Add(new GradientStop(Colors.Red, 0.0));
+                //gsp.Add(new GradientStop(Colors.Blue, 1.0));
+
+                
+                /*
+                //define vertex colouring
+                for (int i = 0; i < mesh.VertexColors.Count; i++)
+                {
+                    //mesh_w.TextureCoordinates.Add(new System.Windows.Point(((double)i) / (double)mesh.VertexColors.Count-1, 1));
+                    //gsp.Add(new GradientStop(Color.FromArgb(mesh.VertexColors[i].A, mesh.VertexColors[i].R, mesh.VertexColors[i].G, mesh.VertexColors[i].B), ((double)i)/mesh.VertexColors.Count-1));
+                    //mesh_w.TextureCoordinates.Add(new System.Windows.Point(i / mesh.VertexColors.Count, 1));
+                    //gsp.Add(new GradientStop(Color.FromArgb(mesh.VertexColors[i].A, mesh.VertexColors[i].R, mesh.VertexColors[i].G, mesh.VertexColors[i].B), i));
+                    //mesh_w.TextureCoordinates.Add(new System.Windows.Point(0, Friends.GetRandomDouble()));
+                    //mesh_w.TextureCoordinates.Add(new System.Windows.Point(0, 0.1));
+                    //mesh_w.TextureCoordinates.Add(new System.Windows.Point(0, 0.9));
+
+                    double val = (double)i / (double)(mesh.VertexColors.Count+1);
+                    mesh_w.TextureCoordinates.Add(new System.Windows.Point(0, val));
+
+                    gsp.Add(new GradientStop(Color.FromRgb(mesh.VertexColors[i].R, mesh.VertexColors[i].G, mesh.VertexColors[i].B), val));
+                }
+
+                */
+                
+                for (int i = 0; i < mesh.VertexColors.Count; i++)
+                {
+                    aveA += mesh.VertexColors[i].A;
+                    aveR += mesh.VertexColors[i].R;
+                    aveG += mesh.VertexColors[i].G;
+                    aveB += mesh.VertexColors[i].B;
+                }
+
+               
+
+
+                //define faces - triangulation only
                 for (int i = 0; i < mesh.Faces.Count; i++)
                 {
                     mesh_w.TriangleIndices.Add(mesh.Faces[i].A);
                     mesh_w.TriangleIndices.Add(mesh.Faces[i].B);
                     mesh_w.TriangleIndices.Add(mesh.Faces[i].C);
-
                 }
             }
-
+            
+             
 
             //Create material and add geometry to viewport
-            var brush = new SolidColorBrush(Color.FromArgb(220, (byte)51, (byte)188, (byte)188));
-            DiffuseMaterial material = new DiffuseMaterial(brush);
-            DiffuseMaterial backmaterial = new DiffuseMaterial(Brushes.LightGray);
+            DiffuseMaterial material;
+            DiffuseMaterial backmaterial;
+            //LinearGradientBrush lBrsh = new LinearGradientBrush(gsp, new System.Windows.Point(0.0, 0.0), new System.Windows.Point(0, 1.0));
+
+            if (mesh.VertexColors.Count > 0)
+            {
+
+                aveA/=mesh.VertexColors.Count;
+                aveR/=mesh.VertexColors.Count;
+                aveG/=mesh.VertexColors.Count;
+                aveB/=mesh.VertexColors.Count;
+
+                var avebrush = new SolidColorBrush(Color.FromArgb((byte)aveA, (byte)aveR, (byte)aveG, (byte)aveB));
+                material = new DiffuseMaterial(avebrush);
+                backmaterial = new DiffuseMaterial(avebrush);
+            }
+
+            else
+            {
+                var brush = new SolidColorBrush(Color.FromArgb(220, (byte)51, (byte)188, (byte)188));
+                material = new DiffuseMaterial(brush);
+                backmaterial = new DiffuseMaterial(Brushes.LightGray);
+            }
+
             GeometryModel3D model = new GeometryModel3D(mesh_w, material);
             model.BackMaterial = backmaterial;
             ModelVisual3D vis = new ModelVisual3D();

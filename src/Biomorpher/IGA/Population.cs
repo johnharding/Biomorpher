@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
+using Grasshopper.Kernel.Data;
 
 namespace Biomorpher.IGA
 {
@@ -14,6 +15,7 @@ namespace Biomorpher.IGA
         // List of sliders
         private List<GH_NumberSlider> popSliders;
         private List<GalapagosGeneListObject> popGenePools;
+        public GH_Path popPath { get; set; }
 
         // the population of chromosomes
         public Chromosome[] chromosomes { get; set; }
@@ -27,6 +29,7 @@ namespace Biomorpher.IGA
             chromosomes = new Chromosome[popSize];
             popSliders = new List<GH_NumberSlider>(sliders);
             popGenePools = new List<GalapagosGeneListObject>(genePools);
+            popPath = new GH_Path();
             GenerateRandomPop();
         }
 
