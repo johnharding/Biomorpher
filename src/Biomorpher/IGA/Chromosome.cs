@@ -29,7 +29,7 @@ namespace Biomorpher.IGA
         // Fitness used for elitism selection
         private double fitness {get; set;}
 
-        //k-means
+        //k-means representatve
         public bool isRepresentative;
 
         /// <summary>
@@ -110,9 +110,21 @@ namespace Biomorpher.IGA
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
             clone.fitness = this.fitness;
-            clone.clusterId = this.clusterId;
 
-            // need to also clone the phenotype geometry and optional performance criteria?
+            clone.clusterId = this.clusterId;
+            clone.isRepresentative = this.isRepresentative;
+            clone.distToRepresentative = this.distToRepresentative;
+
+            if (this.phenotype != null)
+            {
+                clone.phenotype = new List<Mesh>(this.phenotype);
+            }
+
+            if (this.performance != null)
+            {
+                clone.performance = new List<double>(this.performance);
+            }
+            
             return clone;
         }
 

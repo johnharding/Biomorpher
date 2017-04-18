@@ -98,6 +98,7 @@
     <Compile Include="BiomorpherAttributes.cs" />
     <Compile Include="BiomorpherComponent.cs" />
     <Compile Include="BiomorpherInfo.cs" />
+    <Compile Include="IGA\BioBranch.cs" />
     <Compile Include="IGA\Chromosome.cs">
       <SubType>Code</SubType>
     </Compile>

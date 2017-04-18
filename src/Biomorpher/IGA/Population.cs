@@ -15,7 +15,6 @@ namespace Biomorpher.IGA
         // List of sliders
         private List<GH_NumberSlider> popSliders;
         private List<GalapagosGeneListObject> popGenePools;
-        public GH_Path popPath { get; set; }
 
         // the population of chromosomes
         public Chromosome[] chromosomes { get; set; }
@@ -29,7 +28,6 @@ namespace Biomorpher.IGA
             chromosomes = new Chromosome[popSize];
             popSliders = new List<GH_NumberSlider>(sliders);
             popGenePools = new List<GalapagosGeneListObject>(genePools);
-            popPath = new GH_Path();
             GenerateRandomPop();
         }
 
@@ -47,6 +45,11 @@ namespace Biomorpher.IGA
             {
                 chromosomes[i] = pop.chromosomes[i].Clone();
             }
+
+            // clone the slider and genepool refs
+            popSliders = new List<GH_NumberSlider>(pop.popSliders);
+            popGenePools = new List<GalapagosGeneListObject>(pop.popGenePools);
+
         }
 
         /// <summary>
@@ -92,7 +95,9 @@ namespace Biomorpher.IGA
                     fitSum += chromosomes[j].GetFitness();
                     if (fitSum > weightedRandom)
                     {
+                        // Clone the chromosomes, but make sure to reset if the design is a cluster representative
                         newPop.chromosomes[i] = chromosomes[j].Clone();
+                        newPop.chromosomes[i].isRepresentative = false;
                         break;
                     }
                 }

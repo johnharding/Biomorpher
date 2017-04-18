@@ -34,12 +34,15 @@ namespace Biomorpher
         // Fields
         private bool GO;
         private Population population;
-        private DataTree<Population> popTree;
+        private List<BioBranch> BioBranches;
         private List<GH_NumberSlider> sliders;
         private List<GalapagosGeneListObject> genePools;
         private BiomorpherComponent owner;
         private int performanceCount;
-
+        
+        // Branch and Twig
+        private int ParentBranchID { get; set; }
+        private int ParentTwigID { get; set; }
 
         /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
@@ -135,6 +138,10 @@ namespace Biomorpher
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
         {
+
+            ParentBranchID = -1; // -1 indicates the master branch
+            ParentTwigID = 0;
+
             // Set the component passed here to a field
             owner = Owner;
 
@@ -153,15 +160,16 @@ namespace Biomorpher
             performanceCount = 0;
             GO = false;
             HighlightedCluster = 0;
-
-            controls = new Dictionary<string, FrameworkElement>();
             fontsize = 16;
             fontsize2 = 12;
             margin_w = 20;
             margin_h = 10;
             rgb_performance = new Color[6] { Color.FromArgb(255, 236, 28, 59), Color.FromArgb(255, 121, 0, 120), Color.FromArgb(255, 17, 141, 200), Color.FromArgb(255, 36, 180, 66), Color.FromArgb(255, 222, 231, 31), Color.FromArgb(255, 243, 57, 0) };
             rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
-            
+
+            // Dictionary of control elements
+            controls = new Dictionary<string, FrameworkElement>();
+
             //Initialise Tab 1 Start settings
             tab1_secondary_settings();
 
@@ -219,7 +227,8 @@ namespace Biomorpher
         public void RunInit()
         {
             // 1. Initialise population history
-            popTree = new DataTree<Population>();
+            BioBranches = new List<BioBranch>();
+            BioBranches.Add(new BioBranch(ParentBranchID, ParentTwigID));
 
             // 2. Create initial population
             population = new Population(popSize, sliders, genePools);
@@ -238,7 +247,7 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_secondary_settings();
 
-            tab3_primary_update();
+            //tab3_primary_update();
             
         }
 
@@ -251,7 +260,8 @@ namespace Biomorpher
         {
             
             // 0. AFTER selections have been made, add initial population to history when we have fitness values!
-            AddPop(population, Generation);
+            // Just the single BioBranch for the time being...
+            //BioBranches[0].AddTwig(population);
 
             // 1. Create new populaltion using user selection (resets fitnesses)
             Generation++;
@@ -274,7 +284,7 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_updatePerforms();
 
-            tab3_primary_update();
+            //tab3_primary_update();
             
         }
 
@@ -1066,37 +1076,45 @@ namespace Biomorpher
             myPath.StrokeThickness = 3;
             canvas.Children.Add(myPath);
 
-
             //Tab3_primary.Child = canvas;
             Tab3_primary.ClipToBounds = true;
-
             HistoryCanvas.Children.Add(canvas);
 
-            Mesh myMesh = new Mesh();
+            List<DockPanel> myPanels = new List<DockPanel>();
             
-            //
 
-            Viewport3d vp3d = new Viewport3d(Friends.SampleMesh(), 999, this); 
-            DockPanel myPanel = new DockPanel();
-            myPanel.Width = 240;
-            myPanel.Height = 200;
-            myPanel.Children.Add(vp3d);
-            HistoryCanvas.Children.Add(myPanel);
+            for (int i = 0; i < BioBranches.Count; i++)
+            {
+                for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
+                {
+                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
+                    {
+                        DockPanel myPanel = new DockPanel();
+                        int xCount = 0;
+
+                        Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
+                        if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
+                        {
+                            Mesh myMesh = new Mesh();
+                            myMesh = thisDesign.phenotype[0];
+                            Viewport3d vp3d = new Viewport3d(myMesh, 999, this);
+                            vp3d.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+                            myPanel.Children.Add(vp3d);
+                            xCount++;
+                        }
+
+                        myPanel.Width = 240 * xCount;
+                        myPanel.Height = 200;
+                        myPanels.Add(myPanel);
+                    }
+                }
+            }
+
+            for (int i = 0; i < myPanels.Count; i++) 
+                HistoryCanvas.Children.Add(myPanels[i]);
 
         }
 
-
-        /// <summary>
-        /// Add a population to the history
-        /// </summary>
-        /// <param name="pop"></param>
-        /// <param name="generation"></param>
-        public void AddPop(Population pop, int generation)
-        {
-            pop.popPath.AppendElement(generation);
-            //pop.popPath.AppendElement(0);
-            popTree.Add(new Population(pop), pop.popPath); //Note we have to make a copy here.
-        }
 
 
         //-------------------------------------------------------------------------------TAB 4: ABOUT------------------------------------------------------------------------//
