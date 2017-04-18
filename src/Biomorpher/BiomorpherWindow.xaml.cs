@@ -23,6 +23,7 @@ using Grasshopper.Kernel.Special;
 using GalapagosComponents;
 using Grasshopper.Kernel.Data;
 using Grasshopper;
+using System.IO;
 
 namespace Biomorpher
 {
@@ -255,6 +256,7 @@ namespace Biomorpher
             tab2_secondary_settings();
 
             //tab3_primary_update();
+            tab3_secondary_settings();
             
         }
 
@@ -268,7 +270,7 @@ namespace Biomorpher
             
             // 0. AFTER selections have been made, add initial population to history when we have fitness values!
             // Just the single BioBranch for the time being...
-            //BioBranches[0].AddTwig(population);
+            BioBranches[0].AddTwig(population);
 
             // 1. Create new populaltion using user selection (resets fitnesses)
             Generation++;
@@ -288,11 +290,12 @@ namespace Biomorpher
 
             // 5. Update display of K-Means and representative meshes
             tab1_primary_update();
+
             tab2_primary_update();
             tab2_updatePerforms();
 
-            //tab3_primary_update();
-            
+            tab3_primary_update();
+
         }
 
 
@@ -440,7 +443,6 @@ namespace Biomorpher
             canvas.Background = new SolidColorBrush(Colors.White);
             string name = "canvas" + clusterIndex;
             canvas.Name = name;
-
 
             //Add outline circle
             System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
@@ -1060,64 +1062,104 @@ namespace Biomorpher
             canvas.Background = new SolidColorBrush(Colors.White);
             //string name = "canvas" + clusterIndex;
             canvas.Name = "jim";
+            canvas.Width = 3000;
+            canvas.Height = 3000;
 
-
-            //Add outline circle
-            System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
-            outline.Height = 2300;
-            outline.Width = 2300;
-            outline.StrokeThickness = 1;
-            outline.Stroke = Brushes.SlateGray;
-
-            Canvas.SetLeft(outline, 40);
-            Canvas.SetTop(outline, 0);
-            canvas.Children.Add(outline);
-
-
-            Path myPath = new Path();
-            myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
-            myPath.Stroke = Brushes.SlateGray;
-            myPath.StrokeThickness = 3;
-            canvas.Children.Add(myPath);
-
-            //Tab3_primary.Child = canvas;
-            Tab3_primary.ClipToBounds = true;
-            HistoryCanvas.Children.Add(canvas);
-
-            List<DockPanel> myPanels = new List<DockPanel>();
+            //List<DockPanel> myPanels = new List<DockPanel>();
             
-
+            
             for (int i = 0; i < BioBranches.Count; i++)
             {
                 for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
                 {
-                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
-                    {
-                        DockPanel myPanel = new DockPanel();
-                        int xCount = 0;
+                    int xCount = 0;
 
+                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
+                    {     
+                        
                         Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
+
                         if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
                         {
+                            DockPanel myPanel = new DockPanel();
                             Mesh myMesh = new Mesh();
                             myMesh = thisDesign.phenotype[0];
                             Viewport3d vp3d = new Viewport3d(myMesh, 999, this);
-                            vp3d.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+                            //vp3d.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
                             myPanel.Children.Add(vp3d);
-                            xCount++;
-                        }
+                            myPanel.Width = 240;
+                            myPanel.Height = 200;
 
-                        myPanel.Width = 240 * xCount;
-                        myPanel.Height = 200;
-                        myPanels.Add(myPanel);
+                            Canvas.SetLeft(myPanel, 240 * xCount);
+                            Canvas.SetTop(myPanel, 300 * j);
+                            canvas.Children.Add(myPanel);
+                            xCount++;
+                        } 
+
                     }
+
+
+                    //Path myPath = new Path();
+                    //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
+                    //myPath.Stroke = Brushes.SlateGray;
+                    //myPath.StrokeThickness = 2;
+                    //Canvas.SetLeft(myPath, xCount * 120);
+                    //Canvas.SetTop(myPath, 300 * j);
+                    //canvas.Children.Add(myPath);
+
                 }
             }
 
-            for (int i = 0; i < myPanels.Count; i++) 
-                HistoryCanvas.Children.Add(myPanels[i]);
+            Tab3_primary.ClipToBounds = true;
+            HistoryCanvas.Children.Clear();
+            HistoryCanvas.Children.Add(canvas); // See xaml for history canvas
+        }
+
+
+        //Create settings panel for Tab 3
+        public void tab3_secondary_settings()
+        {
+            StackPanel sp3 = new StackPanel();
+            controls.Add("SP3", sp3);
+
+            //Header
+            Border border_head = new Border();
+            border_head.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+
+            Label label_head = new Label();
+            label_head.FontSize = fontsize;
+            label_head.FontWeight = FontWeights.Bold;
+            label_head.Content = "Evolution History";
+
+            border_head.Child = label_head;
+            sp3.Children.Add(border_head);
+
+            DockPanel dp_buttons = new DockPanel();
+            dp_buttons.LastChildFill = false;
+
+
+            // Buttons
+            Border border_buttons = new Border();
+            border_buttons.Margin = new Thickness(margin_w, margin_h + 20, margin_w, 0);
+
+            Button button_ExportPNG = createButton("b_tab3_ExportPNG", "ExportPNG", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_ExportPNG_Click));
+            DockPanel.SetDock(button_ExportPNG, Dock.Left);
+            dp_buttons.Children.Add(button_ExportPNG);
+
+            Button button_exit = createButton("b_tab3_Exit", "Exit", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_Exit_Click));
+            DockPanel.SetDock(button_exit, Dock.Right);
+            dp_buttons.Children.Add(button_exit);
+
+            border_buttons.Child = dp_buttons;
+            sp3.Children.Add(border_buttons);
+
+
+            //Add the stackpanels to the secondary area of Tab 3
+            Tab3_secondary.Child = sp3;
 
         }
+
+
 
         #endregion
 
@@ -1367,6 +1409,12 @@ namespace Biomorpher
             Exit();
         }
 
+        //Handle event when the "Exit" button is clicked in tab 3      
+        public void tab3_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Exit();
+        }
+
 
         //Event handler for all checkboxes in tab 2        
         public void tab2_SelectParents_Check(object sender, RoutedEventArgs e)
@@ -1447,6 +1495,40 @@ namespace Biomorpher
             }
 
         }
+
+
+
+        //Handle event when the "SavePNG" button is clicked in tab 3      
+        public void tab3_ExportPNG_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+
+                System.Windows.Forms.SaveFileDialog fd = new System.Windows.Forms.SaveFileDialog();
+                //fd.Filter = "Bmp(*.BMP;)|*.BMP;| Jpg(*Jpg)|*.jpg";
+                fd.Filter = "Png(*.PNG;)|*.PNG";
+                fd.AddExtension = true;
+
+                if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+
+                    Friends.CreateSaveBitmap(HistoryCanvas, fd.FileName);
+                    //Friends.CreateSaveBitmap(HistoryCanvas, @"C:\temp\out.png");
+
+                }
+
+
+
+                
+            }
+            catch
+            {
+                System.Console.Beep();
+            }
+            
+        }
+
+
 
 
         //INotifyPropertyChanged Implementation
