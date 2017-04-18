@@ -106,11 +106,11 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public Chromosome Clone()
         {
-            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools); // Pass the original slider
+            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools); // Pass the original sliders and genepools
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
-            clone.fitness = this.fitness;
 
+            clone.fitness = this.fitness;
             clone.clusterId = this.clusterId;
             clone.isRepresentative = this.isRepresentative;
             clone.distToRepresentative = this.distToRepresentative;
@@ -131,7 +131,7 @@ namespace Biomorpher.IGA
         /// <summary>
         /// Goes through each gene and mutates it depending on a given probability
         /// </summary>
-        /// <param name="probability"></param>
+        /// <param name="probability"> probability that a single gene in the chomrosome will mutate</param>
         public void Mutate(double probability)
         {
             bool flag = false;
@@ -154,7 +154,7 @@ namespace Biomorpher.IGA
         /// <summary>
         /// Returns the genes for this chromosome
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the list of genes</returns>
         public double[] GetGenes()
         {
             return genes;
@@ -163,7 +163,7 @@ namespace Biomorpher.IGA
         /// <summary>
         /// Returns the real genes for this chromosome
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the list of real genes (i.e. slider values)</returns>
         public double[] GetRealGenes()
         {
             return realgenes;
@@ -178,7 +178,10 @@ namespace Biomorpher.IGA
             return performance;
         }
 
-
+        /// <summary>
+        /// Returns criteria names
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetCriteria()
         {
             return criteria;

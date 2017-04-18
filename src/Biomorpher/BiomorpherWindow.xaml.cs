@@ -31,6 +31,9 @@ namespace Biomorpher
     /// </summary>
     public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
+
+        #region FIELDS & PROPS
+
         // Fields
         private bool GO;
         private Population population;
@@ -134,6 +137,9 @@ namespace Biomorpher
         Color[] rgb_performance;
         Color[] rgb_kmeans;
 
+        #endregion
+
+        #region CONSTRUCTOR
 
         // Constructor
         public BiomorpherWindow(BiomorpherComponent Owner)
@@ -177,8 +183,9 @@ namespace Biomorpher
             Tab4_primary_permanent();
         }
 
+        #endregion
 
-        //----------------------------------------------------------------------------MAIN METHODS-------------------------------------------------------------------------//
+        #region MAIN METHODS
 
         /// <summary>
         /// Gets the phenotype information for all the current chromosomes
@@ -389,12 +396,10 @@ namespace Biomorpher
             return crit;
         }
 
+        #endregion
 
-        //----------------------------------------------------------------------------UI METHODS-------------------------------------------------------------------------//
+        #region UI TAB 1 (POPULATION)
 
-
-        //-------------------------------------------------------------------------------TAB 1: POPULATION------------------------------------------------------------------------//
-        
         //Update display of K-Means clustering
         public void tab1_primary_update()
         {
@@ -583,8 +588,9 @@ namespace Biomorpher
             Tab1_secondary.Child = sp;
         }
 
+        #endregion
 
-        //-------------------------------------------------------------------------------TAB 2: DESIGNS------------------------------------------------------------------------//
+        #region UI TAB 2 (DESIGNS)
 
         //Create permanent grid layout for Tab 1 and Tab 2 (if Tab 2 is specified then checkboxes are added to the top right corners of the grid as well)
         public void tab12_primary_permanent(int tabIndex)
@@ -1042,11 +1048,9 @@ namespace Biomorpher
         }
 
 
+        #endregion
 
-
-
-        //-------------------------------------------------------------------------------TAB 3: DESIGN HISTORY------------------------------------------------------------------------//
-        //HERE GOES THE CODE FOR TAB 3
+        #region UI TAB 3 (HISTORY)
 
         //Updates the display of the representative meshes and their performance values
         public void tab3_primary_update()
@@ -1115,10 +1119,9 @@ namespace Biomorpher
 
         }
 
+        #endregion
 
-
-        //-------------------------------------------------------------------------------TAB 4: ABOUT------------------------------------------------------------------------//
-        //HERE GOES THE CODE FOR TAB 4
+        #region UI TAB 4 (ABOUT)
 
         void Tab4_primary_permanent()
         {
@@ -1168,25 +1171,10 @@ namespace Biomorpher
 
             Tab4_primary.Child = sp;
         }
-        /*
 
-        Biomorpher
+        # endregion
 
-        
-        
-
-        Dependencies
-
-        HelixToolkit: https://github.com/helix-toolkit
-        Mahapps.metro: http://mahapps.com/
-  
-        Licence: MIT
-         
-        */
-
-
-
-        //-------------------------------------------------------------------------------HELPERS: GENERAL CONTROLS------------------------------------------------------------------------//
+        #region CONTROL HELPERS
 
         //Create Grid control
         public Grid createGrid(int rowCount, int columnCount, double width, double height)
@@ -1232,7 +1220,6 @@ namespace Biomorpher
             b.Content = content;
             b.Width = width;
             b.HorizontalAlignment = HorizontalAlignment.Left;
-
             b.Click += handler;
 
             controls.Add(name, b);
@@ -1251,12 +1238,10 @@ namespace Biomorpher
             slider.Minimum = minVal;
             slider.Maximum = maxVal;
             slider.Value = val;
-
             slider.Name = controlName;
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
-
 
             string format = "{0:0.00}";
             if (isIntSlider)
@@ -1285,11 +1270,11 @@ namespace Biomorpher
 
             DockPanel.SetDock(label_val, Dock.Right);
             dp.Children.Add(label_val);
-
             dp.Children.Add(slider);
 
             return dp;
         }
+
 
         //Create slider with label WITH eventhandler (allows user to e.g. control popSize and mutation rate)
         public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider, RoutedPropertyChangedEventHandler<double> handler)
@@ -1328,9 +1313,9 @@ namespace Biomorpher
             return dp;
         }
 
+        #endregion
 
-
-        //-------------------------------------------------------------------------------EVENT HANDLERS------------------------------------------------------------------------//
+        #region EVENT HANDLERS
 
         //Tab 1 Popsize event handler
         private void tab1_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1475,7 +1460,7 @@ namespace Biomorpher
             }
         }
 
-
+        #endregion
 
     }
 }
