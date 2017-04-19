@@ -695,7 +695,7 @@ namespace Biomorpher
                 {
                     dp.Children.RemoveAt(dp.Children.Count - 1);
                 }
-                Viewport3d vp3d = new Viewport3d(meshes[i], i, this);
+                Viewport3d vp3d = new Viewport3d(meshes[i], i, this, true);
                 dp.Children.Add(vp3d);
 
 
@@ -1060,19 +1060,28 @@ namespace Biomorpher
 
             Canvas canvas = new Canvas();
             canvas.Background = new SolidColorBrush(Colors.White);
-            //string name = "canvas" + clusterIndex;
             canvas.Name = "jim";
             canvas.Width = 3000;
             canvas.Height = 3000;
+            int vportWidth = 120;
+            int vportHeight = 100;
+            int vportGap = 20;
+            int vportMargin = 50;
 
-            //List<DockPanel> myPanels = new List<DockPanel>();
-            
-            
             for (int i = 0; i < BioBranches.Count; i++)
             {
                 for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
                 {
                     int xCount = 0;
+
+
+                    TextBlock txt = new TextBlock();
+                    txt.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+                    txt.FontSize = 12;
+                    txt.Inlines.Add(i + "." + j);
+                    Canvas.SetLeft(txt, 30);
+                    Canvas.SetTop(txt, (vportHeight + vportGap) * j + 20);
+                    canvas.Children.Add(txt);
 
                     for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
                     {     
@@ -1081,23 +1090,31 @@ namespace Biomorpher
 
                         if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
                         {
-                            DockPanel myPanel = new DockPanel();
+                            
+                            //DockPanel myPanel = new DockPanel();
                             Mesh myMesh = new Mesh();
-                            myMesh = thisDesign.phenotype[0];
-                            Viewport3d vp3d = new Viewport3d(myMesh, 999, this);
-                            //vp3d.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-                            myPanel.Children.Add(vp3d);
-                            myPanel.Width = 240;
-                            myPanel.Height = 200;
+                            if(myMesh!=null)
+                                myMesh = thisDesign.phenotype[0];
+                            else
+                                myMesh = Friends.SampleMesh();
 
-                            Canvas.SetLeft(myPanel, 240 * xCount);
-                            Canvas.SetTop(myPanel, 300 * j);
-                            canvas.Children.Add(myPanel);
+                            Viewport3d vp3d = new Viewport3d(myMesh, 999, this, false);
+                            vp3d.BorderThickness = new Thickness(0.5);
+                            vp3d.BorderBrush = Brushes.LightGray;
+                            vp3d.Width = vportWidth;
+                            vp3d.Height = vportHeight;
+                            //myPanel.Children.Add(vp3d);
+                            //myPanel.Width = 
+                            //myPanel.Height = vportHeight;
+
+                            Canvas.SetLeft(vp3d, (vportWidth + vportGap) * xCount + vportMargin);
+                            Canvas.SetTop(vp3d, (vportHeight + vportGap) * j);
+                            canvas.Children.Add(vp3d);
+
                             xCount++;
                         } 
 
                     }
-
 
                     //Path myPath = new Path();
                     //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
@@ -1107,12 +1124,27 @@ namespace Biomorpher
                     //Canvas.SetTop(myPath, 300 * j);
                     //canvas.Children.Add(myPath);
 
+                    TextBox myTextbox = new TextBox();
+                    myTextbox.Width = vportWidth;
+                    myTextbox.Height = vportHeight;
+                    myTextbox.BorderThickness = new Thickness(0.3);
+                    myTextbox.IsManipulationEnabled = true;
+                    myTextbox.TextWrapping = TextWrapping.Wrap;
+                    myTextbox.SnapsToDevicePixels = true;
+                    myTextbox.AcceptsReturn = true;
+                    myTextbox.AcceptsTab = true;
+                    Canvas.SetLeft(myTextbox, (vportWidth + vportGap) * xCount + vportMargin);
+                    Canvas.SetTop(myTextbox, (vportHeight + vportGap) * j);
+
+                    canvas.Children.Add(myTextbox);
                 }
             }
 
             Tab3_primary.ClipToBounds = true;
             HistoryCanvas.Children.Clear();
             HistoryCanvas.Children.Add(canvas); // See xaml for history canvas
+            //HistoryCanvas.UpdateLayout();
+            //HistoryCanvas.UseLayoutRounding = true;
         }
 
 
@@ -1505,20 +1537,15 @@ namespace Biomorpher
             {
 
                 System.Windows.Forms.SaveFileDialog fd = new System.Windows.Forms.SaveFileDialog();
-                //fd.Filter = "Bmp(*.BMP;)|*.BMP;| Jpg(*Jpg)|*.jpg";
                 fd.Filter = "Png(*.PNG;)|*.PNG";
                 fd.AddExtension = true;
 
                 if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
 
-                    Friends.CreateSaveBitmap(HistoryCanvas, fd.FileName);
-                    //Friends.CreateSaveBitmap(HistoryCanvas, @"C:\temp\out.png");
+                    Friends.CreateSaveBitmap((Canvas)HistoryCanvas.Children[0], fd.FileName);
 
                 }
-
-
-
                 
             }
             catch

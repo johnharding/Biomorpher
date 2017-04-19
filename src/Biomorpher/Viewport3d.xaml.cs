@@ -27,16 +27,16 @@ namespace Biomorpher
         private int ID;
         BiomorpherWindow W;
 
-        public Viewport3d(Mesh mesh, int id, BiomorpherWindow w)
+        public Viewport3d(Mesh mesh, int id, BiomorpherWindow w, bool hasViewcube)
         {
             ID = id;
             W = w;
             InitializeComponent();
-            create3DViewPort(mesh);
+            create3DViewPort(mesh, hasViewcube);
         }
 
 
-        private void create3DViewPort(Mesh mesh)
+        private void create3DViewPort(Mesh mesh, bool hasViewcube)
         {
             var hVp3D = new HelixViewport3D();
 
@@ -51,6 +51,7 @@ namespace Biomorpher
             hVp3D.ViewCubeBackText = "W";
             hVp3D.ViewCubeHeight = 40;
             hVp3D.ViewCubeWidth = 40;
+            hVp3D.ShowViewCube = hasViewcube;
             var lights = new DefaultLights();
             hVp3D.Children.Add(lights);
 
@@ -112,8 +113,6 @@ namespace Biomorpher
                     aveG += mesh.VertexColors[i].G;
                     aveB += mesh.VertexColors[i].B;
                 }
-
-               
 
 
                 //define faces - triangulation only
