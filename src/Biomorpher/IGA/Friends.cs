@@ -43,7 +43,8 @@ namespace Biomorpher.IGA
         {
             lock (syncLock)
             { // synchronize
-                return getrandom.Next(min, max);
+                int value = getrandom.Next(min, max);
+                return value;
             }
         }
 
@@ -55,7 +56,8 @@ namespace Biomorpher.IGA
         {
             lock (syncLock)
             { // synchronize
-                return getrandom.NextDouble();
+                double value = getrandom.NextDouble();
+                return value;
             }
         }
 

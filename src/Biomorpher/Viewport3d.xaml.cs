@@ -55,7 +55,6 @@ namespace Biomorpher
             var lights = new DefaultLights();
             hVp3D.Children.Add(lights);
 
-
             //Windows geometry objects
             MeshGeometry3D mesh_w = new MeshGeometry3D();
             Point3DCollection pts_w = new Point3DCollection();
@@ -68,8 +67,7 @@ namespace Biomorpher
 
             // TODO: Use Helix own meshgeometry wrap
             //MeshGeometryVisual3D jimmy = new MeshGeometryVisual3D();
-           
-
+          
             if (mesh != null)
             {
                 //define vertices

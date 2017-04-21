@@ -43,6 +43,7 @@ namespace Biomorpher
         private List<GalapagosGeneListObject> genePools;
         private BiomorpherComponent owner;
         private int performanceCount;
+        private static readonly object syncLock = new object();
         
         // Branch and Twig
         private int ParentBranchID { get; set; }
@@ -294,7 +295,10 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_updatePerforms();
 
-            tab3_primary_update();
+            lock (syncLock)
+            {
+                tab3_primary_update();
+            }
 
         }
 
@@ -698,7 +702,6 @@ namespace Biomorpher
                 Viewport3d vp3d = new Viewport3d(meshes[i], i, this, true);
                 dp.Children.Add(vp3d);
 
-
                 //Performance display update
                 if (dp_sub.Children.Count > 2)
                 {
@@ -1057,91 +1060,103 @@ namespace Biomorpher
         //Updates the display of the representative meshes and their performance values
         public void tab3_primary_update()
         {
-
+            HistoryCanvas.Children.Clear();
             Canvas canvas = new Canvas();
+            canvas.Children.Capacity = 1000;
             canvas.Background = new SolidColorBrush(Colors.White);
             canvas.Name = "jim";
             canvas.Width = 3000;
             canvas.Height = 3000;
-            int vportWidth = 120;
+            int vportWidth = 100;
             int vportHeight = 100;
-            int vportGap = 20;
-            int vportMargin = 50;
+            int vportGap = 10;
+            int vportMarginX = 50;
+            int vportMarginY = 20;
+            int maxTextX = 0;
 
             for (int i = 0; i < BioBranches.Count; i++)
             {
                 for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
                 {
-                    int xCount = 0;
+                        int xCount = 0;
 
+                        TextBlock txt = new TextBlock();
+                        txt.HorizontalAlignment = HorizontalAlignment.Left;
+                        txt.FontSize = 12;
+                        txt.Inlines.Add(i + "." + j);
+                        Canvas.SetLeft(txt, 20);
+                        Canvas.SetTop(txt, (vportHeight + vportGap) * j + vportMarginY);
+                        canvas.Children.Add(txt);
 
-                    TextBlock txt = new TextBlock();
-                    txt.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-                    txt.FontSize = 12;
-                    txt.Inlines.Add(i + "." + j);
-                    Canvas.SetLeft(txt, 30);
-                    Canvas.SetTop(txt, (vportHeight + vportGap) * j + 20);
-                    canvas.Children.Add(txt);
-
-                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
-                    {     
-                        
-                        Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
-
-                        if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
+                        for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
                         {
-                            
-                            //DockPanel myPanel = new DockPanel();
-                            Mesh myMesh = new Mesh();
-                            if(myMesh!=null)
-                                myMesh = thisDesign.phenotype[0];
-                            else
+
+                            Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
+
+                            if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
+                            {
+
+                                //DockPanel myPanel = new DockPanel();
+
+                                Mesh myMesh = new Mesh();
+
+                                /*
+                                if (myMesh != null)
+                                    myMesh = thisDesign.phenotype[0];
+                                else
+                                    myMesh = Friends.SampleMesh();
+                                */
+
                                 myMesh = Friends.SampleMesh();
 
-                            Viewport3d vp3d = new Viewport3d(myMesh, 999, this, false);
-                            vp3d.BorderThickness = new Thickness(0.5);
-                            vp3d.BorderBrush = Brushes.LightGray;
-                            vp3d.Width = vportWidth;
-                            vp3d.Height = vportHeight;
-                            //myPanel.Children.Add(vp3d);
-                            //myPanel.Width = 
-                            //myPanel.Height = vportHeight;
+                                
+                                Viewport3d vp3 = new Viewport3d(myMesh, 999, this, false);
+                                vp3.BorderThickness = new Thickness(0.5);
+                                vp3.BorderBrush = Brushes.LightGray;
+                                vp3.Width = vportWidth;
+                                vp3.Height = vportHeight;
 
-                            Canvas.SetLeft(vp3d, (vportWidth + vportGap) * xCount + vportMargin);
-                            Canvas.SetTop(vp3d, (vportHeight + vportGap) * j);
-                            canvas.Children.Add(vp3d);
+                                Canvas.SetLeft(vp3, (double)((vportWidth + vportGap) * xCount + vportMarginX));
+                                Canvas.SetTop(vp3, (double)((vportHeight + vportGap) * j + vportMarginY));
+                                canvas.Children.Add(vp3);
 
-                            xCount++;
-                        } 
+                                xCount++;
+                            }
 
-                    }
+                        }
 
-                    //Path myPath = new Path();
-                    //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
-                    //myPath.Stroke = Brushes.SlateGray;
-                    //myPath.StrokeThickness = 2;
-                    //Canvas.SetLeft(myPath, xCount * 120);
-                    //Canvas.SetTop(myPath, 300 * j);
-                    //canvas.Children.Add(myPath);
+                        //Path myPath = new Path();
+                        //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
+                        //myPath.Stroke = Brushes.SlateGray;
+                        //myPath.StrokeThickness = 2;
+                        //Canvas.SetLeft(myPath, xCount * 120);
+                        //Canvas.SetTop(myPath, 300 * j);
+                        //canvas.Children.Add(myPath);
 
-                    TextBox myTextbox = new TextBox();
-                    myTextbox.Width = vportWidth;
-                    myTextbox.Height = vportHeight;
-                    myTextbox.BorderThickness = new Thickness(0.3);
-                    myTextbox.IsManipulationEnabled = true;
-                    myTextbox.TextWrapping = TextWrapping.Wrap;
-                    myTextbox.SnapsToDevicePixels = true;
-                    myTextbox.AcceptsReturn = true;
-                    myTextbox.AcceptsTab = true;
-                    Canvas.SetLeft(myTextbox, (vportWidth + vportGap) * xCount + vportMargin);
-                    Canvas.SetTop(myTextbox, (vportHeight + vportGap) * j);
+                        TextBox myTextbox = new TextBox();
+                        myTextbox.Width = vportWidth * 2 + vportGap;
+                        myTextbox.Height = vportHeight;
+                        myTextbox.BorderThickness = new Thickness(0.5);
+                        myTextbox.IsManipulationEnabled = true;
+                        myTextbox.TextWrapping = TextWrapping.Wrap;
+                        myTextbox.SnapsToDevicePixels = true;
+                        myTextbox.AcceptsReturn = true;
+                        myTextbox.AcceptsTab = true;
+                        
+                        int settingOutX = (vportWidth + vportGap) * xCount + vportMarginX;
+                        if (settingOutX > maxTextX)
+                            maxTextX = settingOutX;
+                        Canvas.SetLeft(myTextbox, maxTextX);
+                        Canvas.SetTop(myTextbox, (vportHeight + vportGap) * j + vportMarginY);
 
-                    canvas.Children.Add(myTextbox);
+                        canvas.Children.Add(myTextbox);
+                    
                 }
             }
+            
+
 
             Tab3_primary.ClipToBounds = true;
-            HistoryCanvas.Children.Clear();
             HistoryCanvas.Children.Add(canvas); // See xaml for history canvas
             //HistoryCanvas.UpdateLayout();
             //HistoryCanvas.UseLayoutRounding = true;
