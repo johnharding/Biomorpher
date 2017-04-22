@@ -108,11 +108,18 @@
     <Compile Include="Viewport3d.xaml.cs">
       <DependentUpon>Viewport3d.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewportBasic.xaml.cs">
+      <DependentUpon>ViewportBasic.xaml</DependentUpon>
+    </Compile>
     <Page Include="BiomorpherWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Viewport3d.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewportBasic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

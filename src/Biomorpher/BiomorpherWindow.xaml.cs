@@ -44,6 +44,7 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private int performanceCount;
         private static readonly object syncLock = new object();
+        Canvas _historycanvas;
         
         // Branch and Twig
         private int ParentBranchID { get; set; }
@@ -160,6 +161,9 @@ namespace Biomorpher
 
             // Initial Window things
             InitializeComponent();
+            _historycanvas = new Canvas();
+            HistoryCanvas.Children.Add(_historycanvas);
+
             Topmost = true;
             PopSize = 100;
             MutateProbability = 0.01;
@@ -180,6 +184,9 @@ namespace Biomorpher
 
             //Initialise Tab 1 Start settings
             tab1_secondary_settings();
+
+            //
+            Tab3_primary.ClipToBounds = true;
 
             // Show info
             Tab4_primary_permanent();
@@ -295,10 +302,7 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_updatePerforms();
 
-            lock (syncLock)
-            {
-                tab3_primary_update();
-            }
+            tab3_primary_update();
 
         }
 
@@ -1060,108 +1064,112 @@ namespace Biomorpher
         //Updates the display of the representative meshes and their performance values
         public void tab3_primary_update()
         {
-            HistoryCanvas.Children.Clear();
-            Canvas canvas = new Canvas();
-            canvas.Children.Capacity = 1000;
-            canvas.Background = new SolidColorBrush(Colors.White);
-            canvas.Name = "jim";
-            canvas.Width = 3000;
-            canvas.Height = 3000;
+            //HistoryCanvas.Children.Clear();
+            //Canvas canvas = new Canvas();
+            //canvas.Background = new SolidColorBrush(Colors.White);
+            //canvas.Name = "jim";
+            //canvas.Width = 3000;
+            //canvas.Height = 3000;
             int vportWidth = 100;
             int vportHeight = 100;
             int vportGap = 10;
-            int vportMarginX = 50;
+            int vportMarginX = 30;
             int vportMarginY = 20;
             int maxTextX = 0;
 
+            Grid myGrid = createGrid(1, 12, 1200, 100);
+
             for (int i = 0; i < BioBranches.Count; i++)
             {
-                for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
-                {
-                        int xCount = 0;
+                    //for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
+                    //{
+                    int xCount = 0;
+                    int j = generation - 1;
+                    
+                    // Create the text identifier
+                    TextBlock txt = new TextBlock();
+                    txt.HorizontalAlignment = HorizontalAlignment.Left;
+                    txt.FontSize = 12;
+                    txt.Inlines.Add(i + "." + j);
+                    Canvas.SetLeft(txt, 10);
+                    Canvas.SetTop(txt, vportHeight * j + vportMarginY);
+                    _historycanvas.Children.Add(txt);
 
-                        TextBlock txt = new TextBlock();
-                        txt.HorizontalAlignment = HorizontalAlignment.Left;
-                        txt.FontSize = 12;
-                        txt.Inlines.Add(i + "." + j);
-                        Canvas.SetLeft(txt, 20);
-                        Canvas.SetTop(txt, (vportHeight + vportGap) * j + vportMarginY);
-                        canvas.Children.Add(txt);
 
-                        for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
+                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
+                    {
+
+                        Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
+
+                        if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
                         {
 
-                            Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
+                            //DockPanel myPanel = new DockPanel();
 
-                            if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
-                            {
+                            Mesh myMesh = new Mesh();
 
-                                //DockPanel myPanel = new DockPanel();
-
-                                Mesh myMesh = new Mesh();
-
-                                /*
-                                if (myMesh != null)
-                                    myMesh = thisDesign.phenotype[0];
-                                else
-                                    myMesh = Friends.SampleMesh();
-                                */
-
+                            if (myMesh != null)
+                                myMesh = thisDesign.phenotype[0];
+                            else
                                 myMesh = Friends.SampleMesh();
+                            
 
-                                
-                                Viewport3d vp3 = new Viewport3d(myMesh, 999, this, false);
-                                vp3.BorderThickness = new Thickness(0.5);
-                                vp3.BorderBrush = Brushes.LightGray;
-                                vp3.Width = vportWidth;
-                                vp3.Height = vportHeight;
+                            ViewportBasic vp4 = new ViewportBasic(myMesh);
+                            //vp4.BorderThickness = new Thickness(0.5);
+                            //vp4.BorderBrush = Brushes.LightGray;
 
-                                Canvas.SetLeft(vp3, (double)((vportWidth + vportGap) * xCount + vportMarginX));
-                                Canvas.SetTop(vp3, (double)((vportHeight + vportGap) * j + vportMarginY));
-                                canvas.Children.Add(vp3);
+                            //Canvas.SetLeft(vp3, (double)((vportWidth + vportGap) * xCount + vportMarginX));
+                            //Canvas.SetTop(vp3, (double)((vportHeight + vportGap) * j + vportMarginY));
+                            //HistoryCanvas.Children.Add(vp3);
 
-                                xCount++;
-                            }
+                            Grid.SetRow(vp4, 0);
+                            Grid.SetColumn(vp4, xCount);
+                            myGrid.Children.Add(vp4);
 
+                            xCount++;
                         }
 
-                        //Path myPath = new Path();
-                        //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
-                        //myPath.Stroke = Brushes.SlateGray;
-                        //myPath.StrokeThickness = 2;
-                        //Canvas.SetLeft(myPath, xCount * 120);
-                        //Canvas.SetTop(myPath, 300 * j);
-                        //canvas.Children.Add(myPath);
+                    }
 
-                        TextBox myTextbox = new TextBox();
-                        myTextbox.Width = vportWidth * 2 + vportGap;
-                        myTextbox.Height = vportHeight;
-                        myTextbox.BorderThickness = new Thickness(0.5);
-                        myTextbox.IsManipulationEnabled = true;
-                        myTextbox.TextWrapping = TextWrapping.Wrap;
-                        myTextbox.SnapsToDevicePixels = true;
-                        myTextbox.AcceptsReturn = true;
-                        myTextbox.AcceptsTab = true;
+                    //Path myPath = new Path();
+                    //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
+                    //myPath.Stroke = Brushes.SlateGray;
+                    //myPath.StrokeThickness = 2;
+                    //Canvas.SetLeft(myPath, xCount * 120);
+                    //Canvas.SetTop(myPath, 300 * j);
+                    //canvas.Children.Add(myPath);
+
+                    /*
+                    TextBox myTextbox = new TextBox();
+                    myTextbox.Width = vportWidth * 2 + vportGap;
+                    myTextbox.Height = vportHeight;
+                    myTextbox.BorderThickness = new Thickness(0.5);
+                    myTextbox.IsManipulationEnabled = true;
+                    myTextbox.TextWrapping = TextWrapping.Wrap;
+                    myTextbox.SnapsToDevicePixels = true;
+                    myTextbox.AcceptsReturn = true;
+                    myTextbox.AcceptsTab = true;
                         
-                        int settingOutX = (vportWidth + vportGap) * xCount + vportMarginX;
-                        if (settingOutX > maxTextX)
-                            maxTextX = settingOutX;
-                        Canvas.SetLeft(myTextbox, maxTextX);
-                        Canvas.SetTop(myTextbox, (vportHeight + vportGap) * j + vportMarginY);
+                    int settingOutX = (vportWidth + vportGap) * xCount + vportMarginX;
+                    if (settingOutX > maxTextX)
+                        maxTextX = settingOutX;
+                    Canvas.SetLeft(myTextbox, maxTextX);
+                    Canvas.SetTop(myTextbox, (vportHeight + vportGap) * j + vportMarginY);
 
-                        canvas.Children.Add(myTextbox);
-                    
-                }
+                    canvas.Children.Add(myTextbox);
+                    */
+                    //}
             }
+
+            Canvas.SetLeft(myGrid, vportMarginX);
+            Canvas.SetTop(myGrid, (generation - 1) * vportHeight + vportMarginY);
+            _historycanvas.Children.Add(myGrid); // See xaml for history canvas
             
+            // TODO: Define these DYNAMICALLY, important for the png export.
+            _historycanvas.Width = 1000;
+            _historycanvas.Height = 1000;
 
-
-            Tab3_primary.ClipToBounds = true;
-            HistoryCanvas.Children.Add(canvas); // See xaml for history canvas
-            //HistoryCanvas.UpdateLayout();
-            //HistoryCanvas.UseLayoutRounding = true;
         }
-
 
         //Create settings panel for Tab 3
         public void tab3_secondary_settings()
@@ -1205,7 +1213,6 @@ namespace Biomorpher
             Tab3_secondary.Child = sp3;
 
         }
-
 
 
         #endregion
@@ -1558,7 +1565,7 @@ namespace Biomorpher
                 if (fd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
 
-                    Friends.CreateSaveBitmap((Canvas)HistoryCanvas.Children[0], fd.FileName);
+                    Friends.CreateSaveBitmap(_historycanvas, fd.FileName);
 
                 }
                 

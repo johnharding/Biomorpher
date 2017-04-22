@@ -35,7 +35,6 @@ namespace Biomorpher
             create3DViewPort(mesh, hasViewcube);
         }
 
-
         private void create3DViewPort(Mesh mesh, bool hasViewcube)
         {
             var hVp3D = new HelixViewport3D();
@@ -54,6 +53,7 @@ namespace Biomorpher
             hVp3D.ShowViewCube = hasViewcube;
             var lights = new DefaultLights();
             hVp3D.Children.Add(lights);
+            hVp3D.IsInertiaEnabled = true;
 
             //Windows geometry objects
             MeshGeometry3D mesh_w = new MeshGeometry3D();
@@ -161,6 +161,10 @@ namespace Biomorpher
             this.AddChild(hVp3D);
  
         }
+
+
+
+
 
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
