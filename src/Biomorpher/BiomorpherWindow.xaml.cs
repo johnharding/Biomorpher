@@ -136,7 +136,6 @@ namespace Biomorpher
         int fontsize;
         int fontsize2;
         int margin_w;
-        int margin_h;
         Color[] rgb_performance;
         Color[] rgb_kmeans;
 
@@ -172,10 +171,9 @@ namespace Biomorpher
             performanceCount = 0;
             GO = false;
             HighlightedCluster = 0;
-            fontsize = 16;
+            fontsize = 20;
             fontsize2 = 12;
             margin_w = 20;
-            margin_h = 10;
             rgb_performance = new Color[6] { Color.FromArgb(255, 236, 28, 59), Color.FromArgb(255, 121, 0, 120), Color.FromArgb(255, 17, 141, 200), Color.FromArgb(255, 36, 180, 66), Color.FromArgb(255, 222, 231, 31), Color.FromArgb(255, 243, 57, 0) };
             rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
 
@@ -313,6 +311,15 @@ namespace Biomorpher
         public void RunAuto()
         {
             //TODO: Advances pop using a performance criteria.
+        }
+
+        /// <summary>
+        /// Returns the window controls added to the dictionary
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, FrameworkElement> GetControls()
+        {
+            return controls;
         }
 
 
@@ -546,37 +553,46 @@ namespace Biomorpher
 
             //Header
             Border border_head = new Border();
-            border_head.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-
+            border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
             Label label_head = new Label();
             label_head.FontSize = fontsize;
-            label_head.FontWeight = FontWeights.Bold;
-            label_head.Content = "Population Settings";
-
+            label_head.Content = "Settings";
             border_head.Child = label_head;
             sp.Children.Add(border_head);
 
+            // K-means description
+            Border _border = new Border();
+            _border.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            TextBlock _txt = new TextBlock();
+            _txt.TextWrapping = TextWrapping.Wrap;
+            _txt.FontSize = fontsize2;
+            _txt.Inlines.Add("Choose the initial population size and mutation rate. During evolution, mutation rate can be altered whereas population size cannot.");
+            Label _label = new Label();
+            _label.Content = _txt;
+            _border.Child = _label;
+            sp.Children.Add(_border);
 
-            //Create sliders with labels
+
+
+            // Create sliders with labels
             Border border_popSize = new Border();
-            border_popSize.Margin = new Thickness(margin_w, margin_h + 10, margin_w, 0);
+            border_popSize.Margin = new Thickness(margin_w, 20, margin_w, 0);
             DockPanel dp_popSize = createSlider("Population size", "s_tab1_popSize", 12, 200, PopSize, true, new RoutedPropertyChangedEventHandler<double>(tab1_popSize_ValueChanged));
             border_popSize.Child = dp_popSize;
             sp.Children.Add(border_popSize);
 
-
             Border border_mutation = new Border();
-            border_mutation.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            border_mutation.Margin = new Thickness(margin_w, 0, margin_w, 0);
             DockPanel dp_mutation = createSlider("Mutation probability", "s_tab1_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(tab1_mutation_ValueChanged));
             border_mutation.Child = dp_mutation;
             sp.Children.Add(border_mutation);
 
 
+            // Now for the buttons
             DockPanel dp_buttons = new DockPanel();
             dp_buttons.LastChildFill = false;
-
             Border border_buttons = new Border();
-            border_buttons.Margin = new Thickness(margin_w, margin_h + 20, margin_w, 0);
+            border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
             //dp_buttons.Arrange(new Rect(200, 200, 200, 200));
 
             //GO button
@@ -588,11 +604,34 @@ namespace Biomorpher
             Button button_exit = createButton("b_tab1_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(tab1_Exit_Click));
             DockPanel.SetDock(button_exit, Dock.Right);
             dp_buttons.Children.Add(button_exit);
-
-
             border_buttons.Child = dp_buttons;
+            
             sp.Children.Add(border_buttons);
 
+            
+            // K-means text
+            Border border_kmeans = new Border();
+            border_kmeans.Margin = new Thickness(margin_w, 50, margin_w, 0);
+            Label label_kmeans = new Label();
+            label_kmeans.FontSize = fontsize;
+            label_kmeans.Content = "K-means Clusters";
+            border_kmeans.Child = label_kmeans;
+            sp.Children.Add(border_kmeans);
+            
+            
+            // K-means description
+            Border border = new Border();
+            border.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            TextBlock txt = new TextBlock();
+            //txt.Foreground = Brushes.White;
+            txt.TextWrapping = TextWrapping.Wrap;
+            txt.FontSize = fontsize2;
+            txt.Inlines.Add("Designs are clustered into 12 groups based on parameter (n-dimensional) similarity. Click on the 'design' tab to see representative closest to centroid of each group");
+            Label label = new Label();
+            label.Content = txt;
+            border.Child = label;
+            sp.Children.Add(border);
+            
 
             //Add the stackpanel to the secondary area of Tab 0
             Tab1_secondary.Child = sp;
@@ -860,39 +899,26 @@ namespace Biomorpher
 
             //Header
             Border border_head = new Border();
-            border_head.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
 
             Label label_head = new Label();
             label_head.FontSize = fontsize;
-            label_head.FontWeight = FontWeights.Bold;
-            label_head.Content = "Cluster Representatives";
+            label_head.SetBinding(ContentProperty, new Binding("Generation"));
+            label_head.DataContext = this;
+            label_head.ContentStringFormat = "Generation {0}";
 
             border_head.Child = label_head;
             sp.Children.Add(border_head);
 
-            //Generation info
-            Border border_gen = new Border();
-            border_gen.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-
-            Label label_gen = new Label();
-            label_gen.SetBinding(ContentProperty, new Binding("Generation"));
-            label_gen.DataContext = this;
-            label_gen.ContentStringFormat = "#{0}";
-            label_gen.FontSize = 26; // fontsize;
-            label_gen.FontWeight = FontWeights.Bold;
-
-            border_gen.Child = label_gen;
-            sp.Children.Add(border_gen);
-
 
             //Selection description
             Border border_sel = new Border();
-            border_sel.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
+            border_sel.Margin = new Thickness(margin_w, 0, margin_w, 0);
 
             TextBlock txt_sel = new TextBlock();
             txt_sel.TextWrapping = TextWrapping.Wrap;
             txt_sel.FontSize = fontsize2;
-            txt_sel.Inlines.Add("\nSelect parents whose genes will be used to create the next design generation via the checkboxes");
+            txt_sel.Inlines.Add("Select parents whose genes will be used to create the next design generation via the checkboxes");
 
             Label label_sel = new Label();
             label_sel.Content = txt_sel;
@@ -904,7 +930,7 @@ namespace Biomorpher
             dp_buttons.LastChildFill = false;
 
             Border border_buttons = new Border();
-            border_buttons.Margin = new Thickness(margin_w, margin_h+20, margin_w, 0);
+            border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
 
 
             //Evolve button
@@ -920,19 +946,25 @@ namespace Biomorpher
             border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
 
+            //Header 2
+            Border border_data = new Border();
+            border_data.Margin = new Thickness(margin_w, 50, margin_w, 0);
+            Label label_data = new Label();
+            label_data.FontSize = fontsize;
+            label_data.Content = "Design Properties";
+            border_data.Child = label_data;
+            sp.Children.Add(border_data);
 
             // Doubleclick description
             Border border_dcl = new Border();
-            border_dcl.Margin = new Thickness(margin_w, margin_h + 5, margin_w, 0);
-
+            border_dcl.Margin = new Thickness(margin_w, 0, margin_w, 0);
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
-            txt_dcl.Inlines.Add("\nDouble click a design to diplay its Rhino/Grasshopper instance and review performance data");
+            txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
-
             border_dcl.Child = label_dcl;
             sp.Children.Add(border_dcl);
 
@@ -1009,12 +1041,13 @@ namespace Biomorpher
 
             //Design info
             Border border_clus = (Border) controls["CLUSTER"];
-            border_clus.Margin = new Thickness(margin_w, margin_h + 10, margin_w, 0);
+            border_clus.Margin = new Thickness(margin_w, 20, margin_w, 10);
             
             Label label_gen = new Label();
-            label_gen.Content = "Design " + HighlightedCluster;
-            label_gen.FontSize = fontsize; // fontsize;
-            label_gen.FontWeight = FontWeights.Bold;
+            label_gen.Content = "Design " + HighlightedCluster +":";
+            label_gen.FontSize = 16; // fontsize;
+            label_gen.FontStyle = FontStyles.Italic;
+            //label_gen.FontWeight = FontWeights.Bold;
 
             border_clus.Child = label_gen;
 
@@ -1034,7 +1067,7 @@ namespace Biomorpher
             //Add performance label
             for (int i = 0; i < performanceCount; i++)
             {
-                myBorders[i].Margin = new Thickness(margin_w+5, margin_h, margin_w, 0);
+                myBorders[i].Margin = new Thickness(margin_w+5, 0, margin_w, 0);
 
                 // Try to catch if we just don't have the criteria info
                 string label_p;
@@ -1074,10 +1107,10 @@ namespace Biomorpher
             int vportHeight = 100;
             int vportGap = 10;
             int vportMarginX = 30;
-            int vportMarginY = 20;
+            int vportMarginY = 24;
             int maxTextX = 0;
 
-            Grid myGrid = createGrid(1, 12, 1200, 100);
+            Grid myGrid = createGrid(1, 12, 1800, 150);
 
             for (int i = 0; i < BioBranches.Count; i++)
             {
@@ -1149,7 +1182,13 @@ namespace Biomorpher
                     myTextbox.SnapsToDevicePixels = true;
                     myTextbox.AcceptsReturn = true;
                     myTextbox.AcceptsTab = true;
-                        
+                    
+                    Grid.SetRow(myTextbox, 0);
+                    Grid.SetColumn(myTextbox, xCount);
+                    myGrid.Children.Add(myTextbox);
+                    */
+
+                    /*
                     int settingOutX = (vportWidth + vportGap) * xCount + vportMarginX;
                     if (settingOutX > maxTextX)
                         maxTextX = settingOutX;
@@ -1158,7 +1197,7 @@ namespace Biomorpher
 
                     canvas.Children.Add(myTextbox);
                     */
-                    //}
+                    
             }
 
             Canvas.SetLeft(myGrid, vportMarginX);
@@ -1179,25 +1218,36 @@ namespace Biomorpher
 
             //Header
             Border border_head = new Border();
-            border_head.Margin = new Thickness(margin_w, margin_h, margin_w, 0);
-
+            border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
             Label label_head = new Label();
             label_head.FontSize = fontsize;
-            label_head.FontWeight = FontWeights.Bold;
             label_head.Content = "Evolution History";
-
             border_head.Child = label_head;
             sp3.Children.Add(border_head);
 
-            DockPanel dp_buttons = new DockPanel();
-            dp_buttons.LastChildFill = false;
+
+            // History description
+            Border border = new Border();
+            border.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            TextBlock txt = new TextBlock();
+            txt.TextWrapping = TextWrapping.Wrap;
+            txt.FontSize = fontsize2;
+            txt.Inlines.Add("Recorded history of designs. ");
+            Label label = new Label();
+            label.Content = txt;
+            border.Child = label;
+            sp3.Children.Add(border);
+
 
 
             // Buttons
-            Border border_buttons = new Border();
-            border_buttons.Margin = new Thickness(margin_w, margin_h + 20, margin_w, 0);
+            DockPanel dp_buttons = new DockPanel();
+            dp_buttons.LastChildFill = false;
 
-            Button button_ExportPNG = createButton("b_tab3_ExportPNG", "ExportPNG", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_ExportPNG_Click));
+            Border border_buttons = new Border();
+            border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
+
+            Button button_ExportPNG = createButton("b_tab3_ExportPNG", "Export PNG", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_ExportPNG_Click));
             DockPanel.SetDock(button_ExportPNG, Dock.Left);
             dp_buttons.Children.Add(button_ExportPNG);
 
@@ -1207,6 +1257,37 @@ namespace Biomorpher
 
             border_buttons.Child = dp_buttons;
             sp3.Children.Add(border_buttons);
+
+
+
+            //Header2
+            Border border_head2 = new Border();
+            border_head2.Margin = new Thickness(margin_w, 50, margin_w, 0);
+            Label label_head2 = new Label();
+            label_head2.FontSize = fontsize;
+            label_head2.Content = "Notes";
+            border_head2.Child = label_head2;
+            sp3.Children.Add(border_head2);
+
+
+
+            Border border_txt = new Border();
+            border_txt.Margin = new Thickness(margin_w, 10, margin_w, 0);
+
+            TextBox myTextbox = new TextBox();
+            //myTextbox.Width = vportWidth * 2 + vportGap;
+            //myTextbox.Height = 400;
+            myTextbox.MinHeight = 400;
+            myTextbox.BorderThickness = new Thickness(0);
+            myTextbox.IsManipulationEnabled = true;
+            myTextbox.TextWrapping = TextWrapping.Wrap;
+            myTextbox.SnapsToDevicePixels = true;
+            myTextbox.AcceptsReturn = true;
+            myTextbox.AcceptsTab = true;
+            myTextbox.Background = Brushes.AntiqueWhite;
+            border_txt.Child = myTextbox;
+            sp3.Children.Add(border_txt);
+
 
 
             //Add the stackpanels to the secondary area of Tab 3
@@ -1338,6 +1419,7 @@ namespace Biomorpher
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
+            //slider.Foreground = Brushes.White;
 
             string format = "{0:0.00}";
             if (isIntSlider)
@@ -1353,6 +1435,7 @@ namespace Biomorpher
             Label label_name = new Label();
             label_name.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_name.Content = labelName;
+            //label_name.Foreground = Brushes.White;
 
             DockPanel.SetDock(label_name, Dock.Top);
             dp.Children.Add(label_name);
@@ -1363,6 +1446,7 @@ namespace Biomorpher
             label_val.ContentStringFormat = format;
             binding_val.Source = slider;
             label_val.SetBinding(Label.ContentProperty, binding_val);
+            //label_val.Foreground = Brushes.White;
 
             DockPanel.SetDock(label_val, Dock.Right);
             dp.Children.Add(label_val);
@@ -1376,7 +1460,7 @@ namespace Biomorpher
         public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider, RoutedPropertyChangedEventHandler<double> handler)
         {
             DockPanel dp = createSlider(labelName, controlName, minVal, maxVal, val, isIntSlider);
-
+            
             Slider slider = (Slider)controls[controlName];
             slider.ValueChanged += handler;
 
@@ -1400,7 +1484,7 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = label;
             l.FontSize = fontsize;
-            l.FontWeight = FontWeights.Bold;
+            //l.FontWeight = FontWeights.Bold;
 
             DockPanel.SetDock(l, Dock.Top);
             dp.Children.Add(l);

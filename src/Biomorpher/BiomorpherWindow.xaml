@@ -11,18 +11,18 @@
         Title="Biomorpher" 
         Height="720" 
         Width="1280"
+        WindowTransitionsEnabled="False"
         BorderBrush="{DynamicResource AccentColorBrush}"
-        BorderThickness="0">
+        BorderThickness="1">
 
     <Grid Background="White">
-        <Border Background="#FFF4F4F5" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
-
+        <Border Background="LightGray" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
         <TabControl x:Name="tabControl">
 
             <TabItem Header="Population" x:Name="Tab1">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
-                    <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab1_primary"/>
+                    <Border BorderThickness="0" Padding ="10" Width="Auto" Height="Auto" x:Name="Tab1_primary" />
                 </DockPanel>
             </TabItem>
 
@@ -70,8 +70,6 @@
              /MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
-                <ResourceDictionary Source="pack://application:,,,
-             /MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </controls:MetroWindow.Resources>

@@ -22,11 +22,15 @@ namespace Biomorpher
     /// </summary>
     public partial class ViewportBasic : UserControl
     {
+        
+        private Viewport3D myViewport;
+        private Rect3D bounds {get; set;}
+
         public ViewportBasic(Mesh mesh)
         {
             InitializeComponent();
 
-            Viewport3D myViewport = new Viewport3D();
+            myViewport = new Viewport3D();
             MeshGeometry3D mesh_w = new MeshGeometry3D();
             Point3DCollection pts_w = new Point3DCollection();
 
@@ -89,6 +93,8 @@ namespace Biomorpher
 
             // Bits of the model
             GeometryModel3D model = new GeometryModel3D(mesh_w, material);
+            bounds = model.Bounds;
+            
             model.BackMaterial = backmaterial;
             DirectionalLight myLight = new DirectionalLight(Colors.White, new Vector3D(-0.5, -1, -1));
 
@@ -103,10 +109,42 @@ namespace Biomorpher
 
             // Viewport
             myViewport.Children.Add(vis);
-            myViewport.Camera = new PerspectiveCamera(new Point3D(200, 200, 200), new Vector3D(-1, -1, -1), new Vector3D(0, 0, 1), 30);
+            ZoomExtents();
 
             // Add to UserControl
             this.AddChild(myViewport);
+
+        }
+
+        public void ZoomExtents()
+        {
+
+            // find centre and origin of bounding box
+            Point3d cen = new Point3d(bounds.X + bounds.SizeX / 2, bounds.Y + bounds.SizeY / 2, bounds.Z + bounds.SizeZ / 2);
+
+            // Find distances to corners of bounding box
+            double directrixX = cen.DistanceTo(new Point3d(bounds.X + bounds.SizeX, 0d, 0d));
+            double directrixY = cen.DistanceTo(new Point3d(0d, bounds.Y + bounds.SizeY, 0d));
+            double directrixZ = cen.DistanceTo(new Point3d(0d, 0d, bounds.Z + bounds.SizeZ));
+
+            // Find the radius of the camera sphere
+            double sphereRad = directrixX;
+            if (directrixY > sphereRad) sphereRad = directrixY;
+            if (directrixZ > sphereRad) sphereRad = directrixZ;
+
+            // Now set the camera based on this max view sphere rad
+            double camX = cen.X + sphereRad;
+            double camY = cen.Y + sphereRad;
+            double camZ = cen.Z + sphereRad;
+
+            // Find the orthowidth
+            double orthoWidth = bounds.SizeX;
+            if (bounds.SizeY > orthoWidth) orthoWidth = bounds.SizeY;
+            if (bounds.SizeZ > orthoWidth) orthoWidth = bounds.SizeZ;
+            orthoWidth *= 1.5; //just over root 2
+
+            //myViewport.Camera = new PerspectiveCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), 30);
+            myViewport.Camera = new OrthographicCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), orthoWidth);
 
         }
     }

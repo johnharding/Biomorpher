@@ -99,6 +99,9 @@ namespace Biomorpher.IGA
         }
 
 
+        //public static perspect
+
+
         public static void CreateSaveBitmap(Canvas canvas, string filename)
         {
 

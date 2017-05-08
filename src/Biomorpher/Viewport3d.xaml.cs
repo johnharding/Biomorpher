@@ -25,7 +25,8 @@ namespace Biomorpher
     public partial class Viewport3d : UserControl
     {
         private int ID;
-        BiomorpherWindow W;
+        private BiomorpherWindow W;
+        private HelixViewport3D hVp3D;
 
         public Viewport3d(Mesh mesh, int id, BiomorpherWindow w, bool hasViewcube)
         {
@@ -37,8 +38,8 @@ namespace Biomorpher
 
         private void create3DViewPort(Mesh mesh, bool hasViewcube)
         {
-            var hVp3D = new HelixViewport3D();
-
+            hVp3D = new HelixViewport3D();
+ 
             //Settings
             hVp3D.ShowFrameRate = false;
             hVp3D.ViewCubeOpacity = 0.1;
@@ -159,12 +160,40 @@ namespace Biomorpher
 
             //Add viewport to user control
             this.AddChild(hVp3D);
- 
+
+
+
+            /*
+            ContextMenu myMenu = new ContextMenu();
+
+            MenuItem item1 = new MenuItem();
+            MenuItem item2 = new MenuItem();
+
+            item1.Header = "item1";
+            //item1.Click += new RoutedEventHandler(item1_Click);
+            myMenu.Items.Add(item1);
+
+            item2.Header = "item2";
+            //item2.Click += new RoutedEventHandler(item2_Click);
+            myMenu.Items.Add(item2);
+
+            //this.ContextMenu = myMenu;
+            //myMenu.IsOpen = true;
+            hVp3D.ContextMenu = myMenu;
+             */
+
         }
 
 
+        public void SetCamera(ProjectionCamera cam)
+        {
+            hVp3D.Camera = cam;
+        }
 
-
+        public ProjectionCamera GetCamera()
+        {
+            return hVp3D.Camera;
+        }
 
 
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
@@ -181,6 +210,34 @@ namespace Biomorpher
                     break;
                 }
             }
+
+
+            try
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    string dp_name = "dp_tab2_" + i;
+                    //string dp_sub_name = "dp_sub_tab2_" + i;
+
+                    DockPanel dp = (DockPanel)W.GetControls()[dp_name];
+                    //DockPanel dp_sub = (DockPanel)W.GetControls()[dp_sub_name];
+
+                    Viewport3d myViewport = (Viewport3d)dp.Children[1];
+                    myViewport.SetCamera(this.GetCamera());
+
+                    ProjectionCamera cam;
+                    
+                }
+            }
+            catch
+            {
+            }
+
+        }
+
+        protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseRightButtonDown(e);
         }
 
     }
