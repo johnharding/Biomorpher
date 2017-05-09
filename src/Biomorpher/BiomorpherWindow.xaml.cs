@@ -45,10 +45,7 @@ namespace Biomorpher
         private int performanceCount;
         private static readonly object syncLock = new object();
         Canvas _historycanvas;
-        
-        // Branch and Twig
-        private int ParentBranchID { get; set; }
-        private int ParentTwigID { get; set; }
+        private int biobranchID;
 
         /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
@@ -147,9 +144,6 @@ namespace Biomorpher
         public BiomorpherWindow(BiomorpherComponent Owner)
         {
 
-            ParentBranchID = -1; // -1 indicates the master branch
-            ParentTwigID = 0;
-
             // Set the component passed here to a field
             owner = Owner;
 
@@ -242,7 +236,8 @@ namespace Biomorpher
         {
             // 1. Initialise population history
             BioBranches = new List<BioBranch>();
-            BioBranches.Add(new BioBranch(ParentBranchID, ParentTwigID));
+            biobranchID = 0;
+            BioBranches.Add(new BioBranch(-1, 0));
 
             // 2. Create initial population
             population = new Population(popSize, sliders, genePools);
@@ -273,10 +268,9 @@ namespace Biomorpher
         /// </summary>
         public void Run()
         {
-            
             // 0. AFTER selections have been made, add initial population to history when we have fitness values!
-            // Just the single BioBranch for the time being...
-            BioBranches[0].AddTwig(population);
+            // List of biobranches. BiobranchID is a global variable
+            BioBranches[biobranchID].AddTwig(population);
 
             // 1. Create new populaltion using user selection (resets fitnesses)
             Generation++;
@@ -303,6 +297,34 @@ namespace Biomorpher
             tab3_primary_update();
 
         }
+
+        /// <summary>
+        /// Runs when a new biobranch is spawned
+        /// </summary>
+        public void RunNewBranch()
+        {
+            BioBranches[biobranchID].AddTwig(population);
+
+            // Reset generation counter
+            Generation = 0;
+
+            // 3. Perform K-means clustering
+            //population.KMeansClustering(12);
+
+            // 4. Get geometry for each chromosome
+            GetPhenotypes();
+
+            // 5. Update display of K-Means and representative meshes
+            tab1_primary_update();
+
+            tab2_primary_update();
+            tab2_updatePerforms();
+
+            //tab3_primary_update();
+        }
+
+
+
 
 
         /// <summary>
@@ -1097,108 +1119,98 @@ namespace Biomorpher
         //Updates the display of the representative meshes and their performance values
         public void tab3_primary_update()
         {
-            //HistoryCanvas.Children.Clear();
-            //Canvas canvas = new Canvas();
-            //canvas.Background = new SolidColorBrush(Colors.White);
-            //canvas.Name = "jim";
-            //canvas.Width = 3000;
-            //canvas.Height = 3000;
-            int vportWidth = 100;
-            int vportHeight = 100;
-            int vportGap = 10;
+            int vportWidth = 120;
+            int vportHeight = 120;
             int vportMarginX = 30;
             int vportMarginY = 24;
-            int maxTextX = 0;
 
-            Grid myGrid = createGrid(1, 12, 1800, 150);
+            Grid myGrid = new Grid();
+            myGrid.ShowGridLines = true;
+            myGrid.Height = vportHeight;
 
-            for (int i = 0; i < BioBranches.Count; i++)
+            myGrid.RowDefinitions.Add(new RowDefinition());
+                    
+            int xCount = 0;
+            int j = Generation - 1;
+
+            StackPanel dp = new StackPanel();
+            dp.Orientation = Orientation.Vertical;
+            //dp.LastChildFill = false;
+
+            // Create the text identifier
+            TextBlock txt = new TextBlock();
+            txt.HorizontalAlignment = HorizontalAlignment.Left;
+            txt.FontSize = 20;
+            string name = biobranchID + "." + j;
+            txt.Inlines.Add(name);
+            dp.Children.Add(txt);
+
+            Button myButton = new Button();
+            myButton.Width = 80;
+            myButton.Height = 20;
+
+            // Tag button with some info
+            int[] myTag = new int[2];
+            myTag[0] = biobranchID;
+            myTag[1] = j;
+            myButton.Tag = myTag;
+
+            myButton.Content = "reinstate";
+            myButton.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            myButton.Click += new RoutedEventHandler(reinstatePopClick);
+
+            Border border_buttons = new Border();
+            border_buttons.Margin = new Thickness(0, 20, 0, 0);
+            border_buttons.Child = myButton;
+            dp.Children.Add(border_buttons);
+
+
+            myGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            myGrid.Width = (xCount + 1) * vportWidth;
+            Grid.SetRow(dp, 0);
+            Grid.SetColumn(dp, xCount);
+            myGrid.Children.Add(dp);
+
+            xCount++;
+
+            for (int k = 0; k < BioBranches[biobranchID].Twigs[j].chromosomes.Length; k++)
             {
-                    //for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
-                    //{
-                    int xCount = 0;
-                    int j = generation - 1;
-                    
-                    // Create the text identifier
-                    TextBlock txt = new TextBlock();
-                    txt.HorizontalAlignment = HorizontalAlignment.Left;
-                    txt.FontSize = 12;
-                    txt.Inlines.Add(i + "." + j);
-                    Canvas.SetLeft(txt, 10);
-                    Canvas.SetTop(txt, vportHeight * j + vportMarginY);
-                    _historycanvas.Children.Add(txt);
 
+                Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
 
-                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
-                    {
+                if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
+                {
 
-                        Chromosome thisDesign = BioBranches[i].Twigs[j].chromosomes[k];
+                    //DockPanel myPanel = new DockPanel();
 
-                        if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
-                        {
+                    Mesh myMesh = new Mesh();
 
-                            //DockPanel myPanel = new DockPanel();
+                    if (myMesh != null)
+                        myMesh = thisDesign.phenotype[0];
+                    else
+                        myMesh = Friends.SampleMesh();
 
-                            Mesh myMesh = new Mesh();
+                    ViewportBasic vp4 = new ViewportBasic(myMesh);
 
-                            if (myMesh != null)
-                                myMesh = thisDesign.phenotype[0];
-                            else
-                                myMesh = Friends.SampleMesh();
-                            
+                    myGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                    myGrid.Width = (xCount + 1) * vportWidth;
+                    Grid.SetRow(vp4, 0);
+                    Grid.SetColumn(vp4, xCount);
+                    myGrid.Children.Add(vp4);
 
-                            ViewportBasic vp4 = new ViewportBasic(myMesh);
-                            //vp4.BorderThickness = new Thickness(0.5);
-                            //vp4.BorderBrush = Brushes.LightGray;
+                    xCount++;
+                }
 
-                            //Canvas.SetLeft(vp3, (double)((vportWidth + vportGap) * xCount + vportMarginX));
-                            //Canvas.SetTop(vp3, (double)((vportHeight + vportGap) * j + vportMarginY));
-                            //HistoryCanvas.Children.Add(vp3);
-
-                            Grid.SetRow(vp4, 0);
-                            Grid.SetColumn(vp4, xCount);
-                            myGrid.Children.Add(vp4);
-
-                            xCount++;
-                        }
-
-                    }
-
-                    //Path myPath = new Path();
-                    //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
-                    //myPath.Stroke = Brushes.SlateGray;
-                    //myPath.StrokeThickness = 2;
-                    //Canvas.SetLeft(myPath, xCount * 120);
-                    //Canvas.SetTop(myPath, 300 * j);
-                    //canvas.Children.Add(myPath);
-
-                    /*
-                    TextBox myTextbox = new TextBox();
-                    myTextbox.Width = vportWidth * 2 + vportGap;
-                    myTextbox.Height = vportHeight;
-                    myTextbox.BorderThickness = new Thickness(0.5);
-                    myTextbox.IsManipulationEnabled = true;
-                    myTextbox.TextWrapping = TextWrapping.Wrap;
-                    myTextbox.SnapsToDevicePixels = true;
-                    myTextbox.AcceptsReturn = true;
-                    myTextbox.AcceptsTab = true;
-                    
-                    Grid.SetRow(myTextbox, 0);
-                    Grid.SetColumn(myTextbox, xCount);
-                    myGrid.Children.Add(myTextbox);
-                    */
-
-                    /*
-                    int settingOutX = (vportWidth + vportGap) * xCount + vportMarginX;
-                    if (settingOutX > maxTextX)
-                        maxTextX = settingOutX;
-                    Canvas.SetLeft(myTextbox, maxTextX);
-                    Canvas.SetTop(myTextbox, (vportHeight + vportGap) * j + vportMarginY);
-
-                    canvas.Children.Add(myTextbox);
-                    */
-                    
             }
+
+            //Path myPath = new Path();
+            //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
+            //myPath.Stroke = Brushes.SlateGray;
+            //myPath.StrokeThickness = 2;
+            //Canvas.SetLeft(myPath, xCount * 120);
+            //Canvas.SetTop(myPath, 300 * j);
+            //canvas.Children.Add(myPath);
+                    
 
             Canvas.SetLeft(myGrid, vportMarginX);
             Canvas.SetTop(myGrid, (generation - 1) * vportHeight + vportMarginY);
@@ -1257,7 +1269,6 @@ namespace Biomorpher
 
             border_buttons.Child = dp_buttons;
             sp3.Children.Add(border_buttons);
-
 
 
             //Header2
@@ -1551,6 +1562,22 @@ namespace Biomorpher
         public void tab3_Exit_Click(object sender, RoutedEventArgs e)
         {
             Exit();
+        }
+
+        //Reinstates a population
+        public void reinstatePopClick(object sender, RoutedEventArgs e)
+        {
+            // Get info from the sender button
+            Button myButton = (Button)sender;
+            int[] myTag = (int[])myButton.Tag;
+            int branch = myTag[0];
+            int twig   = myTag[1];
+
+            // Add a new biobranch, using the tag information as the parent BRANCH and TWIG 
+            BioBranches.Add(new BioBranch(branch, twig));
+            biobranchID++;
+            population = new Population(BioBranches[branch].Twigs[twig]); // clones the population
+            RunNewBranch();
         }
 
 
