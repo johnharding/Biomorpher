@@ -33,7 +33,7 @@ namespace Biomorpher
     public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
 
-        #region FIELDS & PROPS
+        #region FIELDS & PROPERTIES
 
         // Fields
         private bool GO;
@@ -44,8 +44,12 @@ namespace Biomorpher
         private BiomorpherComponent owner;
         private int performanceCount;
         private static readonly object syncLock = new object();
-        Canvas _historycanvas;
         private int biobranchID;
+
+        // History fields
+        Canvas _historycanvas;
+        int _historyY;
+
 
         /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
@@ -156,6 +160,7 @@ namespace Biomorpher
             InitializeComponent();
             _historycanvas = new Canvas();
             HistoryCanvas.Children.Add(_historycanvas);
+            _historyY = 0;
 
             Topmost = true;
             PopSize = 100;
@@ -199,7 +204,7 @@ namespace Biomorpher
                 if (population.chromosomes[i].isRepresentative)
                 {
                     owner.canvas.Document.Enabled = false;                              // Disable the solver before tweaking sliders
-                    owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders
+                    owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders using gene values
                     owner.canvas.Document.Enabled = true;                               // Enable the solver again
                     owner.ExpireSolution(true);                                         // Now expire the main component and recompute
                     performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
@@ -237,7 +242,7 @@ namespace Biomorpher
             // 1. Initialise population history
             BioBranches = new List<BioBranch>();
             biobranchID = 0;
-            BioBranches.Add(new BioBranch(-1, 0));
+            BioBranches.Add(new BioBranch(-1, 0, 0));
 
             // 2. Create initial population
             population = new Population(popSize, sliders, genePools);
@@ -320,10 +325,7 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_updatePerforms();
 
-            //tab3_primary_update();
         }
-
-
 
 
 
@@ -623,7 +625,7 @@ namespace Biomorpher
             dp_buttons.Children.Add(button_go);
 
             //EXIT button
-            Button button_exit = createButton("b_tab1_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(tab1_Exit_Click));
+            Button button_exit = createButton("b_tab1_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
             DockPanel.SetDock(button_exit, Dock.Right);
             dp_buttons.Children.Add(button_exit);
             border_buttons.Child = dp_buttons;
@@ -961,7 +963,7 @@ namespace Biomorpher
             dp_buttons.Children.Add(button_evo);
 
             //EXIT2 button
-            Button button_exit = createButton("b_tab2_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(tab2_Exit_Click));
+            Button button_exit = createButton("b_tab2_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
             DockPanel.SetDock(button_exit, Dock.Right);
             dp_buttons.Children.Add(button_exit);
 
@@ -1203,6 +1205,10 @@ namespace Biomorpher
 
             }
 
+            // Update shift
+            if (myGrid.Width > _historyY)
+                _historyY = (int)myGrid.Width;
+
             //Path myPath = new Path();
             //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
             //myPath.Stroke = Brushes.SlateGray;
@@ -1211,8 +1217,8 @@ namespace Biomorpher
             //Canvas.SetTop(myPath, 300 * j);
             //canvas.Children.Add(myPath);
                     
-
-            Canvas.SetLeft(myGrid, vportMarginX);
+            // Set the left side based on the startY position for the new branch
+            Canvas.SetLeft(myGrid, vportMarginX + BioBranches[biobranchID].StartY);
             Canvas.SetTop(myGrid, (generation - 1) * vportHeight + vportMarginY);
             _historycanvas.Children.Add(myGrid); // See xaml for history canvas
             
@@ -1244,12 +1250,11 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.Inlines.Add("Recorded history of designs. ");
+            txt.Inlines.Add("Recorded history of designs.");
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
             sp3.Children.Add(border);
-
 
 
             // Buttons
@@ -1263,7 +1268,7 @@ namespace Biomorpher
             DockPanel.SetDock(button_ExportPNG, Dock.Left);
             dp_buttons.Children.Add(button_ExportPNG);
 
-            Button button_exit = createButton("b_tab3_Exit", "Exit", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_Exit_Click));
+            Button button_exit = createButton("b_tab3_Exit", "Exit", Tab3_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
             DockPanel.SetDock(button_exit, Dock.Right);
             dp_buttons.Children.Add(button_exit);
 
@@ -1271,7 +1276,7 @@ namespace Biomorpher
             sp3.Children.Add(border_buttons);
 
 
-            //Header2
+            // Note header
             Border border_head2 = new Border();
             border_head2.Margin = new Thickness(margin_w, 50, margin_w, 0);
             Label label_head2 = new Label();
@@ -1280,15 +1285,11 @@ namespace Biomorpher
             border_head2.Child = label_head2;
             sp3.Children.Add(border_head2);
 
-
-
+            // Notes
             Border border_txt = new Border();
             border_txt.Margin = new Thickness(margin_w, 10, margin_w, 0);
-
             TextBox myTextbox = new TextBox();
-            //myTextbox.Width = vportWidth * 2 + vportGap;
-            //myTextbox.Height = 400;
-            myTextbox.MinHeight = 400;
+            myTextbox.MinHeight = 200;
             myTextbox.BorderThickness = new Thickness(0);
             myTextbox.IsManipulationEnabled = true;
             myTextbox.TextWrapping = TextWrapping.Wrap;
@@ -1298,8 +1299,6 @@ namespace Biomorpher
             myTextbox.Background = Brushes.AntiqueWhite;
             border_txt.Child = myTextbox;
             sp3.Children.Add(border_txt);
-
-
 
             //Add the stackpanels to the secondary area of Tab 3
             Tab3_secondary.Child = sp3;
@@ -1430,7 +1429,6 @@ namespace Biomorpher
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
-            //slider.Foreground = Brushes.White;
 
             string format = "{0:0.00}";
             if (isIntSlider)
@@ -1446,7 +1444,6 @@ namespace Biomorpher
             Label label_name = new Label();
             label_name.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_name.Content = labelName;
-            //label_name.Foreground = Brushes.White;
 
             DockPanel.SetDock(label_name, Dock.Top);
             dp.Children.Add(label_name);
@@ -1457,7 +1454,6 @@ namespace Biomorpher
             label_val.ContentStringFormat = format;
             binding_val.Source = slider;
             label_val.SetBinding(Label.ContentProperty, binding_val);
-            //label_val.Foreground = Brushes.White;
 
             DockPanel.SetDock(label_val, Dock.Right);
             dp.Children.Add(label_val);
@@ -1495,7 +1491,6 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = label;
             l.FontSize = fontsize;
-            //l.FontWeight = FontWeights.Bold;
 
             DockPanel.SetDock(l, Dock.Top);
             dp.Children.Add(l);
@@ -1537,9 +1532,6 @@ namespace Biomorpher
                 Slider s_popSize = (Slider)controls["s_tab1_popSize"];
                 s_popSize.IsEnabled = false;
 
-                //(Keep mutation enabled?)
-                //Slider s_mutation = (Slider)controls["s_tab1_mutation"];
-                //s_mutation.IsEnabled = false;
             }
 
             GO = true;
@@ -1547,22 +1539,11 @@ namespace Biomorpher
 
 
         //Handle event when the "Exit" button is clicked in tab 1       
-        public void tab1_Exit_Click(object sender, RoutedEventArgs e)
+        public void Exit_Click(object sender, RoutedEventArgs e)
         {
             Exit();
         }
 
-        //Handle event when the "Exit" button is clicked in tab 2      
-        public void tab2_Exit_Click(object sender, RoutedEventArgs e)
-        {
-            Exit();
-        }
-
-        //Handle event when the "Exit" button is clicked in tab 3      
-        public void tab3_Exit_Click(object sender, RoutedEventArgs e)
-        {
-            Exit();
-        }
 
         //Reinstates a population
         public void reinstatePopClick(object sender, RoutedEventArgs e)
@@ -1574,7 +1555,12 @@ namespace Biomorpher
             int twig   = myTag[1];
 
             // Add a new biobranch, using the tag information as the parent BRANCH and TWIG 
-            BioBranches.Add(new BioBranch(branch, twig));
+            int offset = 0;
+            for (int i = 0; i < BioBranches.Count; i++)
+                offset += BioBranches[biobranchID].StartY; // offset the startY
+
+            BioBranches.Add(new BioBranch(branch, twig, _historyY + offset));
+            _historyY = 0;
             biobranchID++;
             population = new Population(BioBranches[branch].Twigs[twig]); // clones the population
             RunNewBranch();

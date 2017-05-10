@@ -12,19 +12,28 @@ using GalapagosComponents;
 
 namespace Biomorpher.IGA
 {
+    /// <summary>
+    /// Chromosome representing one Grasshopper instance
+    /// </summary>
     public class Chromosome
     {
+
         public List<Mesh> phenotype;        // TODO: should be more than meshes at some point
-        private List<double> performance;   // (optional) list of performance values
-        private List<string> criteria;      // (optional) labels for performance criteria
+
+        /// <summary>
+        /// Optional list of performance values
+        /// </summary>
+        private List<double> performance; 
+
+        /// <summary>
+        /// Associated list of performance criteria descriptions
+        /// </summary>
+        private List<string> criteria; 
         
         // Normalised values used in the chromosome
         private double[] genes;
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> chromoSliders;
         private List<GalapagosComponents.GalapagosGeneListObject> chromoGenePools;
-
-        // Actual slider values.. 
-        private double[] realgenes;
 
         // Fitness used for elitism selection
         private double fitness {get; set;}
@@ -56,7 +65,6 @@ namespace Biomorpher.IGA
             }
 
             genes = new double[chromoSliders.Count + GenePoolCounter];
-            realgenes = new double[chromoSliders.Count + GenePoolCounter];
             fitness = 0.0;
 
             isRepresentative = false;
@@ -64,36 +72,14 @@ namespace Biomorpher.IGA
             distToRepresentative = -1.0;
         }
 
+        /// <summary>
+        /// Generates a random set of genes for this chromosome
+        /// </summary>
         public void GenerateRandomGenes()
         {
-            // Generates a random set of genes and real counterparts
-            for (int i=0; i<genes.Length; i++)
-            {
-                genes[i] = Friends.GetRandomDouble();
-            }
-
-            // Update the real genes
-            UpdateRealGenes();
+            for (int i=0; i<genes.Length; i++) genes[i] = Friends.GetRandomDouble();
         }
 
-
-        public void UpdateRealGenes()
-        {
-            for (int i = 0; i < chromoSliders.Count; i++)
-            {
-                double sliderMin = (double) chromoSliders[i].Slider.Minimum;
-                double sliderMax = (double) chromoSliders[i].Slider.Maximum;
-
-                realgenes[i] = genes[i] * (sliderMax - sliderMin) + sliderMin;
-            }
-
-            for (int i = 0; i < chromoGenePools.Count; i++)
-            {
-                // TODO??
-            }
-
-
-        }
 
         public double GetFitness()
         {
@@ -106,25 +92,37 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public Chromosome Clone()
         {
-            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools); // Pass the original sliders and genepools
-            Array.Copy(this.genes, clone.genes, this.genes.Length);
-            Array.Copy(this.realgenes, clone.realgenes, this.realgenes.Length);
+            // Clone sliders and genepools associated with this chromosome
+            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools);
 
+            // Clone gene array
+            Array.Copy(this.genes, clone.genes, this.genes.Length);
+            
+            // Clone fitness and K-means data
             clone.fitness = this.fitness;
             clone.clusterId = this.clusterId;
             clone.isRepresentative = this.isRepresentative;
             clone.distToRepresentative = this.distToRepresentative;
 
+            // Clone phenotype mesh
             if (this.phenotype != null)
             {
                 clone.phenotype = new List<Mesh>(this.phenotype);
             }
 
+            // Clone performance values
             if (this.performance != null)
             {
                 clone.performance = new List<double>(this.performance);
             }
+
+            // Clone crieria
+            if (this.criteria != null)
+            {
+                clone.criteria = new List<string>(this.criteria);
+            }
             
+            // Return new chromosome
             return clone;
         }
 
@@ -134,7 +132,6 @@ namespace Biomorpher.IGA
         /// <param name="probability"> probability that a single gene in the chomrosome will mutate</param>
         public void Mutate(double probability)
         {
-            bool flag = false;
             for(int i=0; i<genes.Length; i++)
             {
                 double tempRand = Friends.GetRandomDouble();
@@ -142,12 +139,8 @@ namespace Biomorpher.IGA
                 if (tempRand < probability)
                 {
                     genes[i] = Friends.GetRandomDouble();
-                    flag = true;
                 }
             }
-
-            // Only call this if the chromosome has changed
-            if (flag) UpdateRealGenes();
 
         }
 
@@ -158,15 +151,6 @@ namespace Biomorpher.IGA
         public double[] GetGenes()
         {
             return genes;
-        }
-
-        /// <summary>
-        /// Returns the real genes for this chromosome
-        /// </summary>
-        /// <returns>the list of real genes (i.e. slider values)</returns>
-        public double[] GetRealGenes()
-        {
-            return realgenes;
         }
 
         /// <summary>
