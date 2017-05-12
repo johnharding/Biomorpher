@@ -22,15 +22,21 @@ namespace Biomorpher.IGA
         /// <summary>
         /// Biomorpher version
         /// </summary>
-        /// <returns></returns>
+        /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
             return "0.1.1";
         }
 
 
-        //Function to get random number
+        /// <summary>
+        /// Master random number generator
+        /// </summary>
         private static readonly Random getrandom = new Random(21);
+
+        /// <summary>
+        /// Synclock for single threading
+        /// </summary>
         private static readonly object syncLock = new object();
         
         /// <summary>
@@ -42,7 +48,7 @@ namespace Biomorpher.IGA
         public static int GetRandomInt(int min, int max)
         {
             lock (syncLock)
-            { // synchronize
+            {
                 int value = getrandom.Next(min, max);
                 return value;
             }
@@ -55,37 +61,34 @@ namespace Biomorpher.IGA
         public static double GetRandomDouble()
         {
             lock (syncLock)
-            { // synchronize
+            {
                 double value = getrandom.NextDouble();
                 return value;
             }
         }
 
         /// <summary>
-        /// Makes an open bezier curve pathgeometry with 4 points
+        /// Returns an open bezier curve pathgeometry with 4 points
         /// </summary>
-        /// <param name="P1x"></param>
-        /// <param name="P1y"></param>
-        /// <param name="P2x"></param>
-        /// <param name="P2y"></param>
-        /// <param name="P3x"></param>
-        /// <param name="P3y"></param>
-        /// <param name="P4x"></param>
-        /// <param name="P4y"></param>
+        /// <param name="P1"></param>
+        /// <param name="P2"></param>
+        /// <param name="P3"></param>
+        /// <param name="P4"></param>
         /// <returns></returns>
-        public static PathGeometry MakeBezierGeometry(double P1x, double P1y, double P2x, double P2y, double P3x, double P3y, double P4x, double P4y)
+        public static PathGeometry MakeBezierGeometry(System.Windows.Point P1, System.Windows.Point P2, System.Windows.Point P3, System.Windows.Point P4)
         {
-            BezierSegment myBezier = new BezierSegment(new System.Windows.Point(P2x, P2y), new System.Windows.Point(P3x, P3y), new System.Windows.Point(P4x, P4y), true);
+            BezierSegment myBezier = new BezierSegment(P2, P3, P4, true);
             PathFigure myPathFigure = new PathFigure();
-            myPathFigure.StartPoint = new System.Windows.Point(P1x, P1y);
+            myPathFigure.StartPoint = P1;
             myPathFigure.Segments.Add(myBezier);
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures.Add(myPathFigure);
             return myPathGeometry;
         }
 
+
         /// <summary>
-        /// A default Rhino Mesh object
+        /// A default Rhino Mesh object used for debugging
         /// </summary>
         /// <returns></returns>
         public static Mesh SampleMesh()
@@ -98,22 +101,19 @@ namespace Biomorpher.IGA
             return sampleMesh;
         }
 
-
-        //public static perspect
-
-
+        
+        /// <summary>
+        /// Exports a canvas to an image png file
+        /// </summary>
+        /// <param name="canvas"></param>
+        /// <param name="filename"></param>
         public static void CreateSaveBitmap(Canvas canvas, string filename)
         {
 
-
             RenderTargetBitmap renderBitmap = new RenderTargetBitmap((int)canvas.Width, (int)canvas.Height, 96d, 96d, PixelFormats.Pbgra32);
-            // Pbgra32 needed otherwise the image output is black
-            //canvas.Measure(new Size((int)canvas.Width, (int)canvas.Height));
-            //canvas.Arrange(new Rect(new Size((int)canvas.Width, (int)canvas.Height)));
 
             renderBitmap.Render(canvas);
 
-            //JpegBitmapEncoder encoder = new JpegBitmapEncoder();
             PngBitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
 
@@ -122,6 +122,24 @@ namespace Biomorpher.IGA
                 encoder.Save(file);
             }
 
+        }
+
+        /// <summary>
+        /// Calculate Euclidean distance
+        /// </summary>
+        /// <param name="genes"></param>
+        /// <param name="mean"></param>
+        /// <returns></returns>
+        public static double calcDistance(double[] genes, double[] mean)
+        {
+            double dist = 0.0;
+
+            for (int i = 0; i < genes.Length; i++)
+            {
+                dist += Math.Pow((genes[i] - mean[i]), 2);
+            }
+
+            return Math.Sqrt(dist);
         }
     }
 

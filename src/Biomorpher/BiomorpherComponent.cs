@@ -17,6 +17,9 @@ using Grasshopper.Kernel.Data;
 
 namespace Biomorpher
 {
+    /// <summary>
+    /// The Grasshopper component
+    /// </summary>
     public class BiomorpherComponent : GH_Component
     {
         public Grasshopper.GUI.Canvas.GH_Canvas canvas; 
@@ -64,7 +67,7 @@ namespace Biomorpher
         }
 
         /// <summary>
-        /// Grasshopper solve method
+        /// Grasshopper solveinstance
         /// </summary>
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -84,7 +87,6 @@ namespace Biomorpher
 
         }
 
-        
         /// <summary>
         /// Gets the current sliders in Input[0]
         /// </summary>
@@ -115,6 +117,8 @@ namespace Biomorpher
         /// Sets the current slider values for a geven input chromosome
         /// </summary>
         /// <param name="chromo"></param>
+        /// <param name="sliders"></param>
+        /// <param name="genePools"></param>
         public void SetSliders(Chromosome chromo, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             double[] genes = chromo.GetGenes();
@@ -131,7 +135,6 @@ namespace Biomorpher
 
             // Set the gene pool values
             // Note that we use the back end of the genes, beyond the slider count
-
             int geneIndex = sCount;
 
             for (int i = 0; i < genePools.Count; i++)
@@ -150,8 +153,7 @@ namespace Biomorpher
         /// <summary>
         /// Updates the geometry for an input chromosome
         /// </summary>
-        /// <param name="chromo"></param>
-        /// <param name="da"></param>
+        /// <param name="chromo">The chromosome used to get geometry from the gh canvas</param>
         /// <returns></returns>
         public int GetGeometry(Chromosome chromo)
         {
@@ -184,12 +186,9 @@ namespace Biomorpher
                 }
             }
 
-            // TODO: Get other types of geometry
-
             // TODO: The allGeometry should not be of type Mesh.
             List<Mesh> allGeometry = new List<Mesh>();
             allGeometry.Add(joinedMesh);
-
 
             // Get performance data
             List<double> performas = new List<double>();
@@ -197,7 +196,6 @@ namespace Biomorpher
 
             foreach (IGH_Param param in Params.Input[2].Sources)
             {
-
                 foreach (Object myObj in param.VolatileData.AllData(true))
                 {
                     if (myObj is GH_Number)
@@ -213,9 +211,7 @@ namespace Biomorpher
                         performas.Add((double)temp.Value);
                         criteria.Add(param.NickName);
                     }
-                    
-                }
-                
+                }      
             }
 
             // Set the phenotype within the chromosome class
@@ -227,9 +223,9 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Cluster tree data for the output
+        /// Population cluster data for the component output. Outputs normalised genes values.
         /// </summary>
-        /// <param name="pop"></param>
+        /// <param name="pop">Uses the given population to set the cluster output data</param>
         public void SetComponentOut(Population pop)
         {
             myNumbers = new GH_Structure<GH_Number>();
@@ -244,7 +240,6 @@ namespace Biomorpher
                 {
                     List<GH_Number> myList = new List<GH_Number>();
                     
-
                     if (pop.chromosomes[j].clusterId == i)
                     {
                         for (int k = 0; k < pop.chromosomes[j].GetGenes().Length; k++)
@@ -253,30 +248,34 @@ namespace Biomorpher
                             myList.Add(myGHNumber);
                         }
 
-                        //myNumbers.AppendRange(myList, myPath.AppendElement(j));
                         myNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
                         localCounter++;
 
                     }
                 }
             }
-
-            
-
         }
 
-
+        /// <summary>
+        /// Gets the component guid
+        /// </summary>
         public override Guid ComponentGuid
         {
             get { return new Guid("87264CC5-8461-4003-8FF7-7584B13BAF06"); }
         }
 
+        /// <summary>
+        /// Create bespoke component attributes
+        /// </summary>
         public override void CreateAttributes()
         {
             m_attributes = new BiomorpherAttributes(this);
         }
 
 
+        /// <summary>
+        /// Locate the component with the rest of the rif raf
+        /// </summary>
         public override GH_Exposure Exposure
         {
             get
@@ -285,6 +284,9 @@ namespace Biomorpher
             }
         }
 
+        /// <summary>
+        /// Icon icon what a lovely icon
+        /// </summary>
         protected override Bitmap Icon
         {
             get
@@ -293,20 +295,34 @@ namespace Biomorpher
             }
         }
 
+        /// <summary>
+        /// Extra fancy menu items
+        /// </summary>
+        /// <param name="menu"></param>
         protected override void AppendAdditionalComponentMenuItems(System.Windows.Forms.ToolStripDropDown menu)
         {
             base.AppendAdditionalComponentMenuItems(menu);
             Menu_AppendItem(menu, @"All Sliders", AddAllSliders);
+            Menu_AppendItem(menu, @"Selected Sliders", AddSelectedSliders);
             Menu_AppendItem(menu, @"No Sliders", RemoveAllSliders);
             Menu_AppendItem(menu, @"Github source", GotoGithub);
         }
 
-
+        /// <summary>
+        /// Dare ye go to github?
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GotoGithub(Object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(@"https://github.com/johnharding/Biomorpher");
         }
 
+        /// <summary>
+        /// Add all sliders
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddAllSliders(Object sender, EventArgs e)
         {
             try
@@ -332,6 +348,46 @@ namespace Biomorpher
             ExpireSolution(true);
         }
 
+
+        /// <summary>
+        /// Add selected sliders
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddSelectedSliders(Object sender, EventArgs e)
+        {
+            try
+            {
+                IEnumerator<IGH_DocumentObject> enumerator = canvas.Document.Objects.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    IGH_DocumentObject current = enumerator.Current;
+                    if (current != null)
+                    {
+                        if (current.Attributes.Selected)
+                        {
+                            if (current is GH_NumberSlider)
+                            {
+                                this.Params.Input[0].AddSource((IGH_Param)current, 0);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
+            ExpireSolution(true);
+        }
+
+
+        /// <summary>
+        /// Remove all connected sliders
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RemoveAllSliders(Object sender, EventArgs e)
         {
             this.Params.Input[0].RemoveAllSources();

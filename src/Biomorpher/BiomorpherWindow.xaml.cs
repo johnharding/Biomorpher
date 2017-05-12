@@ -41,15 +41,18 @@ namespace Biomorpher
         private List<BioBranch> BioBranches;
         private List<GH_NumberSlider> sliders;
         private List<GalapagosGeneListObject> genePools;
-        private BiomorpherComponent owner;
         private int performanceCount;
-        private static readonly object syncLock = new object();
         private int biobranchID;
+        private static readonly object syncLock = new object();
 
+        /// <summary>
+        /// Component itself will be passed to this
+        /// </summary>
+        private BiomorpherComponent owner;
+        
         // History fields
         Canvas _historycanvas;
         int _historyY;
-
 
         /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
@@ -68,9 +71,9 @@ namespace Biomorpher
             }
         }
 
-
-
-        //UI properties
+        /// <summary>
+        /// Population size
+        /// </summary>
         private int popSize;
         public int PopSize
         {
@@ -85,6 +88,9 @@ namespace Biomorpher
             }
         }
 
+        /// <summary>
+        /// Mutatation probability
+        /// </summary>
         private double mutateProbability;
         public double MutateProbability
         {
@@ -99,7 +105,9 @@ namespace Biomorpher
             }
         }
 
-
+        /// <summary>
+        /// Current generation (i.e. twigID)
+        /// </summary>
         private int generation;
         public int Generation
         {
@@ -114,7 +122,9 @@ namespace Biomorpher
             }
         }
 
-
+        /// <summary>
+        /// Number of parents selected
+        /// </summary>
         private int parentCount;
         public int ParentCount
         {
@@ -129,8 +139,9 @@ namespace Biomorpher
             }
         }
 
-
-        //A dictionary, which contains the controls that need to be accessible from other methods after their creation (key to update controls)
+        /// <summary>
+        /// A dictionary, which contains the controls that need to be accessible from other methods after their creation (key to update controls)
+        /// </summary>
         private Dictionary<string, FrameworkElement> controls;
 
         //Font, spacing and colours
@@ -144,7 +155,10 @@ namespace Biomorpher
 
         #region CONSTRUCTOR
 
-        // Constructor
+        /// <summary>
+        /// Main window constructor. Biomorpher component itself is passed here.
+        /// </summary>
+        /// <param name="Owner"></param>
         public BiomorpherWindow(BiomorpherComponent Owner)
         {
 
@@ -179,13 +193,13 @@ namespace Biomorpher
             // Dictionary of control elements
             controls = new Dictionary<string, FrameworkElement>();
 
-            //Initialise Tab 1 Start settings
+            //Initialise Tab 1 Start settings (i.e. popsize and mutation sliders)
             tab1_secondary_settings();
 
-            //
+            //Make sure that tab 3 graphics are clipped to bounds
             Tab3_primary.ClipToBounds = true;
 
-            // Show info
+            // Show biomorpher info
             Tab4_primary_permanent();
         }
 
@@ -259,11 +273,10 @@ namespace Biomorpher
 
             tab12_primary_permanent(2);
             tab2_primary_update();
+
             tab2_secondary_settings();
 
-            //tab3_primary_update();
             tab3_secondary_settings();
-            
         }
 
 
@@ -313,20 +326,19 @@ namespace Biomorpher
             // Reset generation counter
             Generation = 0;
 
-            // 3. Perform K-means clustering
+            // Perform K-means clustering again?
             //population.KMeansClustering(12);
 
-            // 4. Get geometry for each chromosome
+            // Get geometry for each chromosome
             GetPhenotypes();
 
-            // 5. Update display of K-Means and representative meshes
+            // Update display of K-Means and representative meshes
             tab1_primary_update();
 
             tab2_primary_update();
             tab2_updatePerforms();
 
         }
-
 
 
         /// <summary>
@@ -337,6 +349,7 @@ namespace Biomorpher
             //TODO: Advances pop using a performance criteria.
         }
 
+
         /// <summary>
         /// Returns the window controls added to the dictionary
         /// </summary>
@@ -344,18 +357,6 @@ namespace Biomorpher
         public Dictionary<string, FrameworkElement> GetControls()
         {
             return controls;
-        }
-
-
-        /// <summary>
-        /// Exits the window
-        /// </summary>
-        public void Exit()
-        {
-            // TODO: Set sliders and get geometry for a chosen chromosome
-
-            // Close the window
-            this.Close();
         }
 
 
@@ -1183,8 +1184,6 @@ namespace Biomorpher
                 if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
                 {
 
-                    //DockPanel myPanel = new DockPanel();
-
                     Mesh myMesh = new Mesh();
 
                     if (myMesh != null)
@@ -1384,7 +1383,13 @@ namespace Biomorpher
         }
 
 
-        //Create checkbox control
+        /// <summary>
+        /// Creates a checkbox control
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="handler"></param>
+        /// <param name="chromoID"></param>
+        /// <returns></returns>
         public CheckBox createCheckBox(string name, RoutedEventHandler handler, int chromoID)
         {
             CheckBox cb = new CheckBox();
@@ -1541,7 +1546,7 @@ namespace Biomorpher
         //Handle event when the "Exit" button is clicked in tab 1       
         public void Exit_Click(object sender, RoutedEventArgs e)
         {
-            Exit();
+            this.Close();
         }
 
 

@@ -17,8 +17,10 @@ namespace Biomorpher.IGA
     /// </summary>
     public class Chromosome
     {
-
-        public List<Mesh> phenotype;        // TODO: should be more than meshes at some point
+        /// <summary>
+        /// Geometry phenotype. Currently only meshes
+        /// </summary>
+        public List<Mesh> phenotype;
 
         /// <summary>
         /// Optional list of performance values
@@ -30,29 +32,46 @@ namespace Biomorpher.IGA
         /// </summary>
         private List<string> criteria; 
         
-        // Normalised values used in the chromosome
+        /// <summary>
+        /// gene array
+        /// </summary>
         private double[] genes;
+
+        /// <summary>
+        /// List of associated sliders to this chromosome
+        /// </summary>
         private List<Grasshopper.Kernel.Special.GH_NumberSlider> chromoSliders;
+
+        /// <summary>
+        /// List of associated genepools to this chromosome
+        /// </summary>
         private List<GalapagosComponents.GalapagosGeneListObject> chromoGenePools;
 
-        // Fitness used for elitism selection
+        /// <summary>
+        /// Fitness from 0.0 to 1.0 used for elitism selection
+        /// </summary>
         private double fitness {get; set;}
 
-        //k-means representatve
+        /// <summary>
+        /// Describes if the chromosome is a k-means cluster representative
+        /// </summary>
         public bool isRepresentative;
 
         /// <summary>
-        /// The associated cluster centroid representative ID (could be itself)
+        /// The associated cluster centroid representative ID (could be itself).
         /// </summary>
         public int clusterId;
 
+        /// <summary>
+        /// Distance to cluster representative (could be zero). Used for K-means plot.
+        /// </summary>
         public double distToRepresentative;
 
         /// <summary>
         /// Main chromosome constructor
         /// </summary>
-        /// <param name="newLength"></param>
-        /// <param name="randSeed"></param>
+        /// <param name="sliders">Grasshopper sliders used to formulate the chromosome</param>
+        /// <param name="genePools">Grasshopper genepools used to formulate the chromosome</param>
         public Chromosome(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             chromoSliders = new List<GH_NumberSlider>(sliders);
@@ -80,14 +99,17 @@ namespace Biomorpher.IGA
             for (int i=0; i<genes.Length; i++) genes[i] = Friends.GetRandomDouble();
         }
 
-
+        /// <summary>
+        /// Returns the fitness value for this chromosome
+        /// </summary>
+        /// <returns></returns>
         public double GetFitness()
         {
             return fitness;
         }
 
         /// <summary>
-        /// Clones the chromosome TODO: needs to be more than just the genes we clone here!
+        /// Clones the chromosome including k-means data, geometry phenotype and performance data
         /// </summary>
         /// <returns></returns>
         public Chromosome Clone()
@@ -172,14 +194,11 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
-        /// Sets the phenotype for this chromosome with some input geometry
+        /// Sets the phenotype for this chromosome (geometry and performance criteria)
         /// </summary>
         /// <param name="meshes"></param>
         public void SetPhenotype(List<Mesh> meshes, List<double> performas, List<string> crit)
         {
-            // Reset the phenotype to some input meshes
-            // TODO: in the future this should be generic geometry including curves, etc.
-            //       the argument for this method will have to be updated also.
             phenotype = new List<Mesh>(meshes);
             performance = new List<double>(performas);
             criteria = new List<string>(crit);
@@ -200,7 +219,7 @@ namespace Biomorpher.IGA
         /// <summary>
         /// Shakes the genes a little
         /// </summary>
-        /// <param name="t"></param>
+        /// <param name="t">amount to jiggle the genes by from 0.0 to 1.0</param>
         public void JiggleGenes(double t)
         {
             for(int i=0; i<genes.Length; i++)

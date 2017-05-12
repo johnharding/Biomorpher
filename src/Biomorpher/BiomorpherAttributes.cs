@@ -11,51 +11,70 @@ using System.Drawing.Drawing2D;
 
 namespace Biomorpher
 {
+    /// <summary>
+    /// Component attributes
+    /// </summary>
     public class BiomorpherAttributes : GH_ComponentAttributes
     {
+        /// <summary>
+        /// Declare main window as part of component attributes
+        /// </summary>
         private BiomorpherWindow myMainWindow;
 
+        /// <summary>
+        /// Component attributes constructor
+        /// </summary>
         public BiomorpherComponent MyOwner
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Component attributes
+        /// </summary>
+        /// <param name="owner"></param>
         public BiomorpherAttributes(BiomorpherComponent owner)
             : base(owner)
         {
             this.MyOwner = owner;
         }
 
+        /// <summary>
+        /// Layout component
+        /// </summary>
         protected override void Layout()
         {
             base.Layout();
         }
 
 
-
+        /// <summary>
+        /// Open the biomorpher window upon doubleclick
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
         public override GH_ObjectResponse RespondToMouseDoubleClick(GH_Canvas sender, GH_CanvasMouseEvent e)
         {
             if ((ContentBox.Contains(e.CanvasLocation)))
             {
-                // Best to flip this boolean to iron out any errors
-                //MyOwner.GO = true;
-                //MyOwner.ExpireSolution(true);
-
                 myMainWindow = new BiomorpherWindow(MyOwner);
                 myMainWindow.Show();
                 
-
                 return GH_ObjectResponse.Handled;
             }
-
-
 
             return GH_ObjectResponse.Ignore;
         }
 
 
-
+        /// <summary>
+        /// Render the component
+        /// </summary>
+        /// <param name="canvas"></param>
+        /// <param name="graphics"></param>
+        /// <param name="channel"></param>
         protected override void Render(GH_Canvas canvas, Graphics graphics, GH_CanvasChannel channel)
         {
             if (channel == GH_CanvasChannel.Wires)
@@ -73,8 +92,6 @@ namespace Biomorpher
                 GraphicsPath path = RoundedRectangle.Create((int)(Bounds.Location.X), (int)Bounds.Y - 13, (int)Bounds.Width, 24, 3);
                 graphics.DrawPath(myPen, path);
 
-
-                //Tahoma
                 Font myFont = new Font(Grasshopper.Kernel.GH_FontServer.Standard.FontFamily, 5, FontStyle.Italic);
                 StringFormat format = new StringFormat();
 
