@@ -321,7 +321,7 @@ namespace Biomorpher
         /// </summary>
         public void RunNewBranch()
         {
-            BioBranches[biobranchID].AddTwig(population);
+            //BioBranches[biobranchID].AddTwig(population);
 
             // Reset generation counter
             Generation = 0;
@@ -1128,13 +1128,17 @@ namespace Biomorpher
             int vportMarginY = 24;
 
             Grid myGrid = new Grid();
-            myGrid.ShowGridLines = true;
             myGrid.Height = vportHeight;
 
             myGrid.RowDefinitions.Add(new RowDefinition());
                     
             int xCount = 0;
             int j = Generation - 1;
+
+            Border dpborder = new Border();
+            dpborder.BorderBrush = Brushes.White;
+            dpborder.BorderThickness = new Thickness(0.3);
+            dpborder.Padding = new Thickness(5);
 
             StackPanel dp = new StackPanel();
             dp.Orientation = Orientation.Vertical;
@@ -1166,13 +1170,13 @@ namespace Biomorpher
             border_buttons.Margin = new Thickness(0, 20, 0, 0);
             border_buttons.Child = myButton;
             dp.Children.Add(border_buttons);
-
+            dpborder.Child = dp;
 
             myGrid.ColumnDefinitions.Add(new ColumnDefinition());
             myGrid.Width = (xCount + 1) * vportWidth;
-            Grid.SetRow(dp, 0);
-            Grid.SetColumn(dp, xCount);
-            myGrid.Children.Add(dp);
+            Grid.SetRow(dpborder, 0);
+            Grid.SetColumn(dpborder, xCount);
+            myGrid.Children.Add(dpborder);
 
             xCount++;
 
@@ -1191,13 +1195,21 @@ namespace Biomorpher
                     else
                         myMesh = Friends.SampleMesh();
 
+                    Border border = new Border();
+                    border.BorderBrush = Brushes.White;
+                    border.BorderThickness = new Thickness(0.3);
+                    border.Padding = new Thickness(2);
+
                     ViewportBasic vp4 = new ViewportBasic(myMesh);
+                    border.Child = vp4;
+                    vp4.BorderThickness = new Thickness(0.3);
+                    vp4.BorderBrush = Brushes.LightGray;
 
                     myGrid.ColumnDefinitions.Add(new ColumnDefinition());
                     myGrid.Width = (xCount + 1) * vportWidth;
-                    Grid.SetRow(vp4, 0);
-                    Grid.SetColumn(vp4, xCount);
-                    myGrid.Children.Add(vp4);
+                    Grid.SetRow(border, 0);
+                    Grid.SetColumn(border, xCount);
+                    myGrid.Children.Add(border);
 
                     xCount++;
                 }
@@ -1316,9 +1328,6 @@ namespace Biomorpher
             border_dcl.Margin = new Thickness(10, 10, 40, 20);
             sp.Children.Add(border_dcl);
             
-            //TextBox fish = new TextBox();
-            //fish.Text = "Sauce";
-
             BitmapImage b = new BitmapImage();
             b.BeginInit();
             b.UriSource = new Uri(@"Images\BioIcon2_240.png", UriKind.Relative);
@@ -1525,7 +1534,11 @@ namespace Biomorpher
         }
 
 
-        //Handle event when the "GO!" button is clicked in tab 1       
+        /// <summary>
+        /// Handle event when the "GO!" button is clicked in tab 1 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void tab1_Go_Click(object sender, RoutedEventArgs e)
         {
 
@@ -1543,14 +1556,23 @@ namespace Biomorpher
         }
 
 
-        //Handle event when the "Exit" button is clicked in tab 1       
+        /// <summary>
+        /// Closes the window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+      
         public void Exit_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
 
-        //Reinstates a population
+        /// <summary>
+        /// Reinstates an old population and makes a new biobranch
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void reinstatePopClick(object sender, RoutedEventArgs e)
         {
             // Get info from the sender button
@@ -1559,20 +1581,31 @@ namespace Biomorpher
             int branch = myTag[0];
             int twig   = myTag[1];
 
-            // Add a new biobranch, using the tag information as the parent BRANCH and TWIG 
+            // Define the offset Y for the new biobrach
             int offset = 0;
             for (int i = 0; i < BioBranches.Count; i++)
-                offset += BioBranches[biobranchID].StartY; // offset the startY
+                offset += BioBranches[i].StartY; // offset the startY
 
-            BioBranches.Add(new BioBranch(branch, twig, _historyY + offset));
+            // Add a new biobranch, using the tag information as the parent BRANCH and TWIG 
+            BioBranches.Add(new BioBranch(branch, twig, offset + _historyY + 50));
             _historyY = 0;
             biobranchID++;
-            population = new Population(BioBranches[branch].Twigs[twig]); // clones the population
+
+            // Clone the population
+            population = new Population(BioBranches[branch].Twigs[twig]);
+
+            // Clone carries of fitnesses, so it needs to be reset for a new run.
+            population.ResetAllFitness();
+
             RunNewBranch();
         }
 
 
-        //Event handler for all checkboxes in tab 2        
+        /// <summary>
+        /// Event handler for all checkboxes in tab 2
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void tab2_SelectParents_Check(object sender, RoutedEventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
