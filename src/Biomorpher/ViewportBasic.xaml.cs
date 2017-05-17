@@ -26,6 +26,10 @@ namespace Biomorpher
         private Viewport3D myViewport;
         private Rect3D bounds {get; set;}
 
+        /// <summary>
+        /// Creates a simple viewport without helix
+        /// </summary>
+        /// <param name="mesh"></param>
         public ViewportBasic(Mesh mesh)
         {
             InitializeComponent();
@@ -106,7 +110,7 @@ namespace Biomorpher
             // ModelVisual
             ModelVisual3D vis = new ModelVisual3D();
             vis.Content = modelGroup;
-
+            
             // Viewport
             myViewport.Children.Add(vis);
             ZoomExtents();

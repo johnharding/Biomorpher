@@ -31,6 +31,16 @@ namespace Biomorpher.IGA
         public Chromosome[] chromosomes { get; set; }
 
         /// <summary>
+        /// Location on the history canvas for a bezier curve to spawn
+        /// </summary>
+        public System.Windows.Point HistoryNodeOUT { get; set; }
+
+        /// <summary>
+        /// Location on the history canvas for a bezier curve to finish
+        /// </summary>
+        public System.Windows.Point HistoryNodeIN { get; set; }
+
+        /// <summary>
         /// Construct a new population of chromosomes using sliders and genepools
         /// </summary>
         /// <param name="popSize"></param>

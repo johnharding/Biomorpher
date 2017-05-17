@@ -1,4 +1,5 @@
-﻿using Rhino.Geometry;
+﻿using HelixToolkit.Wpf;
+using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace Biomorpher.IGA
@@ -18,6 +20,11 @@ namespace Biomorpher.IGA
     /// </summary>
     public static class Friends
     {
+
+        /// <summary>
+        /// A dummy helix viewport, used to share the camera settings
+        /// </summary>
+        public static HelixViewport3D dummyHelix = new HelixViewport3D();
 
         /// <summary>
         /// Biomorpher version
@@ -101,7 +108,6 @@ namespace Biomorpher.IGA
             return sampleMesh;
         }
 
-        
         /// <summary>
         /// Exports a canvas to an image png file
         /// </summary>

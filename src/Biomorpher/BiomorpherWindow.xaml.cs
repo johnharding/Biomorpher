@@ -53,6 +53,7 @@ namespace Biomorpher
         // History fields
         Canvas _historycanvas;
         int _historyY;
+        int pngHeight;
 
         /// <summary>
         /// indicates the particular cluster that is in focus (i.e. with performance values shown) NOT CHROMOSOME ID
@@ -175,6 +176,7 @@ namespace Biomorpher
             _historycanvas = new Canvas();
             HistoryCanvas.Children.Add(_historycanvas);
             _historyY = 0;
+            pngHeight = 0;
 
             Topmost = true;
             PopSize = 100;
@@ -767,6 +769,7 @@ namespace Biomorpher
                 {
                     dp.Children.RemoveAt(dp.Children.Count - 1);
                 }
+
                 Viewport3d vp3d = new Viewport3d(meshes[i], i, this, true);
                 dp.Children.Add(vp3d);
 
@@ -1124,7 +1127,6 @@ namespace Biomorpher
         {
             int vportWidth = 120;
             int vportHeight = 120;
-            int vportMarginX = 30;
             int vportMarginY = 24;
 
             Grid myGrid = new Grid();
@@ -1138,8 +1140,8 @@ namespace Biomorpher
             Border dpborder = new Border();
             dpborder.BorderBrush = Brushes.White;
             dpborder.BorderThickness = new Thickness(0.3);
-            dpborder.Padding = new Thickness(5);
-
+            //dpborder.Padding = new Thickness(5);
+            dpborder.Margin = new Thickness(30, 0, 0, 0);
             StackPanel dp = new StackPanel();
             dp.Orientation = Orientation.Vertical;
             //dp.LastChildFill = false;
@@ -1151,10 +1153,10 @@ namespace Biomorpher
             string name = biobranchID + "." + j;
             txt.Inlines.Add(name);
             dp.Children.Add(txt);
-
+            
             Button myButton = new Button();
-            myButton.Width = 80;
-            myButton.Height = 20;
+            myButton.Width = 70;
+            myButton.Height = 16;
 
             // Tag button with some info
             int[] myTag = new int[2];
@@ -1167,7 +1169,7 @@ namespace Biomorpher
             myButton.Click += new RoutedEventHandler(reinstatePopClick);
 
             Border border_buttons = new Border();
-            border_buttons.Margin = new Thickness(0, 20, 0, 0);
+            border_buttons.Margin = new Thickness(0, 10, 0, 0);
             border_buttons.Child = myButton;
             dp.Children.Add(border_buttons);
             dpborder.Child = dp;
@@ -1199,10 +1201,11 @@ namespace Biomorpher
                     border.BorderBrush = Brushes.White;
                     border.BorderThickness = new Thickness(0.3);
                     border.Padding = new Thickness(2);
-
+                    
                     ViewportBasic vp4 = new ViewportBasic(myMesh);
                     border.Child = vp4;
-                    vp4.BorderThickness = new Thickness(0.3);
+                    vp4.Background = Brushes.White;
+                    vp4.BorderThickness = new Thickness(0.6);
                     vp4.BorderBrush = Brushes.LightGray;
 
                     myGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -1210,7 +1213,7 @@ namespace Biomorpher
                     Grid.SetRow(border, 0);
                     Grid.SetColumn(border, xCount);
                     myGrid.Children.Add(border);
-
+                    
                     xCount++;
                 }
 
@@ -1219,27 +1222,35 @@ namespace Biomorpher
             // Update shift
             if (myGrid.Width > _historyY)
                 _historyY = (int)myGrid.Width;
-
-            //Path myPath = new Path();
-            //myPath.Data = Friends.MakeBezierGeometry(0, 0, 0, 500, 800, 0, 800, 500);
-            //myPath.Stroke = Brushes.SlateGray;
-            //myPath.StrokeThickness = 2;
-            //Canvas.SetLeft(myPath, xCount * 120);
-            //Canvas.SetTop(myPath, 300 * j);
-            //canvas.Children.Add(myPath);
+            
                     
             // Set the left side based on the startY position for the new branch
-            Canvas.SetLeft(myGrid, vportMarginX + BioBranches[biobranchID].StartY);
-            Canvas.SetTop(myGrid, (generation - 1) * vportHeight + vportMarginY);
+            Canvas.SetLeft(myGrid, BioBranches[biobranchID].StartY);
+            int yLocation = (generation - 1) * vportHeight + vportMarginY;
+            Canvas.SetTop(myGrid, yLocation);
             _historycanvas.Children.Add(myGrid); // See xaml for history canvas
-            
+
+            // Now set some node points
+            BioBranches[biobranchID].Twigs[j].HistoryNodeIN = new System.Windows.Point(BioBranches[biobranchID].StartY + vportWidth, 20 + yLocation + vportHeight / 2);
+            BioBranches[biobranchID].Twigs[j].HistoryNodeOUT = new System.Windows.Point(BioBranches[biobranchID].StartY + myGrid.Width, 20 + yLocation + vportHeight / 2);
+
+            // Set the pngHeight to the maximum so far
+            int soupdragon = yLocation + vportHeight;
+            if (soupdragon > pngHeight) pngHeight = soupdragon;
+
+            // Draw the origin curve if we are not the first branch, and we are the first history member
+            if(biobranchID!=0 && j==0)
+                BioBranches[biobranchID].DrawOriginCurve(_historycanvas, BioBranches);
+
             // TODO: Define these DYNAMICALLY, important for the png export.
-            _historycanvas.Width = 1000;
-            _historycanvas.Height = 1000;
+            _historycanvas.Width = BioBranches[biobranchID].StartY + _historyY + 30;
+            _historycanvas.Height = pngHeight + 30;
 
         }
 
-        //Create settings panel for Tab 3
+        /// <summary>
+        /// Create settings panel for Tab 3
+        /// </summary>
         public void tab3_secondary_settings()
         {
             StackPanel sp3 = new StackPanel();
@@ -1300,14 +1311,14 @@ namespace Biomorpher
             Border border_txt = new Border();
             border_txt.Margin = new Thickness(margin_w, 10, margin_w, 0);
             TextBox myTextbox = new TextBox();
-            myTextbox.MinHeight = 200;
+            myTextbox.MinHeight = 400;
             myTextbox.BorderThickness = new Thickness(0);
             myTextbox.IsManipulationEnabled = true;
             myTextbox.TextWrapping = TextWrapping.Wrap;
             myTextbox.SnapsToDevicePixels = true;
             myTextbox.AcceptsReturn = true;
             myTextbox.AcceptsTab = true;
-            myTextbox.Background = Brushes.AntiqueWhite;
+            myTextbox.Background = Brushes.GhostWhite;
             border_txt.Child = myTextbox;
             sp3.Children.Add(border_txt);
 
@@ -1582,12 +1593,10 @@ namespace Biomorpher
             int twig   = myTag[1];
 
             // Define the offset Y for the new biobrach
-            int offset = 0;
-            for (int i = 0; i < BioBranches.Count; i++)
-                offset += BioBranches[i].StartY; // offset the startY
+            int offset = BioBranches[BioBranches.Count-1].StartY;
 
             // Add a new biobranch, using the tag information as the parent BRANCH and TWIG 
-            BioBranches.Add(new BioBranch(branch, twig, offset + _historyY + 50));
+            BioBranches.Add(new BioBranch(branch, twig, offset + _historyY + 20));
             _historyY = 0;
             biobranchID++;
 
@@ -1687,7 +1696,11 @@ namespace Biomorpher
 
 
 
-        //Handle event when the "SavePNG" button is clicked in tab 3      
+        /// <summary>
+        /// Handle event when the "SavePNG" button is clicked in tab 3
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void tab3_ExportPNG_Click(object sender, RoutedEventArgs e)
         {
             try

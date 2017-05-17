@@ -55,6 +55,7 @@ namespace Biomorpher
             var lights = new DefaultLights();
             hVp3D.Children.Add(lights);
             hVp3D.IsInertiaEnabled = true;
+            //hVp3D.Camera = Friends.dummyHelix.Camera;
 
             //Windows geometry objects
             MeshGeometry3D mesh_w = new MeshGeometry3D();
@@ -161,8 +162,6 @@ namespace Biomorpher
             //Add viewport to user control
             this.AddChild(hVp3D);
 
-
-
             /*
             ContextMenu myMenu = new ContextMenu();
 
@@ -209,28 +208,6 @@ namespace Biomorpher
                     W.SetInstance(jimmy);
                     break;
                 }
-            }
-
-
-            try
-            {
-                for (int i = 0; i < 12; i++)
-                {
-                    string dp_name = "dp_tab2_" + i;
-                    //string dp_sub_name = "dp_sub_tab2_" + i;
-
-                    DockPanel dp = (DockPanel)W.GetControls()[dp_name];
-                    //DockPanel dp_sub = (DockPanel)W.GetControls()[dp_sub_name];
-
-                    Viewport3d myViewport = (Viewport3d)dp.Children[1];
-                    myViewport.SetCamera(this.GetCamera());
-
-                    ProjectionCamera cam;
-                    
-                }
-            }
-            catch
-            {
             }
 
         }
