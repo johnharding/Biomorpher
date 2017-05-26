@@ -214,6 +214,7 @@ namespace Biomorpher
         /// </summary>
         public void GetPhenotypes()
         {
+
             // Get geometry for each chromosome in the initial population
             for (int i = 0; i < population.chromosomes.Length; i++)
             {
@@ -226,6 +227,9 @@ namespace Biomorpher
                     performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
                 }
             }
+
+            // TODO: Fill up null performance values instead, because this way if you have a null performance value it kills all the others.
+            //population.RepairPerforms();
 
             // Now set the cluster outputs
             owner.SetComponentOut(population);                                 
@@ -406,10 +410,11 @@ namespace Biomorpher
                     int performasCount = chromosomes[i].GetPerformas().Count;
 
                     performas[chromosomes[i].clusterId] = new double[performasCount];
-                    for(int j=0; j< performasCount; j++)
+                    for (int j = 0; j < performasCount; j++)
                     {
                         performas[chromosomes[i].clusterId][j] = chromosomes[i].GetPerformas()[j];
                     }
+
                 }
                     
             }
@@ -485,6 +490,8 @@ namespace Biomorpher
             canvas.Background = new SolidColorBrush(Colors.White);
             string name = "canvas" + clusterIndex;
             canvas.Name = name;
+            canvas.Width = width;
+            canvas.Height = width;
 
             //Add outline circle
             System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
@@ -493,7 +500,7 @@ namespace Biomorpher
             outline.StrokeThickness = 1;
             outline.Stroke = Brushes.SlateGray;
 
-            Canvas.SetLeft(outline, 40);
+            Canvas.SetLeft(outline, 0);
             Canvas.SetTop(outline, 0);
             canvas.Children.Add(outline);
 
@@ -545,14 +552,14 @@ namespace Biomorpher
                 System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
                 ln.StrokeThickness = 1;
                 ln.Stroke = Brushes.SlateGray;
-                ln.X1 = width / 2.0 + 40;
+                ln.X1 = width / 2.0 + 0;
                 ln.Y1 = width / 2.0;
-                ln.X2 = (width / 2.0) + xCoord + 40;
+                ln.X2 = (width / 2.0) + xCoord + 0;
                 ln.Y2 = (width / 2.0) + yCoord;
                 canvas.Children.Add(ln);
 
                 //drawing order
-                Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0) + 40);
+                Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0) + 0);
                 Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
                 canvas.Children.Add(circle);
             }
@@ -564,7 +571,7 @@ namespace Biomorpher
             circle2.Fill = Brushes.White; //colour
             circle2.Stroke = Brushes.SlateGray;
             circle2.StrokeThickness = 1;
-            Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0) + 40);
+            Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0)+0);
             Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0));
             canvas.Children.Add(circle2);
 
@@ -867,7 +874,12 @@ namespace Biomorpher
         }
 
 
-        //Create performas canvas with coloured circles for one representative design
+        /// <summary>
+        /// Create performas canvas with coloured circles for one representative design
+        /// </summary>
+        /// <param name="colours"></param>
+        /// <param name="isExtrema"></param>
+        /// <returns></returns>
         private Canvas createPerformanceCanvas(List<Color> colours, List<bool> isExtrema)
         {
             int numCircles = colours.Count;
@@ -919,7 +931,9 @@ namespace Biomorpher
         }
 
 
-        //Create settings panel for Tab 2
+        /// <summary>
+        /// Create settings panel for Tab 2
+        /// </summary>
         public void tab2_secondary_settings()
         {
             StackPanel sp = new StackPanel();
@@ -1122,12 +1136,13 @@ namespace Biomorpher
 
         #region UI TAB 3 (HISTORY)
 
-        //Updates the display of the representative meshes and their performance values
+        /// <summary>
+        /// Updates history canvas
+        /// </summary>
         public void tab3_primary_update()
         {
             int vportWidth = 120;
             int vportHeight = 120;
-            int vportMarginY = 24;
 
             Grid myGrid = new Grid();
             myGrid.Height = vportHeight;
@@ -1226,7 +1241,7 @@ namespace Biomorpher
                     
             // Set the left side based on the startY position for the new branch
             Canvas.SetLeft(myGrid, BioBranches[biobranchID].StartY);
-            int yLocation = (generation - 1) * vportHeight + vportMarginY;
+            int yLocation = (generation - 1) * vportHeight;
             Canvas.SetTop(myGrid, yLocation);
             _historycanvas.Children.Add(myGrid); // See xaml for history canvas
 
@@ -1245,6 +1260,9 @@ namespace Biomorpher
             // TODO: Define these DYNAMICALLY, important for the png export.
             _historycanvas.Width = BioBranches[biobranchID].StartY + _historyY + 30;
             _historycanvas.Height = pngHeight + 30;
+
+            HistoryCanvas.Width = _historycanvas.Width;
+            HistoryCanvas.Height = _historycanvas.Height;
 
         }
 

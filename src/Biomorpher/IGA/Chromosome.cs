@@ -206,6 +206,16 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
+        /// Sets the performance criteria without changing the mesh
+        /// </summary>
+        /// <returns></returns>
+        public void SetPerformas(List<double> performas, List<string> crit)
+        {
+            performance = new List<double>(performas);
+            criteria = new List<string>(crit);
+        }
+
+        /// <summary>
         /// Sets the fitness value (0.0 min to 1.0 max)
         /// </summary>
         public void SetFitness(double value)
@@ -214,6 +224,8 @@ namespace Biomorpher.IGA
             if (value > 1.0) value = 1.0;
             fitness = value;
         }
+
+        
 
 
         /// <summary>
@@ -232,6 +244,7 @@ namespace Biomorpher.IGA
                     genes[i] = 1.0 - Friends.GetRandomDouble()*0.001;
             }
         }
+
     }
  
 }

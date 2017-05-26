@@ -37,8 +37,8 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
-                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                            <Canvas Height="6000" Width="6000" x:Name="HistoryCanvas">
+                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                            <Canvas x:Name="HistoryCanvas">
                             </Canvas>
                         </ScrollViewer>
                     </Border>

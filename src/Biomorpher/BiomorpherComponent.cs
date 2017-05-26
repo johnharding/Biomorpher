@@ -211,7 +211,7 @@ namespace Biomorpher
                         performas.Add((double)temp.Value);
                         criteria.Add(param.NickName);
                     }
-                }      
+                }
             }
 
             // Set the phenotype within the chromosome class

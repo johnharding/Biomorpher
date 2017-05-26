@@ -120,6 +120,9 @@ namespace Biomorpher
 
         }
 
+        /// <summary>
+        /// Zoom to extent of mesh
+        /// </summary>
         public void ZoomExtents()
         {
 
@@ -145,7 +148,7 @@ namespace Biomorpher
             double orthoWidth = bounds.SizeX;
             if (bounds.SizeY > orthoWidth) orthoWidth = bounds.SizeY;
             if (bounds.SizeZ > orthoWidth) orthoWidth = bounds.SizeZ;
-            orthoWidth *= 1.5; //just over root 2
+            orthoWidth *= 1.618; //phi?
 
             //myViewport.Camera = new PerspectiveCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), 30);
             myViewport.Camera = new OrthographicCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), orthoWidth);

@@ -195,6 +195,43 @@ namespace Biomorpher
         }
 
 
+        /// <summary>
+        /// Press 'c' to match cameras
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Key.Equals(Key.C))
+            {
+                try
+                {
+                    for (int i = 0; i < 12; i++)
+                    {
+                        string dp_name = "dp_tab2_" + i;
+                        //string dp_sub_name = "dp_sub_tab2_" + i;
+
+                        DockPanel dp = (DockPanel)W.GetControls()[dp_name];
+                        //DockPanel dp_sub = (DockPanel)W.GetControls()[dp_sub_name];
+
+                        Viewport3d myViewport = (Viewport3d)dp.Children[1];
+                        myViewport.SetCamera(this.GetCamera());
+
+                        //ProjectionCamera cam;
+
+                    }
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        /// <summary>
+        /// Double click to set the Grasshopper instance
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
         {
             base.OnMouseDoubleClick(e);
@@ -212,10 +249,12 @@ namespace Biomorpher
 
         }
 
+        /*
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseRightButtonDown(e);
         }
+         */
 
     }
 }

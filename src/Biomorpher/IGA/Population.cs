@@ -172,6 +172,45 @@ namespace Biomorpher.IGA
 
 
 
+        /// <summary>
+        /// Repairs performance values
+        /// </summary>
+        public void RepairPerforms()
+        {
+
+            // Finds the maximum number of performance criteria for this population
+            int perfCount = 0;
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                int pc = chromosomes[i].GetPerformas().Count;
+                if (pc > perfCount)
+                    perfCount = pc;
+            }
+
+            // Fills the null performances with zeros and nulls (TODO: A better way? What if we optimised to a minimum?
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                int pc = chromosomes[i].GetPerformas().Count;
+
+                if (pc < perfCount)
+                {
+                    List<double> newPerforms = new List<double>();
+                    List<string> newCrits = new List<string>();
+
+                    for(int j=0; j<perfCount; j++)
+                    {
+                        newPerforms.Add(0.0);
+                        newCrits.Add("NULL");
+                    }
+
+                    chromosomes[i].SetPerformas(newPerforms, newCrits);
+
+                }
+            }
+        }
+
+
+
         //----------------------------------------------------------------- K-MEANS --------------------------------------------------------------//
 
         /// <summary>
