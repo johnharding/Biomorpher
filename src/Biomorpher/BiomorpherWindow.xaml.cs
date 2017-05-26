@@ -229,7 +229,7 @@ namespace Biomorpher
             }
 
             // TODO: Fill up null performance values instead, because this way if you have a null performance value it kills all the others.
-            //population.RepairPerforms();
+            population.RepairPerforms();
 
             // Now set the cluster outputs
             owner.SetComponentOut(population);                                 
