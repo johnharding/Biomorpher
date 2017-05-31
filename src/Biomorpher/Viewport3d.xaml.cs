@@ -196,36 +196,27 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Press 'c' to match cameras
+        /// Matches this camera to the others
         /// </summary>
-        /// <param name="e"></param>
-        protected override void OnKeyDown(KeyEventArgs e)
+        public void MatchCamera()
         {
-            base.OnKeyDown(e);
-
-            if (e.Key.Equals(Key.C))
+            try
             {
-                try
+                for (int i = 0; i < 12; i++)
                 {
-                    for (int i = 0; i < 12; i++)
-                    {
-                        string dp_name = "dp_tab2_" + i;
-                        //string dp_sub_name = "dp_sub_tab2_" + i;
+                    string dp_name = "dp_tab2_" + i;
 
-                        DockPanel dp = (DockPanel)W.GetControls()[dp_name];
-                        //DockPanel dp_sub = (DockPanel)W.GetControls()[dp_sub_name];
+                    DockPanel dp = (DockPanel)W.GetControls()[dp_name];
+   
+                    Viewport3d myViewport = (Viewport3d)dp.Children[1];
+                    myViewport.SetCamera(this.GetCamera());
 
-                        Viewport3d myViewport = (Viewport3d)dp.Children[1];
-                        myViewport.SetCamera(this.GetCamera());
-
-                        //ProjectionCamera cam;
-
-                    }
-                }
-                catch
-                {
                 }
             }
+            catch
+            {
+            }
+
         }
 
         /// <summary>

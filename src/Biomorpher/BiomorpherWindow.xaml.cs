@@ -173,7 +173,9 @@ namespace Biomorpher
 
             // Initial Window things
             InitializeComponent();
+
             _historycanvas = new Canvas();
+            _historycanvas.Background = Brushes.White;
             HistoryCanvas.Children.Add(_historycanvas);
             _historyY = 0;
             pngHeight = 0;
@@ -761,7 +763,7 @@ namespace Biomorpher
 
             //Run through the design windows and add a viewport3d control and performance display to each
             // TODO: Is using the meshes count cool here???
-            for (int i = 0; i < meshes.Count; i++)
+            for (int i = 0; i < 12; i++)
             {
                 //The name of the control to add to
                 string dp_name = "dp_tab2_" + i;
@@ -788,6 +790,21 @@ namespace Biomorpher
 
                 Canvas c = performanceCanvas[i];
                 dp_sub.Children.Add(c);
+            }
+
+
+            // Match the cameras
+            // TODO: Better way to do this???
+            for (int i = 0; i < 12; i++)
+            {
+                //The name of the control to add to
+                string dp_name = "dp_tab2_" + i;
+
+                //Get this control from the dictionary
+                DockPanel dp = (DockPanel)controls[dp_name];
+                Viewport3d vp3d = (Viewport3d)dp.Children[1];
+                vp3d.MatchCamera();
+
             }
         }
 
@@ -1143,6 +1160,7 @@ namespace Biomorpher
         {
             int vportWidth = 120;
             int vportHeight = 120;
+            int vMargin = 20;
 
             Grid myGrid = new Grid();
             myGrid.Height = vportHeight;
@@ -1241,7 +1259,7 @@ namespace Biomorpher
                     
             // Set the left side based on the startY position for the new branch
             Canvas.SetLeft(myGrid, BioBranches[biobranchID].StartY);
-            int yLocation = (generation - 1) * vportHeight;
+            int yLocation = (generation - 1) * vportHeight + vMargin;
             Canvas.SetTop(myGrid, yLocation);
             _historycanvas.Children.Add(myGrid); // See xaml for history canvas
 

@@ -32,7 +32,7 @@ namespace Biomorpher.IGA
         /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
-            return "0.1.1";
+            return "0.2.0";
         }
 
 
@@ -116,7 +116,7 @@ namespace Biomorpher.IGA
         public static void CreateSaveBitmap(Canvas canvas, string filename)
         {
 
-            RenderTargetBitmap renderBitmap = new RenderTargetBitmap((int)canvas.Width, (int)canvas.Height, 96d, 96d, PixelFormats.Pbgra32);
+            RenderTargetBitmap renderBitmap = new RenderTargetBitmap((int)(canvas.Width * 3.125), (int)(canvas.Height * 3.125), 300d, 300d, PixelFormats.Pbgra32);
 
             renderBitmap.Render(canvas);
 
