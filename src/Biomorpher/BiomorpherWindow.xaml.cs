@@ -297,7 +297,7 @@ namespace Biomorpher
             // 0. AFTER selections have been made, add initial population to history when we have fitness values!
             // List of biobranches. BiobranchID is a global variable
             BioBranches[biobranchID].AddTwig(population);
-
+            
             // 1. Create new populaltion using user selection (resets fitnesses)
             Generation++;
             population.RoulettePop();
@@ -400,11 +400,11 @@ namespace Biomorpher
 
 
         //Gets *representative* performance values
-        private double[][] getRepresentativePerformas()
+        private double[][] getRepresentativePerformas(Population thisPop)
         {
             double[][] performas = new double[12][];
 
-            Chromosome[] chromosomes = population.chromosomes;
+            Chromosome[] chromosomes = thisPop.chromosomes;
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 if (chromosomes[i].isRepresentative)
@@ -426,11 +426,11 @@ namespace Biomorpher
 
 
         //Gets *representative* criteria names
-        private string[][] getRepresentativeCriteria()
+        private string[][] getRepresentativeCriteria(Population thisPop)
         {
             string[][] crit = new string[12][];
 
-            Chromosome[] chromosomes = population.chromosomes;
+            Chromosome[] chromosomes = thisPop.chromosomes;
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 if (chromosomes[i].isRepresentative)
@@ -815,7 +815,7 @@ namespace Biomorpher
             int alfaMin = 50;
             int alfaMax = 255;
 
-            double[][] performas = getRepresentativePerformas();
+            double[][] performas = getRepresentativePerformas(population);
             int performasCount = performas[0].Length;
 
             //Extract min/max values of each performance measure
@@ -1051,13 +1051,29 @@ namespace Biomorpher
 
 
         //Create colour-coded label for a performance value
-        private DockPanel createColourCodedLabel(string text, Color c)
+        private DockPanel createColourCodedLabel(string text, Color c, bool isHistoryTab)
         {
             DockPanel dp = new DockPanel();
+            int diameter;
+            int topOffset;
+            int margin;
+            int fSize;
 
             //Create filled circle
-            int diameter = 8;
-            int topOffset = 8;
+            if (isHistoryTab)
+            {
+                diameter = 6;
+                topOffset = 6;
+                margin = 6;
+                fSize = 8;
+            }
+            else
+            {
+                diameter = 8;
+                topOffset = 8;
+                margin = margin_w;
+                fSize = fontsize2;
+            }
 
             Canvas canvas = new Canvas();
             canvas.Background = new SolidColorBrush(Colors.Transparent);
@@ -1074,7 +1090,7 @@ namespace Biomorpher
             canvas.Children.Add(circle);
 
             Border border_c = new Border();
-            border_c.Margin = new Thickness(0, 0, margin_w, 0);
+            border_c.Margin = new Thickness(2, 0, margin, 0);
             border_c.Child = canvas;
 
             DockPanel.SetDock(border_c, Dock.Left);
@@ -1083,7 +1099,7 @@ namespace Biomorpher
             //Create performance label
             Label l = new Label();
             l.Content = text;
-            l.FontSize = fontsize2;
+            l.FontSize = fSize;
 
             dp.Children.Add(l);
 
@@ -1093,40 +1109,53 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Updates the list of performance 'borders'
+        /// Updates the list of performance 'borders' on the right hand side of the main window (tab 2)
+        /// Called when a design is double clicked
         /// </summary>
         private void tab2_updatePerforms()
         {
 
             //Design info
             Border border_clus = (Border) controls["CLUSTER"];
-            border_clus.Margin = new Thickness(margin_w, 20, margin_w, 10);
+            border_clus.Margin = new Thickness(margin_w, 30, margin_w, 10);
             
             Label label_gen = new Label();
             label_gen.Content = "Design " + HighlightedCluster +":";
-            label_gen.FontSize = 16; // fontsize;
-            label_gen.FontStyle = FontStyles.Italic;
-            //label_gen.FontWeight = FontWeights.Bold;
-
+            label_gen.FontSize = fontsize-2;
             border_clus.Child = label_gen;
 
 
             // Get the performance borders from the dictionary
+            // Note that these performance borders are for ONE design.
             List<Border> myBorders = new List<Border>();
             for (int i = 0; i < performanceCount; i++)
             {
                 myBorders.Add((Border)controls["PERFBORDER" + i]);
             }
+            
+            // A separate method is used due to the history tab also utilising this facility
+            AddPerformanceInfo(population, myBorders, HighlightedCluster, false);
+        }
 
+
+        /// <summary>
+        /// Adds performance name criteria, value and coloured dot to a given list of borders
+        /// </summary>
+        /// <param name="yourBorders"></param>
+        /// <param name="clusterID"></param>
+        public void AddPerformanceInfo(Population thisPop, List<Border> yourBorders, int clusterID, bool isHistory)
+        {
             // Performance labels
-            double[][] performas = getRepresentativePerformas();
-            string[][] criteria = getRepresentativeCriteria();
-
+            double[][] performas = getRepresentativePerformas(thisPop);
+            string[][] criteria = getRepresentativeCriteria(thisPop);
 
             //Add performance label
-            for (int i = 0; i < performanceCount; i++)
+            for (int i = 0; i < yourBorders.Count; i++)
             {
-                myBorders[i].Margin = new Thickness(margin_w+5, 0, margin_w, 0);
+                if(!isHistory)
+                    yourBorders[i].Margin = new Thickness(margin_w + 5, 0, margin_w, 0);
+                else
+                    yourBorders[i].Margin = new Thickness(0, 0, 0, 0);
 
                 // Try to catch if we just don't have the criteria info
                 string label_p;
@@ -1134,17 +1163,27 @@ namespace Biomorpher
                 // CAREFUL!!
                 try
                 {
-                    double roundedPerf = Math.Round(performas[HighlightedCluster][i], 3);
-                    label_p = criteria[HighlightedCluster][i].ToString() + "   =   " + roundedPerf.ToString();
+                    double roundedPerf = Math.Round(performas[clusterID][i], 3);
+                    if (!isHistory)
+                        label_p = criteria[clusterID][i].ToString() + "   =   " + roundedPerf.ToString();
+                    else
+                        label_p = "  " + roundedPerf.ToString();
+
+                    // 6 colours MAX!
+                    DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i % 6], isHistory);
+                    yourBorders[i].Child = dp_p;
                 }
                 catch
                 {
-                    label_p = "data not found!";
+                    DockPanel dp_p = new DockPanel();
+                    Label l = new Label();
+                    l.Content = "No performance data available!";
+                    l.FontSize = fontsize2;
+                    dp_p.Children.Add(l);
+                    yourBorders[i].Child = dp_p;
                 }
 
-                // 6 colours MAX!
-                DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i%6]);
-                myBorders[i].Child = dp_p;
+                
             }
         }
 
@@ -1158,26 +1197,26 @@ namespace Biomorpher
         /// </summary>
         public void tab3_primary_update()
         {
+
             int vportWidth = 120;
             int vportHeight = 120;
+            int gridHeight = vportHeight + 20 * (performanceCount + 2);
             int vMargin = 20;
 
             Grid myGrid = new Grid();
-            myGrid.Height = vportHeight;
-
+            myGrid.Height = gridHeight;
             myGrid.RowDefinitions.Add(new RowDefinition());
                     
             int xCount = 0;
             int j = Generation - 1;
 
+            // Create the left hand side border
             Border dpborder = new Border();
             dpborder.BorderBrush = Brushes.White;
             dpborder.BorderThickness = new Thickness(0.3);
-            //dpborder.Padding = new Thickness(5);
             dpborder.Margin = new Thickness(30, 0, 0, 0);
             StackPanel dp = new StackPanel();
             dp.Orientation = Orientation.Vertical;
-            //dp.LastChildFill = false;
 
             // Create the text identifier
             TextBlock txt = new TextBlock();
@@ -1215,14 +1254,19 @@ namespace Biomorpher
 
             xCount++;
 
+            // Now to populate the selected designs for this generation
             for (int k = 0; k < BioBranches[biobranchID].Twigs[j].chromosomes.Length; k++)
             {
-
+                Population thisPop = BioBranches[biobranchID].Twigs[j];
                 Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
 
                 if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
                 {
 
+                    StackPanel sp = new StackPanel();
+                    sp.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+
+                    // Deal with Grid no.1
                     Mesh myMesh = new Mesh();
 
                     if (myMesh != null)
@@ -1236,17 +1280,39 @@ namespace Biomorpher
                     border.Padding = new Thickness(2);
                     
                     ViewportBasic vp4 = new ViewportBasic(myMesh);
-                    border.Child = vp4;
                     vp4.Background = Brushes.White;
                     vp4.BorderThickness = new Thickness(0.6);
                     vp4.BorderBrush = Brushes.LightGray;
+                    border.Child = vp4;
+                    border.Height = 120;
+                    sp.Children.Add(border);
+                    
+                    //Design info
+                    Border border_clus = new Border();
+                    border_clus.Margin = new Thickness(0, 0, 0, 0);
 
+                    // Get the performance borders from the dictionary
+                    // Note that these performance borders are for ONE design.
+                    
+                    List<Border> myBorders = new List<Border>();
+                    for (int i = 0; i < performanceCount; i++)
+                    {
+                        myBorders.Add(new Border());
+                        sp.Children.Add(myBorders[i]);
+                    }
+
+                    // A separate method is used due to the history tab also utilising this facility
+                    AddPerformanceInfo(thisPop, myBorders, thisDesign.clusterId, true);
+                    
+                    //myGrid.Children.Add(border);
                     myGrid.ColumnDefinitions.Add(new ColumnDefinition());
                     myGrid.Width = (xCount + 1) * vportWidth;
                     Grid.SetRow(border, 0);
                     Grid.SetColumn(border, xCount);
-                    myGrid.Children.Add(border);
-                    
+                    Grid.SetRow(sp, 0);
+                    Grid.SetColumn(sp, xCount);
+                    myGrid.Children.Add(sp);
+
                     xCount++;
                 }
 
@@ -1259,7 +1325,7 @@ namespace Biomorpher
                     
             // Set the left side based on the startY position for the new branch
             Canvas.SetLeft(myGrid, BioBranches[biobranchID].StartY);
-            int yLocation = (generation - 1) * vportHeight + vMargin;
+            int yLocation = (generation - 1) * gridHeight + vMargin;
             Canvas.SetTop(myGrid, yLocation);
             _historycanvas.Children.Add(myGrid); // See xaml for history canvas
 
@@ -1268,7 +1334,7 @@ namespace Biomorpher
             BioBranches[biobranchID].Twigs[j].HistoryNodeOUT = new System.Windows.Point(BioBranches[biobranchID].StartY + myGrid.Width, 20 + yLocation + vportHeight / 2);
 
             // Set the pngHeight to the maximum so far
-            int soupdragon = yLocation + vportHeight;
+            int soupdragon = yLocation + gridHeight;
             if (soupdragon > pngHeight) pngHeight = soupdragon;
 
             // Draw the origin curve if we are not the first branch, and we are the first history member
