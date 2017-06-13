@@ -27,6 +27,7 @@ namespace Biomorpher
         private IGH_DataAccess deej;
         public int solveinstanceCounter;
         private GH_Structure<GH_Number> myNumbers;
+        private GH_Structure<GH_Number> myNumbers2;
         private static readonly object syncLock = new object();
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace Biomorpher
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
             pm.AddGenericParameter("Clusters", "Clusters", "Cluster data (k-means++)", GH_ParamAccess.tree);
-            //pm.AddGenericParameter("PopTree", "PopTree", "Historic population data", GH_ParamAccess.tree);
+            pm.AddGenericParameter("History", "History", "Historic parameter values", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -80,8 +81,8 @@ namespace Biomorpher
             }
 
             // Output cluster info
-            if(myNumbers!=null)
-             DA.SetDataTree(0, myNumbers);
+            if(myNumbers!=null) DA.SetDataTree(0, myNumbers);
+            if (myNumbers2 != null) DA.SetDataTree(1, myNumbers2);
 
             solveinstanceCounter++;
 
@@ -226,7 +227,7 @@ namespace Biomorpher
         /// Population cluster data for the component output. Outputs normalised genes values.
         /// </summary>
         /// <param name="pop">Uses the given population to set the cluster output data</param>
-        public void SetComponentOut(Population pop)
+        public void SetComponentOut(Population pop, List<BioBranch> BioBranches)
         {
             myNumbers = new GH_Structure<GH_Number>();
 
@@ -250,10 +251,36 @@ namespace Biomorpher
 
                         myNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
                         localCounter++;
+                    }
+                }
+            }
+
+
+            myNumbers2 = new GH_Structure<GH_Number>();
+
+
+            for (int i = 0; i < BioBranches.Count; i++)
+            {
+                for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
+                {
+                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
+                    {
+
+                        List<GH_Number> myList = new List<GH_Number>();
+                        for (int c = 0; c < pop.chromosomes[j].GetGenes().Length; c++)
+                        {
+                            GH_Number myGHNumber = new GH_Number(BioBranches[i].Twigs[j].chromosomes[k].GetGenes()[c]);
+                            myList.Add(myGHNumber);
+                        }
+
+                        GH_Path myPath = new GH_Path(i, j, k);
+                        myNumbers2.AppendRange(myList, myPath);
 
                     }
                 }
             }
+
+            this.ExpireSolution(true);
         }
 
         /// <summary>

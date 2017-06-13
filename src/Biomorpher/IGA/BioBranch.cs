@@ -12,7 +12,7 @@ namespace Biomorpher.IGA
     /// <summary>
     /// Branch containing a list of biomorpher generations
     /// </summary>
-    class BioBranch
+    public class BioBranch
     {
         /// <summary>
         /// Source branchID where growth began

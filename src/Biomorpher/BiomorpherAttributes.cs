@@ -34,10 +34,10 @@ namespace Biomorpher
         /// Component attributes
         /// </summary>
         /// <param name="owner"></param>
-        public BiomorpherAttributes(BiomorpherComponent owner)
-            : base(owner)
+        public BiomorpherAttributes(BiomorpherComponent owner) : base(owner)
         {
             this.MyOwner = owner;
+            
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Biomorpher
             if ((ContentBox.Contains(e.CanvasLocation)))
             {
                 myMainWindow = new BiomorpherWindow(MyOwner);
-                myMainWindow.Show();
+                //myMainWindow.Show();
                 
                 return GH_ObjectResponse.Handled;
             }

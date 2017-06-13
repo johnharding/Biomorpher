@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
 using Grasshopper.Kernel.Data;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace Biomorpher.IGA
 {
@@ -41,9 +43,16 @@ namespace Biomorpher.IGA
         public System.Windows.Point HistoryNodeIN { get; set; }
 
         /// <summary>
+        /// List containing average performance values for this population
+        /// </summary>
+        public List<double> AveragePerformanceValues { get; set; }
+
+        /// <summary>
         /// Construct a new population of chromosomes using sliders and genepools
         /// </summary>
         /// <param name="popSize"></param>
+        /// <param name="sliders"></param>
+        /// <param name="genePools"></param>
         public Population(int popSize, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             chromosomes = new Chromosome[popSize];
@@ -132,6 +141,122 @@ namespace Biomorpher.IGA
             ResetAllFitness();
         }
 
+
+        /// <summary>
+        /// Set the fitness of each design to be performance based.
+        /// </summary>
+        public void SetPerformanceBasedFitness(Dictionary<string, FrameworkElement> controls, int pCount)
+        {
+
+            RadioButton[] radButtonMin = new RadioButton[pCount];
+            RadioButton[] radButtonMax = new RadioButton[pCount];
+
+            double[] minValues = new double[pCount];
+            double[] maxValues = new double[pCount];
+
+            int toBeOptimisedCount = 0;
+
+            // For each performance measure...
+            for(int p=0; p<pCount; p++)
+            {
+
+                // Get the associated min/max radio buttons
+                radButtonMin[p] = (RadioButton)controls["RADBUTTONMIN" + p];
+                radButtonMax[p] = (RadioButton)controls["RADBUTTONMAX" + p];
+
+                if(radButtonMin[p].IsChecked == true || radButtonMax[p].IsChecked == true)
+                {
+                    minValues[p] = 9999999999;
+                    maxValues[p] = -9999999999;
+
+                    // Find the min and max values before normalisation.
+                    for(int j=0; j<chromosomes.Length; j++)
+                    {
+                        double value = chromosomes[j].GetPerformas()[p];
+                        if (value < minValues[p]) minValues[p] = value;
+                        if (value > maxValues[p]) maxValues[p] = value;
+                    }
+
+                    // Record the number of criteria to be optimised (for fitness weightings)
+                    toBeOptimisedCount++;
+                    
+                }
+            }
+
+
+            // Now time to update the fitnesses
+            for (int p = 0; p < pCount; p++)
+            {
+                // for the minimising criteria
+                if (radButtonMin[p].IsChecked == true || radButtonMax[p].IsChecked == true)
+                {
+                    // For this performance measure, find the range
+                    double range = maxValues[p] - minValues[p];
+
+                    // Find the normalised value for each chromosome
+                    for (int j = 0; j < chromosomes.Length; j++)
+                    {
+                        // Get the normalised value, and flip value for minimising criteria
+                        double value = (chromosomes[j].GetPerformas()[p] - minValues[p]) / range;
+                        if (radButtonMin[p].IsChecked == true)
+                            value = 1 - value;
+
+                        // Adjust depending on number of performance measures to be optimised
+                        value /= (double)toBeOptimisedCount;
+
+                        // Set the fitness of this chromosome based on 1-value (minimise) or value (maximise)
+                        chromosomes[j].CummulateFitness(value);
+
+                        // Check that we are within bounds
+                        if (chromosomes[j].GetFitness() > 1.0 || chromosomes[j].GetFitness() < 0.0)
+                            System.Console.Beep();
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Sets the average performance values for this population
+        /// </summary>
+        /// <param name="pCount"></param>
+        /// <param name="isClusterRepsOnly"></param>
+        public void SetAveragePerformanceValues(int pCount, bool isClusterRepsOnly)
+        {
+            // Declare a brand new list
+            AveragePerformanceValues = new List<double>();
+
+            for (int p = 0; p < pCount; p++)
+            {
+                AveragePerformanceValues.Add(0.0);
+
+                for (int i = 0; i < chromosomes.Length; i++)
+                {
+                    if (isClusterRepsOnly)
+                    {
+                        if (chromosomes[i].isRepresentative)
+                        {
+                            AveragePerformanceValues[p] += chromosomes[i].GetPerformas()[p];
+                        }
+                    }
+
+                    else
+                    {
+                        AveragePerformanceValues[p] += chromosomes[i].GetPerformas()[p];
+                    }
+                }
+
+                if (isClusterRepsOnly) AveragePerformanceValues[p] /= 12;
+                else AveragePerformanceValues[p] /= chromosomes.Length;
+
+                AveragePerformanceValues[p] = Math.Round(AveragePerformanceValues[p], 3);
+
+            }
+
+
+        }
+
+
         /// <summary>
         /// Mutates a gene according to a probability
         /// </summary>
@@ -152,6 +277,7 @@ namespace Biomorpher.IGA
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 chromosomes[i].SetFitness(0.0);
+                chromosomes[i].isChecked = false;
             }
         }
 
@@ -183,37 +309,45 @@ namespace Biomorpher.IGA
 
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                if (chromosomes[i].isRepresentative)
+                try
                 {
                     int pc = chromosomes[i].GetPerformas().Count;
                     if (pc > perfCount)
                         perfCount = pc;
                 }
+                catch
+                {
+                    // just leave the perfCount as it is then
+                }
             }
              
 
-            // Fills the null performances with zeros and nulls (TODO: A better way? What if we optimised to a minimum?
-            
+            // Fills the null performances with zeros (TODO: A better way? What if we optimised to a minimum?
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                if (chromosomes[i].isRepresentative)
+                int pc;
+
+                try
                 {
-                    int pc = chromosomes[i].GetPerformas().Count;
+                    pc = chromosomes[i].GetPerformas().Count;
+                }
+                catch
+                {
+                    pc = 0;
+                }
 
-                    if (pc < perfCount)
+                if (pc < perfCount)
+                {
+                    List<double> newPerforms = new List<double>();
+                    List<string> newCrits = new List<string>();
+
+                    for (int j = 0; j < perfCount; j++)
                     {
-                        List<double> newPerforms = new List<double>();
-                        List<string> newCrits = new List<string>();
-
-                        for (int j = 0; j < perfCount; j++)
-                        {
-                            newPerforms.Add(0.0);
-                            newCrits.Add("NULL");
-                        }
-
-                        chromosomes[i].SetPerformas(newPerforms, newCrits);
-
+                        newPerforms.Add(0.0);
+                        newCrits.Add("NULL");
                     }
+
+                    chromosomes[i].SetPerformas(newPerforms, newCrits);
                 }
             }
              

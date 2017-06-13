@@ -112,6 +112,9 @@
     <Compile Include="ViewportBasic.xaml.cs">
       <DependentUpon>ViewportBasic.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ProgressWindow.xaml.cs">
+      <DependentUpon>ProgressWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="BiomorpherWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -121,6 +124,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ViewportBasic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProgressWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -142,6 +149,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -154,16 +162,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\DoubleClickIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\BiomorpherIcon_24.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BiomorpherIcon2_24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BiomorpherIcon3.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\BioIcon2_240.png" />

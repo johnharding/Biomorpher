@@ -68,6 +68,11 @@ namespace Biomorpher.IGA
         public double distToRepresentative;
 
         /// <summary>
+        /// Indicates if it is checked
+        /// </summary>
+        public bool isChecked;
+
+        /// <summary>
         /// Main chromosome constructor
         /// </summary>
         /// <param name="sliders">Grasshopper sliders used to formulate the chromosome</param>
@@ -89,6 +94,7 @@ namespace Biomorpher.IGA
             isRepresentative = false;
             clusterId = -1;
             distToRepresentative = -1.0;
+            isChecked = false;
         }
 
         /// <summary>
@@ -125,6 +131,7 @@ namespace Biomorpher.IGA
             clone.clusterId = this.clusterId;
             clone.isRepresentative = this.isRepresentative;
             clone.distToRepresentative = this.distToRepresentative;
+            clone.isChecked = this.isChecked;
 
             // Clone phenotype mesh
             if (this.phenotype != null)
@@ -225,7 +232,14 @@ namespace Biomorpher.IGA
             fitness = value;
         }
 
-        
+        /// <summary>
+        /// Cumulates the current fitness value
+        /// </summary>
+        /// <param name="value"></param>
+        public void CummulateFitness(double value)
+        {
+            fitness += value;
+        }
 
 
         /// <summary>

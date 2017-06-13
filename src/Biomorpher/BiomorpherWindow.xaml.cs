@@ -46,6 +46,11 @@ namespace Biomorpher
         private static readonly object syncLock = new object();
 
         /// <summary>
+        /// Progress bar window
+        /// </summary>
+        //private ProgressWindow myProgressWindow = new ProgressWindow();
+        
+        /// <summary>
         /// Component itself will be passed to this
         /// </summary>
         private BiomorpherComponent owner;
@@ -205,6 +210,7 @@ namespace Biomorpher
 
             // Show biomorpher info
             Tab4_primary_permanent();
+            
         }
 
         #endregion
@@ -212,15 +218,32 @@ namespace Biomorpher
         #region MAIN METHODS
 
         /// <summary>
-        /// Gets the phenotype information for all the current chromosomes
+        /// Gets the phenotype information for the current cluster representatives
         /// </summary>
-        public void GetPhenotypes()
+        public void GetPhenotypes(bool clusterRepsOnly)
         {
 
             // Get geometry for each chromosome in the initial population
-            for (int i = 0; i < population.chromosomes.Length; i++)
+            // TODO: Don't repeat code like this!
+            if (clusterRepsOnly)
             {
-                if (population.chromosomes[i].isRepresentative)
+                for (int i = 0; i < population.chromosomes.Length; i++)
+                {
+
+                    if (population.chromosomes[i].isRepresentative)
+                    {
+                        owner.canvas.Document.Enabled = false;                              // Disable the solver before tweaking sliders
+                        owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders using gene values
+                        owner.canvas.Document.Enabled = true;                               // Enable the solver again
+                        owner.ExpireSolution(true);                                         // Now expire the main component and recompute
+                        performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
+                    }
+                }
+            }
+
+            else
+            {
+                for (int i = 0; i < population.chromosomes.Length; i++)
                 {
                     owner.canvas.Document.Enabled = false;                              // Disable the solver before tweaking sliders
                     owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders using gene values
@@ -232,10 +255,7 @@ namespace Biomorpher
 
             // TODO: Fill up null performance values instead, because this way if you have a null performance value it kills all the others.
             population.RepairPerforms();
-
-            // Now set the cluster outputs
-            owner.SetComponentOut(population);                                 
-            owner.ExpireSolution(true);        
+      
         }
 
 
@@ -273,18 +293,25 @@ namespace Biomorpher
             population.KMeansClustering(12);
 
             // 4. Get geometry and performance for each chromosome
-            GetPhenotypes();
+            GetPhenotypes(true);
+
+            // 5. Now get the average performance values (cluster reps only)
+            population.SetAveragePerformanceValues(performanceCount, true);
 
             // 5. Setup tab layout
-            tab12_primary_permanent(1);
+            tab12_primary_permanent(1); // 1 indicates tab 1
             tab1_primary_update();
 
-            tab12_primary_permanent(2);
+            tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
             tab2_primary_update();
 
             tab2_secondary_settings();
 
             tab3_secondary_settings();
+
+
+            // 7. Set component outputs
+            owner.SetComponentOut(population, BioBranches);
         }
 
 
@@ -292,12 +319,22 @@ namespace Biomorpher
         /// <summary>
         /// When this gets called (probably via a button being triggered) we advance a generation 
         /// </summary>
-        public void Run()
+        public void Run(bool isPerformanceCriteriaBased)
         {
             // 0. AFTER selections have been made, add initial population to history when we have fitness values!
             // List of biobranches. BiobranchID is a global variable
             BioBranches[biobranchID].AddTwig(population);
             
+
+            // TODO: COPY PERFORMANCE CRITERIA TO FITNESS IF APPLICABLE (RUNNING AUTO OPTIMISATION)
+            if (isPerformanceCriteriaBased)
+            {
+                GetPhenotypes(false); // We have to do this to make sure we have performance for the whole population.
+                population.ResetAllFitness();
+                population.SetPerformanceBasedFitness(controls, performanceCount);
+            }
+
+
             // 1. Create new populaltion using user selection (resets fitnesses)
             Generation++;
             population.RoulettePop();
@@ -312,16 +349,24 @@ namespace Biomorpher
             population.KMeansClustering(12);
 
             // 4. Get geometry for each chromosome
-            GetPhenotypes();
+            if(!isPerformanceCriteriaBased)
+                GetPhenotypes(true);
+            else
+                GetPhenotypes(false);
 
-            // 5. Update display of K-Means and representative meshes
+            // 5. Now get the average performance values. Cluster reps only bool here
+            population.SetAveragePerformanceValues(performanceCount, !isPerformanceCriteriaBased);
+
+            // 6. Update display of K-Means and representative meshes
             tab1_primary_update();
 
             tab2_primary_update();
             tab2_updatePerforms();
 
-            tab3_primary_update();
+            tab3_primary_update(isPerformanceCriteriaBased);
 
+            // 7. Set component outputs
+            owner.SetComponentOut(population, BioBranches);   
         }
 
         /// <summary>
@@ -338,7 +383,10 @@ namespace Biomorpher
             //population.KMeansClustering(12);
 
             // Get geometry for each chromosome
-            GetPhenotypes();
+            GetPhenotypes(true);
+
+            // 5. Now get the average performance values (cluster reps only)
+            population.SetAveragePerformanceValues(performanceCount, true);
 
             // Update display of K-Means and representative meshes
             tab1_primary_update();
@@ -349,13 +397,6 @@ namespace Biomorpher
         }
 
 
-        /// <summary>
-        /// Advances pop using a performance criteria.
-        /// </summary>
-        public void RunAuto()
-        {
-            //TODO: Advances pop using a performance criteria.
-        }
 
 
         /// <summary>
@@ -677,7 +718,10 @@ namespace Biomorpher
 
         #region UI TAB 2 (DESIGNS)
 
-        //Create permanent grid layout for Tab 1 and Tab 2 (if Tab 2 is specified then checkboxes are added to the top right corners of the grid as well)
+        /// <summary>
+        /// Create permanent grid layout for Tab 1 and Tab 2 (if Tab 2 is specified then checkboxes are added to the top right corners of the grid as well)
+        /// </summary>
+        /// <param name="tabIndex"></param>
         public void tab12_primary_permanent(int tabIndex)
         {
             //Create grid 3x4 layout
@@ -685,7 +729,6 @@ namespace Biomorpher
             int columnCount = 4;
             int gridCount = rowCount * columnCount;
             Grid grid = createGrid(rowCount, columnCount, Tab2_primary.Width, Tab2_primary.Height);
-
 
             //For each grid cell: create border with padding, a dock panel and add a checkbox
             for (int i = 0; i < gridCount; i++)
@@ -1028,18 +1071,71 @@ namespace Biomorpher
             sp.Children.Add(border_dcl);
 
 
-            // Display the highlighted design (made elsewhere)
+            // Display the highlighted design label (i.e. "Design 0"). Add to controls so it can be updated using tab2_updateperforms
             Border border_cluster = new Border();
             controls.Add("CLUSTER", border_cluster);
             sp.Children.Add(border_cluster);
 
-            // Add the performance borders
+
+            // Now for the soupdragons...
+            StackPanel soupdragonMaster = new StackPanel();
+            StackPanel soupdragon1 = new StackPanel();
+            StackPanel soupdragon2 = new StackPanel();
+
+
+            // Add the performance borders to soupdragon 1
             for (int i = 0; i < performanceCount; i++)
             {
                 Border border_p = new Border();
                 controls.Add("PERFBORDER" + i, border_p);
-                sp.Children.Add(border_p);
+                soupdragon1.Children.Add(border_p);
             }
+
+            // Add the performance buttons to soupdragon 2
+            //Viewbox myBox = new Viewbox();
+            //myBox.Child = dummy;
+            //myBox.Height = 16;
+ 
+            // Add the radiobuttons
+            for (int i = 0; i < performanceCount; i++)
+            {
+                DockPanel radButtonPanel = new DockPanel();
+
+                RadioButton radButtonNon = new RadioButton();
+                RadioButton radButtonMin = new RadioButton();
+                RadioButton radButtonMax = new RadioButton();
+                
+
+                radButtonNon.IsChecked = true;
+
+                radButtonNon.ToolTip = "no optimisation";
+                radButtonMin.ToolTip = "minimise";
+                radButtonMax.ToolTip = "maximise";
+
+                controls.Add("RADBUTTONMIN" + i, radButtonMin);
+                controls.Add("RADBUTTONMAX" + i, radButtonMax);
+                controls.Add("RADBUTTONNON" + i, radButtonNon);
+
+                radButtonPanel.Children.Add(radButtonNon);
+                radButtonPanel.Children.Add(radButtonMin);
+                radButtonPanel.Children.Add(radButtonMax);
+
+                radButtonPanel.Height = 24;
+
+                soupdragon2.Children.Add(radButtonPanel);
+            }
+
+            soupdragon1.Width = 214;
+            //soupdragon2.Width = 60;
+            soupdragon1.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            soupdragon2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+
+            // Bring the soupdragons together and add to the overall stackpanel
+            soupdragonMaster.Orientation = Orientation.Horizontal;
+            soupdragonMaster.Children.Add(soupdragon1);
+            soupdragonMaster.Children.Add(soupdragon2);
+            sp.Children.Add(soupdragonMaster);
+
 
             // Performance labels
             tab2_updatePerforms();
@@ -1050,8 +1146,95 @@ namespace Biomorpher
         }
 
 
-        //Create colour-coded label for a performance value
-        private DockPanel createColourCodedLabel(string text, Color c, bool isHistoryTab)
+        /// <summary>
+        /// Updates the list of performance 'borders' on the right hand side of the main window (tab 2)
+        /// Called when a design is double clicked
+        /// </summary>
+        private void tab2_updatePerforms()
+        {
+            //Design info
+            Border border_clus = (Border) controls["CLUSTER"];
+            border_clus.Margin = new Thickness(margin_w, 30, margin_w, 10);
+            
+            Label label_gen = new Label();
+            label_gen.Content = "Design " + HighlightedCluster +":";
+            label_gen.FontSize = fontsize-2;
+            border_clus.Child = label_gen;
+
+            // Get the performance borders from the dictionary
+            // Note that these performance borders are for ONE design.
+            List<Border> myBorders = new List<Border>();
+            for (int i = 0; i < performanceCount; i++)
+            {
+                myBorders.Add((Border)controls["PERFBORDER" + i]);
+            }
+            
+            // A separate method is used due to the history tab also utilising this facility
+            AddPerformanceInfo(population, myBorders, HighlightedCluster, false);
+        }
+
+
+        /// <summary>
+        /// Adds performance name criteria, value and coloured dot to a given list of borders
+        /// </summary>
+        /// <param name="yourBorders"></param>
+        /// <param name="clusterID"></param>
+        public void AddPerformanceInfo(Population thisPop, List<Border> yourBorders, int clusterID, bool isHistory)
+        {
+            // Performance labels
+            double[][] performas = getRepresentativePerformas(thisPop);
+            string[][] criteria = getRepresentativeCriteria(thisPop);
+
+            //Add performance label
+            for (int i = 0; i < yourBorders.Count; i++)
+            {
+                if(!isHistory)
+                    yourBorders[i].Margin = new Thickness(margin_w + 5, 0, margin_w, 0);
+                else
+                    yourBorders[i].Margin = new Thickness(0, 0, 0, 0);
+
+                // Try to catch if we just don't have the criteria info
+                string label_p;
+
+                // CAREFUL!!
+                try
+                {
+                    double roundedPerf = Math.Round(performas[clusterID][i], 3);
+                    if (!isHistory)
+                        label_p = criteria[clusterID][i].ToString() + "   =   " + roundedPerf.ToString();
+                    else
+                        label_p = "  " + roundedPerf.ToString();
+
+                    // 6 colours MAX!
+                    string tooltiptext = "(average = " + population.AveragePerformanceValues[i]+")";
+                    DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 6], isHistory, i);
+                
+                    yourBorders[i].Child = dp_p;
+                }
+                catch
+                {
+                    DockPanel dp_p = new DockPanel();
+                    Label l = new Label();
+                    l.Content = "No performance data available!";
+                    l.FontSize = fontsize2;
+                    dp_p.Children.Add(l);
+                    yourBorders[i].Child = dp_p;
+                }
+
+                
+            }
+        }
+
+
+        /// <summary>
+        /// Create colour-coded label for each performance values
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="c"></param>
+        /// <param name="isHistoryTab"></param>
+        /// <param name="performanceID"></param>
+        /// <returns></returns>
+        private DockPanel createColourCodedLabel(string text, string tooltiptext, Color c, bool isHistoryTab, int performanceID)
         {
             DockPanel dp = new DockPanel();
             int diameter;
@@ -1100,91 +1283,11 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = text;
             l.FontSize = fSize;
-
             dp.Children.Add(l);
 
+            dp.ToolTip = tooltiptext;
+
             return dp;
-        }
-
-
-
-        /// <summary>
-        /// Updates the list of performance 'borders' on the right hand side of the main window (tab 2)
-        /// Called when a design is double clicked
-        /// </summary>
-        private void tab2_updatePerforms()
-        {
-
-            //Design info
-            Border border_clus = (Border) controls["CLUSTER"];
-            border_clus.Margin = new Thickness(margin_w, 30, margin_w, 10);
-            
-            Label label_gen = new Label();
-            label_gen.Content = "Design " + HighlightedCluster +":";
-            label_gen.FontSize = fontsize-2;
-            border_clus.Child = label_gen;
-
-
-            // Get the performance borders from the dictionary
-            // Note that these performance borders are for ONE design.
-            List<Border> myBorders = new List<Border>();
-            for (int i = 0; i < performanceCount; i++)
-            {
-                myBorders.Add((Border)controls["PERFBORDER" + i]);
-            }
-            
-            // A separate method is used due to the history tab also utilising this facility
-            AddPerformanceInfo(population, myBorders, HighlightedCluster, false);
-        }
-
-
-        /// <summary>
-        /// Adds performance name criteria, value and coloured dot to a given list of borders
-        /// </summary>
-        /// <param name="yourBorders"></param>
-        /// <param name="clusterID"></param>
-        public void AddPerformanceInfo(Population thisPop, List<Border> yourBorders, int clusterID, bool isHistory)
-        {
-            // Performance labels
-            double[][] performas = getRepresentativePerformas(thisPop);
-            string[][] criteria = getRepresentativeCriteria(thisPop);
-
-            //Add performance label
-            for (int i = 0; i < yourBorders.Count; i++)
-            {
-                if(!isHistory)
-                    yourBorders[i].Margin = new Thickness(margin_w + 5, 0, margin_w, 0);
-                else
-                    yourBorders[i].Margin = new Thickness(0, 0, 0, 0);
-
-                // Try to catch if we just don't have the criteria info
-                string label_p;
-
-                // CAREFUL!!
-                try
-                {
-                    double roundedPerf = Math.Round(performas[clusterID][i], 3);
-                    if (!isHistory)
-                        label_p = criteria[clusterID][i].ToString() + "   =   " + roundedPerf.ToString();
-                    else
-                        label_p = "  " + roundedPerf.ToString();
-
-                    // 6 colours MAX!
-                    DockPanel dp_p = createColourCodedLabel(label_p, rgb_performance[i % 6], isHistory);
-                    yourBorders[i].Child = dp_p;
-                }
-                catch
-                {
-                    DockPanel dp_p = new DockPanel();
-                    Label l = new Label();
-                    l.Content = "No performance data available!";
-                    l.FontSize = fontsize2;
-                    dp_p.Children.Add(l);
-                    yourBorders[i].Child = dp_p;
-                }
-
-                
-            }
         }
 
 
@@ -1195,9 +1298,9 @@ namespace Biomorpher
         /// <summary>
         /// Updates history canvas
         /// </summary>
-        public void tab3_primary_update()
+        public void tab3_primary_update(bool isOptimisationRun)
         {
-
+            // Set viewport size (TODO: variable?)
             int vportWidth = 120;
             int vportHeight = 120;
             int gridHeight = vportHeight + 20 * (performanceCount + 2);
@@ -1224,6 +1327,8 @@ namespace Biomorpher
             txt.FontSize = 20;
             string name = biobranchID + "." + j;
             txt.Inlines.Add(name);
+            if (isOptimisationRun)
+                txt.Foreground = Brushes.Red;
             dp.Children.Add(txt);
             
             Button myButton = new Button();
@@ -1259,10 +1364,14 @@ namespace Biomorpher
             {
                 Population thisPop = BioBranches[biobranchID].Twigs[j];
                 Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
+                
+                // Potentially a little dangerous this...
+                if (thisDesign.isRepresentative && isOptimisationRun)
+                    thisDesign.isChecked = true;
 
-                if (thisDesign.isRepresentative && thisDesign.GetFitness() == 1.0)
+                // Now just show those representatives that are checked
+                if (thisDesign.isRepresentative && thisDesign.isChecked)
                 {
-
                     StackPanel sp = new StackPanel();
                     sp.VerticalAlignment = System.Windows.VerticalAlignment.Top;
 
@@ -1282,7 +1391,10 @@ namespace Biomorpher
                     ViewportBasic vp4 = new ViewportBasic(myMesh);
                     vp4.Background = Brushes.White;
                     vp4.BorderThickness = new Thickness(0.6);
-                    vp4.BorderBrush = Brushes.LightGray;
+                    if(isOptimisationRun)
+                        vp4.BorderBrush = Brushes.Red;
+                    else
+                        vp4.BorderBrush = Brushes.LightGray;
                     border.Child = vp4;
                     border.Height = 120;
                     sp.Children.Add(border);
@@ -1388,7 +1500,7 @@ namespace Biomorpher
             Border border_buttons = new Border();
             border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
 
-            Button button_ExportPNG = createButton("b_tab3_ExportPNG", "Export PNG", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_ExportPNG_Click));
+            Button button_ExportPNG = createButton("b_tab3_ExportPNG", "save png", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_ExportPNG_Click));
             DockPanel.SetDock(button_ExportPNG, Dock.Left);
             dp_buttons.Children.Add(button_ExportPNG);
 
@@ -1732,7 +1844,10 @@ namespace Biomorpher
                     foreach (Chromosome chromo in population.chromosomes)
                     {
                         if (chromo.clusterId == ID)
+                        {
                             chromo.SetFitness(1.0);
+                            chromo.isChecked = true;
+                        }
                     }
                 }
 
@@ -1748,7 +1863,10 @@ namespace Biomorpher
                     foreach (Chromosome chromo in population.chromosomes)
                     {
                         if (chromo.clusterId == ID)
+                        {
                             chromo.SetFitness(0.0);
+                            chromo.isChecked = false;
+                        }
                     }
                 }
 
@@ -1757,22 +1875,33 @@ namespace Biomorpher
         }
 
 
-        //Handle event when the "Evolve" button is clicked in tab 2       
+        /// <summary>
+        /// Handle event when the "Evolve" button is clicked in tab 2 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button)sender;
 
+            bool isPerformanceCriteriaBased = isRadioMinMaxButtonChecked();
+
+
             //Test if minimum one parent is selected
-            if (ParentCount < 1)
+            if (ParentCount < 1 && !isPerformanceCriteriaBased)
             {
-                MessageBoxResult message = MessageBox.Show(this, "Select minimum one parent via the checkboxes");
+                MessageBoxResult message = MessageBox.Show(this, "Select a minimum of one parent design using the checkboxes, or else select performance criteria to optimise");
             }
 
             else
             {
                 //Run now moved to before we start to uncheck checkboxes
                 //In order to maintin fitness values
-                Run();
+                if (isPerformanceCriteriaBased)
+                    Run(true);
+                else
+                    Run(false);
+
 
                 //Extract indexes from names of checked boxes and uncheck all
                 for (int i = 0; i < 12; i++)
@@ -1794,6 +1923,35 @@ namespace Biomorpher
                 ParentCount = 0;
             }
 
+        }
+
+
+        /// <summary>
+        /// Finds out if one of the min or max radiobuttons is checked.
+        /// </summary>
+        /// <returns></returns>
+        public bool isRadioMinMaxButtonChecked()
+        {
+
+            bool isOneChecked = false;
+
+            try
+            {
+                for (int i = 0; i < performanceCount; i++)
+                {
+                    RadioButton radmin = (RadioButton)controls["RADBUTTONMIN" + i];
+                    RadioButton radmax = (RadioButton)controls["RADBUTTONMAX" + i];
+
+                    if (radmin.IsChecked == true || radmax.IsChecked == true)
+                    {
+                        isOneChecked = true;
+                    }
+                }
+            }
+
+            catch { }
+
+            return isOneChecked;
         }
 
 
@@ -1822,12 +1980,11 @@ namespace Biomorpher
             }
             catch
             {
-                System.Console.Beep();
+                System.Console.Beep(10000, 50);
+                System.Console.Beep(20000, 100);
             }
             
         }
-
-
 
 
         //INotifyPropertyChanged Implementation
@@ -1840,6 +1997,8 @@ namespace Biomorpher
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
+
+     
 
         #endregion
 
