@@ -60,7 +60,7 @@ namespace Biomorpher
             if ((ContentBox.Contains(e.CanvasLocation)))
             {
                 myMainWindow = new BiomorpherWindow(MyOwner);
-                //myMainWindow.Show();
+                myMainWindow.Show();
                 
                 return GH_ObjectResponse.Handled;
             }

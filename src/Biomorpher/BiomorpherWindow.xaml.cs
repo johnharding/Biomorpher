@@ -217,6 +217,126 @@ namespace Biomorpher
 
         #region MAIN METHODS
 
+        
+        /// <summary>
+        /// Instantiate the population and intialise the window
+        /// </summary>
+        public void RunInit()
+        {
+            // 1. Initialise population history
+            BioBranches = new List<BioBranch>();
+            biobranchID = 0;
+            BioBranches.Add(new BioBranch(-1, 0, 0));
+
+            // 2. Create initial population
+            population = new Population(popSize, sliders, genePools);
+
+            // 3. Perform K-means clustering
+            population.KMeansClustering(12);
+
+            // 4. Get geometry and performance for each chromosome
+            GetPhenotypes(true);
+
+            // 5. Now get the average performance values (cluster reps only)
+            population.SetAveragePerformanceValues(performanceCount, true);
+
+            // 6. Setup tab layouts
+            tab12_primary_permanent(1); // 1 indicates tab 1
+            tab1_primary_update();
+
+            tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
+            tab2_primary_update();
+
+            tab2_secondary_settings();
+
+            tab3_secondary_settings();
+
+            // 7. Set component outputs
+            owner.SetComponentOut(population, BioBranches);
+        }
+
+
+
+        /// <summary>
+        /// When this gets called (probably via a button being triggered) we advance a generation 
+        /// </summary>
+        public void Run(bool isPerformanceCriteriaBased)
+        {
+
+            // 8. Get fitness values sorted if performance optimisation is selected
+            // We put these before adding to history, to ensure performance display is correct.
+            if (isPerformanceCriteriaBased)
+            {
+                GetPhenotypes(false); // We have to do this to make sure we have performance for the whole population.
+                population.ResetAllFitness();
+                population.SetPerformanceBasedFitness(controls, performanceCount);
+            }
+
+            // 9. Add old population to history.
+            BioBranches[biobranchID].AddTwig(population);
+
+            //////////////////////////////////////////////////////////////////////////
+
+
+
+            // 1. Create a new population using fitness values (also resets fitnesses)
+            Generation++;
+            population.RoulettePop();
+            
+            // 2. Mutate population using user preferences
+            population.MutatePop(mutateProbability);
+
+            // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
+            population.JigglePop(0.01);
+
+            // 3. Perform K-means clustering
+            population.KMeansClustering(12);
+
+            // 4. Get geometry for cluster reps only
+            GetPhenotypes(true);
+
+            // 5. Now get the average performance values. Cluster reps only bool here
+            population.SetAveragePerformanceValues(performanceCount, true);
+
+            // 6. Update display of K-Means and representative meshes
+            tab1_primary_update();
+
+            tab2_primary_update();
+            tab2_updatePerforms();
+
+            tab3_primary_update(isPerformanceCriteriaBased);
+
+            // 7. Set component outputs
+            owner.SetComponentOut(population, BioBranches);   
+        }
+
+        /// <summary>
+        /// Runs when a new biobranch is spawned.
+        /// </summary>
+        public void RunNewBranch()
+        {
+            // Reset generation counter
+            Generation = 0;
+
+            // Perform K-means clustering again?
+            //population.KMeansClustering(12);
+
+            // Get geometry for each chromosome
+            GetPhenotypes(true);
+
+            // 5. Now get the average performance values (cluster reps only)
+            population.SetAveragePerformanceValues(performanceCount, true);
+
+            // Update display of K-Means and representative meshes
+            tab1_primary_update();
+
+            tab2_primary_update();
+            tab2_updatePerforms();
+
+        }
+
+
+
         /// <summary>
         /// Gets the phenotype information for the current cluster representatives
         /// </summary>
@@ -255,7 +375,7 @@ namespace Biomorpher
 
             // TODO: Fill up null performance values instead, because this way if you have a null performance value it kills all the others.
             population.RepairPerforms();
-      
+
         }
 
 
@@ -265,137 +385,15 @@ namespace Biomorpher
         /// <param name="chromo"></param>
         public void SetInstance(Chromosome chromo)
         {
-            owner.canvas.Document.Enabled = false;                       
-            owner.SetSliders(chromo, sliders, genePools);    
-            owner.canvas.Document.Enabled = true;                            
+            owner.canvas.Document.Enabled = false;
+            owner.SetSliders(chromo, sliders, genePools);
+            owner.canvas.Document.Enabled = true;
             owner.ExpireSolution(true);
             HighlightedCluster = chromo.clusterId;
 
             // Update performance tab
             tab2_updatePerforms();
         }
-
-
-        /// <summary>
-        /// Instantiate the population and intialise the window
-        /// </summary>
-        public void RunInit()
-        {
-            // 1. Initialise population history
-            BioBranches = new List<BioBranch>();
-            biobranchID = 0;
-            BioBranches.Add(new BioBranch(-1, 0, 0));
-
-            // 2. Create initial population
-            population = new Population(popSize, sliders, genePools);
-
-            // 3. Perform K-means clustering
-            population.KMeansClustering(12);
-
-            // 4. Get geometry and performance for each chromosome
-            GetPhenotypes(true);
-
-            // 5. Now get the average performance values (cluster reps only)
-            population.SetAveragePerformanceValues(performanceCount, true);
-
-            // 5. Setup tab layout
-            tab12_primary_permanent(1); // 1 indicates tab 1
-            tab1_primary_update();
-
-            tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
-            tab2_primary_update();
-
-            tab2_secondary_settings();
-
-            tab3_secondary_settings();
-
-
-            // 7. Set component outputs
-            owner.SetComponentOut(population, BioBranches);
-        }
-
-
-
-        /// <summary>
-        /// When this gets called (probably via a button being triggered) we advance a generation 
-        /// </summary>
-        public void Run(bool isPerformanceCriteriaBased)
-        {
-            // 0. AFTER selections have been made, add initial population to history when we have fitness values!
-            // List of biobranches. BiobranchID is a global variable
-            BioBranches[biobranchID].AddTwig(population);
-            
-
-            // TODO: COPY PERFORMANCE CRITERIA TO FITNESS IF APPLICABLE (RUNNING AUTO OPTIMISATION)
-            if (isPerformanceCriteriaBased)
-            {
-                GetPhenotypes(false); // We have to do this to make sure we have performance for the whole population.
-                population.ResetAllFitness();
-                population.SetPerformanceBasedFitness(controls, performanceCount);
-            }
-
-
-            // 1. Create new populaltion using user selection (resets fitnesses)
-            Generation++;
-            population.RoulettePop();
-            
-            // 2. Mutate population using user preferences
-            population.MutatePop(mutateProbability);
-
-            // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
-            population.JigglePop(0.01);
-
-            // 3. Perform K-means clustering
-            population.KMeansClustering(12);
-
-            // 4. Get geometry for each chromosome
-            if(!isPerformanceCriteriaBased)
-                GetPhenotypes(true);
-            else
-                GetPhenotypes(false);
-
-            // 5. Now get the average performance values. Cluster reps only bool here
-            population.SetAveragePerformanceValues(performanceCount, !isPerformanceCriteriaBased);
-
-            // 6. Update display of K-Means and representative meshes
-            tab1_primary_update();
-
-            tab2_primary_update();
-            tab2_updatePerforms();
-
-            tab3_primary_update(isPerformanceCriteriaBased);
-
-            // 7. Set component outputs
-            owner.SetComponentOut(population, BioBranches);   
-        }
-
-        /// <summary>
-        /// Runs when a new biobranch is spawned
-        /// </summary>
-        public void RunNewBranch()
-        {
-            //BioBranches[biobranchID].AddTwig(population);
-
-            // Reset generation counter
-            Generation = 0;
-
-            // Perform K-means clustering again?
-            //population.KMeansClustering(12);
-
-            // Get geometry for each chromosome
-            GetPhenotypes(true);
-
-            // 5. Now get the average performance values (cluster reps only)
-            population.SetAveragePerformanceValues(performanceCount, true);
-
-            // Update display of K-Means and representative meshes
-            tab1_primary_update();
-
-            tab2_primary_update();
-            tab2_updatePerforms();
-
-        }
-
 
 
 
@@ -1181,6 +1179,7 @@ namespace Biomorpher
         /// <param name="clusterID"></param>
         public void AddPerformanceInfo(Population thisPop, List<Border> yourBorders, int clusterID, bool isHistory)
         {
+
             // Performance labels
             double[][] performas = getRepresentativePerformas(thisPop);
             string[][] criteria = getRepresentativeCriteria(thisPop);
@@ -1188,6 +1187,7 @@ namespace Biomorpher
             //Add performance label
             for (int i = 0; i < yourBorders.Count; i++)
             {
+
                 if(!isHistory)
                     yourBorders[i].Margin = new Thickness(margin_w + 5, 0, margin_w, 0);
                 else
@@ -1199,6 +1199,7 @@ namespace Biomorpher
                 // CAREFUL!!
                 try
                 {
+
                     double roundedPerf = Math.Round(performas[clusterID][i], 3);
                     if (!isHistory)
                         label_p = criteria[clusterID][i].ToString() + "   =   " + roundedPerf.ToString();
@@ -1206,7 +1207,7 @@ namespace Biomorpher
                         label_p = "  " + roundedPerf.ToString();
 
                     // 6 colours MAX!
-                    string tooltiptext = "(average = " + population.AveragePerformanceValues[i]+")";
+                    string tooltiptext = "(average = " + thisPop.AveragePerformanceValues[i]+")";
                     DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 6], isHistory, i);
                 
                     yourBorders[i].Child = dp_p;
@@ -1291,6 +1292,7 @@ namespace Biomorpher
         }
 
 
+
         #endregion
 
         #region UI TAB 3 (HISTORY)
@@ -1362,15 +1364,19 @@ namespace Biomorpher
             // Now to populate the selected designs for this generation
             for (int k = 0; k < BioBranches[biobranchID].Twigs[j].chromosomes.Length; k++)
             {
+                bool flag = false;
+
                 Population thisPop = BioBranches[biobranchID].Twigs[j];
                 Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
-                
-                // Potentially a little dangerous this...
-                if (thisDesign.isRepresentative && isOptimisationRun)
-                    thisDesign.isChecked = true;
+
+
+                TagExtrema(thisPop);
+
+                if (isOptimisationRun && thisDesign.isRepresentative) flag = true;
+                if (!isOptimisationRun && thisDesign.isRepresentative && thisDesign.isChecked) flag = true;
 
                 // Now just show those representatives that are checked
-                if (thisDesign.isRepresentative && thisDesign.isChecked)
+                if (flag)
                 {
                     StackPanel sp = new StackPanel();
                     sp.VerticalAlignment = System.Windows.VerticalAlignment.Top;
@@ -1390,8 +1396,13 @@ namespace Biomorpher
                     
                     ViewportBasic vp4 = new ViewportBasic(myMesh);
                     vp4.Background = Brushes.White;
-                    vp4.BorderThickness = new Thickness(0.6);
-                    if(isOptimisationRun)
+
+                    if(thisDesign.isSoupDragon || !isOptimisationRun)
+                        vp4.BorderThickness = new Thickness(1.2);
+                    else
+                        vp4.BorderThickness = new Thickness(0.6);
+
+                    if (thisDesign.isSoupDragon)
                         vp4.BorderBrush = Brushes.Red;
                     else
                         vp4.BorderBrush = Brushes.LightGray;
@@ -1461,6 +1472,57 @@ namespace Biomorpher
             HistoryCanvas.Height = _historycanvas.Height;
 
         }
+
+
+
+        /// <summary>
+        /// Tag extrema values during optimisation
+        /// </summary>
+        /// <param name="thisPop"></param>
+        public void TagExtrema(Population thisPop)
+        {
+            for (int p = 0; p < performanceCount; p++)
+            {
+                int minID = 0;
+                int maxID = 0;
+                double maxDouble = -99999999999999;
+                double minDouble = 99999999999999;
+
+                for (int i = 0; i < thisPop.chromosomes.Length; i++)
+                {
+                    if (thisPop.chromosomes[i].isRepresentative)
+                    {
+                        double val = thisPop.chromosomes[i].GetPerformas()[p];
+
+                        if (val > maxDouble)
+                        {
+                            maxDouble = val;
+                            maxID = i;
+                        }
+
+                        if (val < minDouble)
+                        {
+                            minDouble = val;
+                            minID = i;
+                        }
+
+                    }
+                }
+
+                // Get the associated min/max radio buttons
+                RadioButton radButtonMin = (RadioButton)controls["RADBUTTONMIN" + p];
+                RadioButton radButtonMax = (RadioButton)controls["RADBUTTONMAX" + p];
+
+                if (radButtonMin.IsChecked == true)
+                    thisPop.chromosomes[minID].isSoupDragon = true;
+
+                if (radButtonMax.IsChecked == true)
+                    thisPop.chromosomes[maxID].isSoupDragon = true;
+            }
+        }
+
+
+
 
         /// <summary>
         /// Create settings panel for Tab 3

@@ -79,6 +79,7 @@ namespace Biomorpher.IGA
             // clone the slider and genepool pointers
             popSliders = new List<GH_NumberSlider>(pop.popSliders);
             popGenePools = new List<GalapagosGeneListObject>(pop.popGenePools);
+            AveragePerformanceValues = new List<double>(pop.AveragePerformanceValues);
 
         }
 
@@ -156,6 +157,7 @@ namespace Biomorpher.IGA
 
             int toBeOptimisedCount = 0;
 
+
             // For each performance measure...
             for(int p=0; p<pCount; p++)
             {
@@ -168,17 +170,28 @@ namespace Biomorpher.IGA
                 {
                     minValues[p] = 9999999999;
                     maxValues[p] = -9999999999;
+                    int minID = 0;
+                    int maxID = 0;
 
                     // Find the min and max values before normalisation.
                     for(int j=0; j<chromosomes.Length; j++)
                     {
                         double value = chromosomes[j].GetPerformas()[p];
-                        if (value < minValues[p]) minValues[p] = value;
-                        if (value > maxValues[p]) maxValues[p] = value;
+                        if (value < minValues[p])
+                        {
+                            minValues[p] = value;
+                            minID = j;
+                        }
+                        if (value > maxValues[p])
+                        {
+                            maxValues[p] = value;
+                            maxID = j;
+                        }
                     }
 
                     // Record the number of criteria to be optimised (for fitness weightings)
                     toBeOptimisedCount++;
+
                     
                 }
             }
@@ -252,8 +265,6 @@ namespace Biomorpher.IGA
                 AveragePerformanceValues[p] = Math.Round(AveragePerformanceValues[p], 3);
 
             }
-
-
         }
 
 
@@ -278,8 +289,10 @@ namespace Biomorpher.IGA
             {
                 chromosomes[i].SetFitness(0.0);
                 chromosomes[i].isChecked = false;
+                chromosomes[i].isSoupDragon = false;
             }
         }
+
 
         /// <summary>
         /// Jiggles everychromosome slightly by multiplying by Rand(0, t)

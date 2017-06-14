@@ -58,6 +58,11 @@ namespace Biomorpher.IGA
         public bool isRepresentative;
 
         /// <summary>
+        /// A soupdragon is someone that wants to be recorded after an optimisation run
+        /// </summary>
+        public bool isSoupDragon;
+
+        /// <summary>
         /// The associated cluster centroid representative ID (could be itself).
         /// </summary>
         public int clusterId;
@@ -92,9 +97,11 @@ namespace Biomorpher.IGA
             fitness = 0.0;
 
             isRepresentative = false;
+            isChecked = false;
+            isSoupDragon = false;
+
             clusterId = -1;
             distToRepresentative = -1.0;
-            isChecked = false;
         }
 
         /// <summary>
@@ -132,6 +139,7 @@ namespace Biomorpher.IGA
             clone.isRepresentative = this.isRepresentative;
             clone.distToRepresentative = this.distToRepresentative;
             clone.isChecked = this.isChecked;
+            clone.isSoupDragon = this.isSoupDragon;
 
             // Clone phenotype mesh
             if (this.phenotype != null)
@@ -209,7 +217,6 @@ namespace Biomorpher.IGA
             phenotype = new List<Mesh>(meshes);
             performance = new List<double>(performas);
             criteria = new List<string>(crit);
-
         }
 
         /// <summary>
