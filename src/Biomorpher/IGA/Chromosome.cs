@@ -78,11 +78,16 @@ namespace Biomorpher.IGA
         public bool isChecked;
 
         /// <summary>
+        /// Unique chromosome ID
+        /// </summary>
+        public int ID;
+
+        /// <summary>
         /// Main chromosome constructor
         /// </summary>
         /// <param name="sliders">Grasshopper sliders used to formulate the chromosome</param>
         /// <param name="genePools">Grasshopper genepools used to formulate the chromosome</param>
-        public Chromosome(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
+        public Chromosome(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools, int id)
         {
             chromoSliders = new List<GH_NumberSlider>(sliders);
             chromoGenePools = new List<GalapagosGeneListObject>(genePools);
@@ -102,6 +107,7 @@ namespace Biomorpher.IGA
 
             clusterId = -1;
             distToRepresentative = -1.0;
+            ID = id;
         }
 
         /// <summary>
@@ -128,7 +134,7 @@ namespace Biomorpher.IGA
         public Chromosome Clone()
         {
             // Clone sliders and genepools associated with this chromosome
-            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools);
+            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools, this.ID);
 
             // Clone gene array
             Array.Copy(this.genes, clone.genes, this.genes.Length);

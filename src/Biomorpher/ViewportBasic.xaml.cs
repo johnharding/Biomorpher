@@ -1,4 +1,5 @@
-﻿using Rhino.Geometry;
+﻿using Biomorpher.IGA;
+using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,14 +26,21 @@ namespace Biomorpher
         
         private Viewport3D myViewport;
         private Rect3D bounds {get; set;}
+        private Chromosome thisDesign;
+        private BiomorpherWindow Owner;
 
         /// <summary>
         /// Creates a simple viewport without helix
         /// </summary>
-        /// <param name="mesh"></param>
-        public ViewportBasic(Mesh mesh)
+        /// <param name="chromo"></param>
+        /// <param name="owner"></param>
+        public ViewportBasic(Chromosome chromo, BiomorpherWindow owner)
         {
             InitializeComponent();
+
+            Owner = owner;
+            thisDesign = chromo;
+            this.ToolTip = "double click to display in main viewport";
 
             myViewport = new Viewport3D();
             MeshGeometry3D mesh_w = new MeshGeometry3D();
@@ -42,6 +50,14 @@ namespace Biomorpher
             double aveR = 0;
             double aveG = 0;
             double aveB = 0;
+            
+            // Get the mesh. If no mesh exists, use a default to show things have gone wrong (TODO: Get rid of this)
+            Mesh mesh = new Mesh();
+            if (mesh != null)
+                mesh = thisDesign.phenotype[0];
+            else
+                mesh = Friends.SampleMesh();
+
 
             if (mesh != null)
             {
@@ -153,6 +169,17 @@ namespace Biomorpher
             //myViewport.Camera = new PerspectiveCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), 30);
             myViewport.Camera = new OrthographicCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), orthoWidth);
 
+        }
+
+
+        /// <summary>
+        /// Double click to set the Grasshopper instance
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
+        {
+            base.OnMouseDoubleClick(e);
+            Owner.SetInstance(thisDesign);
         }
     }
 }

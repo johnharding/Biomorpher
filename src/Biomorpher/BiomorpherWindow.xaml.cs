@@ -1207,7 +1207,7 @@ namespace Biomorpher
                         label_p = "  " + roundedPerf.ToString();
 
                     // 6 colours MAX!
-                    string tooltiptext = "(average = " + thisPop.AveragePerformanceValues[i]+")";
+                    string tooltiptext = "(pop average = " + thisPop.AveragePerformanceValues[i]+")";
                     DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 6], isHistory, i);
                 
                     yourBorders[i].Child = dp_p;
@@ -1381,20 +1381,12 @@ namespace Biomorpher
                     StackPanel sp = new StackPanel();
                     sp.VerticalAlignment = System.Windows.VerticalAlignment.Top;
 
-                    // Deal with Grid no.1
-                    Mesh myMesh = new Mesh();
-
-                    if (myMesh != null)
-                        myMesh = thisDesign.phenotype[0];
-                    else
-                        myMesh = Friends.SampleMesh();
-
                     Border border = new Border();
                     border.BorderBrush = Brushes.White;
                     border.BorderThickness = new Thickness(0.3);
                     border.Padding = new Thickness(2);
                     
-                    ViewportBasic vp4 = new ViewportBasic(myMesh);
+                    ViewportBasic vp4 = new ViewportBasic(thisDesign, this);
                     vp4.Background = Brushes.White;
 
                     if(thisDesign.isSoupDragon || !isOptimisationRun)
@@ -1548,7 +1540,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.Inlines.Add("Recorded history of designs.");
+            txt.Inlines.Add("Recorded history of designs. Double click a design to diplay the instance in the Rhino viewport");
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
@@ -1629,7 +1621,7 @@ namespace Biomorpher
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             txt_dcl.FontSize = 24;
-            txt_dcl.Inlines.Add("\nBiomorpher  (v"+Friends.VerionInfo()+")");
+            txt_dcl.Inlines.Add("\nBiomorpher  v"+Friends.VerionInfo());
             sp.Children.Add(txt_dcl);
 
             Border border_dcl2 = new Border();

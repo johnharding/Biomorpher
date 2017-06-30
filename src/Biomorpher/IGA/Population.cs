@@ -90,7 +90,7 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome(popSliders, popGenePools);
+                chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
                 chromosomes[i].GenerateRandomGenes();
             }
         }
