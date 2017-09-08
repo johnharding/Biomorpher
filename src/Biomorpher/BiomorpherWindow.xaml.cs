@@ -174,7 +174,7 @@ namespace Biomorpher
             // Get sliders and gene pools
             sliders = new List<GH_NumberSlider>();
             genePools = new List<GalapagosGeneListObject>();
-            owner.GetSliders(sliders, genePools);
+            if (!owner.GetSliders(sliders, genePools)) return;
 
             // Initial Window things
             InitializeComponent();

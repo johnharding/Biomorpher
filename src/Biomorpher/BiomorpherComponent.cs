@@ -91,8 +91,10 @@ namespace Biomorpher
         /// <summary>
         /// Gets the current sliders in Input[0]
         /// </summary>
-        public void GetSliders(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
+        public bool GetSliders(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
+            bool hasData = false;
+
             lock (syncLock)
             { // synchronize
 
@@ -102,16 +104,20 @@ namespace Biomorpher
                     if (slider != null)
                     {
                         sliders.Add(slider);
+                        hasData = true;
                     }
 
                     GalapagosGeneListObject genepool = param as GalapagosGeneListObject;
                     if (genepool != null)
                     {
                         genePools.Add(genepool);
+                        hasData = true;
                     }
-                
+                    
                 }
             }
+
+            return hasData;
         }
 
         /// <summary>
@@ -171,9 +177,10 @@ namespace Biomorpher
                 }
             }
 
-            // Get only mesh geometry from the object list
-            Mesh joinedMesh = new Mesh();
+            // TODO: The allGeometry should not be of type Mesh.
+            List<Mesh> allGeometry = new List<Mesh>();
 
+            // Get only mesh geometry from the object list
             for (int i = 0; i < localObjs.Count; i++)
             {
                 if (localObjs[i] is GH_Mesh)
@@ -183,13 +190,11 @@ namespace Biomorpher
                     Mesh myLocalMesh = new Mesh();
                     GH_Convert.ToMesh(myGHMesh, ref myLocalMesh, GH_Conversion.Primary);
                     myLocalMesh.Faces.ConvertQuadsToTriangles();
-                    joinedMesh.Append(myLocalMesh);
+                    //Mesh joinedMesh = new Mesh(); yes this is commented out and no I am not a software engineer. Deal with it.
+                    //joinedMesh.Append(myLocalMesh);
+                    allGeometry.Add(myLocalMesh);
                 }
             }
-
-            // TODO: The allGeometry should not be of type Mesh.
-            List<Mesh> allGeometry = new List<Mesh>();
-            allGeometry.Add(joinedMesh);
 
             // Get performance data
             List<double> performas = new List<double>();
