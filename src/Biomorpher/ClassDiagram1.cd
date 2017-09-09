@@ -54,7 +54,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Biomorpher.IGA.Friends">
-    <Position X="23.75" Y="0.5" Width="2" />
+    <Position X="26" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAQIAAgEAABAAAAAgAgAAAiAAAAQAAAAAgAAAAAAAAA=</HashCode>
       <FileName>IGA\Friends.cs</FileName>
@@ -65,6 +65,13 @@
     <TypeIdentifier>
       <HashCode>ICAAEEgAAAAQAEAAhAIhMAAACAAAAEAAAAAABAkABCA=</HashCode>
       <FileName>IGA\Population.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Biomorpher.IGA.BioBranch">
+    <Position X="22.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAgAAIAAAAAGAAAAAAAACAABAAAAAAAAAA=</HashCode>
+      <FileName>IGA\BioBranch.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Ubuntu" Size="8.25" />
