@@ -147,6 +147,68 @@ namespace Biomorpher.IGA
 
             return Math.Sqrt(dist);
         }
+
+
+
+        /// <summary>
+        /// Copies the rhinoMesh data to a new wpf mesh
+        /// </summary>
+        /// <param name="rhinoMesh"></param>
+        /// <param name="wpfMesh"></param>
+        /// <param name="material"></param>
+        public static void ConvertRhinotoWpfMesh(Mesh rhinoMesh, MeshGeometry3D wpfMesh, DiffuseMaterial material)
+        {
+            // Make sure to start afresh
+            //wpfMesh = new MeshGeometry3D();
+            //material = new DiffuseMaterial();
+
+            //define vertices
+            for (int i = 0; i < rhinoMesh.Vertices.Count; i++)
+            {
+                wpfMesh.Positions.Add(new Point3D(rhinoMesh.Vertices[i].X, rhinoMesh.Vertices[i].Y, rhinoMesh.Vertices[i].Z));
+            }
+
+            //define faces - triangulation only
+            for (int i = 0; i < rhinoMesh.Faces.Count; i++)
+            {
+                wpfMesh.TriangleIndices.Add(rhinoMesh.Faces[i].A);
+                wpfMesh.TriangleIndices.Add(rhinoMesh.Faces[i].B);
+                wpfMesh.TriangleIndices.Add(rhinoMesh.Faces[i].C);
+            }
+
+            // Get colours
+            double aveA = 0;
+            double aveR = 0;
+            double aveG = 0;
+            double aveB = 0;
+
+            for (int i = 0; i < rhinoMesh.VertexColors.Count; i++)
+            {
+                aveA += rhinoMesh.VertexColors[i].A;
+                aveR += rhinoMesh.VertexColors[i].R;
+                aveG += rhinoMesh.VertexColors[i].G;
+                aveB += rhinoMesh.VertexColors[i].B;
+            }
+
+            if (rhinoMesh.VertexColors.Count > 0)
+            {
+                aveA /= rhinoMesh.VertexColors.Count;
+                aveR /= rhinoMesh.VertexColors.Count;
+                aveG /= rhinoMesh.VertexColors.Count;
+                aveB /= rhinoMesh.VertexColors.Count;
+
+                material.Brush = new SolidColorBrush(Color.FromArgb((byte)aveA, (byte)aveR, (byte)aveG, (byte)aveB));
+            }
+
+            else
+            {
+                material.Brush = new SolidColorBrush(Color.FromArgb((byte)220, (byte)51, (byte)188, (byte)188));
+            }
+
+
+        }
+
+
     }
 
 }

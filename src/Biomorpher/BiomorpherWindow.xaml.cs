@@ -418,23 +418,22 @@ namespace Biomorpher
 
 
         //Gets representative meshes
-        private List<Mesh> getRepresentativePhenotypes()
+        private List<Mesh>[] getRepresentativePhenotypes()
         {
-            Mesh[] phenotypes = new Mesh[12];
+            // EXACTLY 12 SOUPDRAGONS
+            List<Mesh>[] soupdragon = new List<Mesh>[12];
 
-            Chromosome[] chromosomes = population.chromosomes;
-
-            for (int i = 0; i < chromosomes.Length; i++)
+            for (int i = 0; i < population.chromosomes.Length; i++)
             {
-                if (chromosomes[i].isRepresentative)
+                if (population.chromosomes[i].isRepresentative)
                 {
-                    phenotypes[chromosomes[i].clusterId] = chromosomes[i].phenotype[0];
+                    soupdragon[population.chromosomes[i].clusterId] = population.chromosomes[i].phenotype;
                 }
                     
             }
 
             // List is now ordered according to cluster IDs
-            return phenotypes.ToList();
+            return soupdragon;
         }
 
 
@@ -799,11 +798,10 @@ namespace Biomorpher
         //Updates the display of the representative meshes and their performance values
         public void tab2_primary_update()
         {
-            List<Mesh> meshes = getRepresentativePhenotypes();
+            List<Mesh>[] meshes = getRepresentativePhenotypes();
             List<Canvas> performanceCanvas = createPerformanceCanvasAll();
 
             //Run through the design windows and add a viewport3d control and performance display to each
-            // TODO: Is using the meshes count cool here???
             for (int i = 0; i < 12; i++)
             {
                 //The name of the control to add to
