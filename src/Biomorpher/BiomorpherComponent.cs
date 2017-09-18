@@ -26,8 +26,7 @@ namespace Biomorpher
         public bool GO = false;
         private IGH_DataAccess deej;
         public int solveinstanceCounter;
-        private GH_Structure<GH_Number> myNumbers;
-        private GH_Structure<GH_Number> myNumbers2;
+        private GH_Structure<GH_Number> myNumbers, myNumbers2, myNumbers3;
         private static readonly object syncLock = new object();
 
         /// <summary>
@@ -50,11 +49,13 @@ namespace Biomorpher
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here: currently meshes only please", GH_ParamAccess.tree);
             pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design", GH_ParamAccess.tree);
+            pm.AddNumberParameter("InitialPop", "InitialPop", "Optional initial population (non-random)", GH_ParamAccess.tree);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].Optional = true;
+            pm[3].Optional = true;
         }
         
         /// <summary>
@@ -63,8 +64,9 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddGenericParameter("Clusters", "Clusters", "Cluster data (k-means++)", GH_ParamAccess.tree);
-            pm.AddGenericParameter("History", "History", "Historic parameter values", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Population", "Population", "Current population genes", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Clusters", "Clusters", "Current K-means++ clusters)", GH_ParamAccess.tree);
+            pm.AddGenericParameter("History", "History", "Historic population genes", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -81,8 +83,9 @@ namespace Biomorpher
             }
 
             // Output cluster info
-            if(myNumbers!=null) DA.SetDataTree(0, myNumbers);
-            if (myNumbers2 != null) DA.SetDataTree(1, myNumbers2);
+            if (myNumbers3 != null) DA.SetDataTree(0, myNumbers3);
+            if(myNumbers!=null) DA.SetDataTree(1, myNumbers);
+            if (myNumbers2 != null) DA.SetDataTree(2, myNumbers2);
 
             solveinstanceCounter++;
 
@@ -118,6 +121,13 @@ namespace Biomorpher
             }
 
             return hasData;
+        }
+
+
+        public bool GetExistingPopulation(Chromosome[] chromosomes)
+        {
+
+            return false;
         }
 
         /// <summary>
@@ -234,6 +244,25 @@ namespace Biomorpher
         /// <param name="pop">Uses the given population to set the cluster output data</param>
         public void SetComponentOut(Population pop, List<BioBranch> BioBranches)
         {
+            
+            myNumbers3 = new GH_Structure<GH_Number>();
+
+            // Curent pop
+            for (int i = 0; i < pop.chromosomes.Length; i++)
+            {
+                GH_Path myPath = new GH_Path(i);
+
+                List<GH_Number> myList = new List<GH_Number>();
+                for (int k = 0; k < pop.chromosomes[i].GetGenes().Length; k++)
+                {
+                    GH_Number myGHNumber = new GH_Number(pop.chromosomes[i].GetGenes()[k]);
+                    myList.Add(myGHNumber);
+                }
+
+                myNumbers3.AppendRange(myList, myPath);
+            }
+
+
             myNumbers = new GH_Structure<GH_Number>();
 
             for (int i = 0; i < 12; i++)
@@ -256,12 +285,15 @@ namespace Biomorpher
 
                         myNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
                         localCounter++;
-                    }
+                    }   
+
                 }
             }
 
 
+
             myNumbers2 = new GH_Structure<GH_Number>();
+            
 
 
             for (int i = 0; i < BioBranches.Count; i++)

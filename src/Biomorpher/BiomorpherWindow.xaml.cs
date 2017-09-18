@@ -229,7 +229,7 @@ namespace Biomorpher
             BioBranches.Add(new BioBranch(-1, 0, 0));
 
             // 2. Create initial population
-            population = new Population(popSize, sliders, genePools);
+            population = new Population(popSize, sliders, genePools, owner);
 
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
@@ -1607,7 +1607,7 @@ namespace Biomorpher
             
             BitmapImage b = new BitmapImage();
             b.BeginInit();
-            b.UriSource = new Uri(@"Images\BioIcon2_240.png", UriKind.Relative);
+            b.UriSource = new Uri(@"Images\newIcon.png", UriKind.Relative);
             b.EndInit();
 
             Image myImage = new Image();
@@ -1615,6 +1615,7 @@ namespace Biomorpher
             myImage.Width = 100;
             myImage.Height = 100;
             sp.Children.Add(myImage);
+
 
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;

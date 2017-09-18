@@ -17,6 +17,8 @@ namespace Biomorpher.IGA
     public class Population
     {
 
+        private BiomorpherComponent owner;
+
         /// <summary>
         /// List of sliders associated with this population
         /// </summary>
@@ -53,12 +55,21 @@ namespace Biomorpher.IGA
         /// <param name="popSize"></param>
         /// <param name="sliders"></param>
         /// <param name="genePools"></param>
-        public Population(int popSize, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
+        public Population(int popSize, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools, BiomorpherComponent Owner)
         {
+
+            owner = Owner;
+
             chromosomes = new Chromosome[popSize];
             popSliders = new List<GH_NumberSlider>(sliders);
             popGenePools = new List<GalapagosGeneListObject>(genePools);
-            GenerateRandomPop();
+
+
+            bool isExisting = owner.GetExistingPopulation(chromosomes);
+            if (!isExisting)
+            {
+                GenerateRandomPop();
+            }
         }
 
         /// <summary>
@@ -80,6 +91,9 @@ namespace Biomorpher.IGA
             popSliders = new List<GH_NumberSlider>(pop.popSliders);
             popGenePools = new List<GalapagosGeneListObject>(pop.popGenePools);
             AveragePerformanceValues = new List<double>(pop.AveragePerformanceValues);
+
+            // clone the owner
+            owner = pop.owner;
 
         }
 
@@ -105,7 +119,7 @@ namespace Biomorpher.IGA
             double totalFitness = 0.0;
 
             // Set up a fresh population  
-            Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools);
+            Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools, owner);
 
             // find the total fitness
             for (int i = 0; i < chromosomes.Length; i++)
