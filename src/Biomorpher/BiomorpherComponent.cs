@@ -28,6 +28,7 @@ namespace Biomorpher
         public int solveinstanceCounter;
         private GH_Structure<GH_Number> myNumbers, myNumbers2, myNumbers3;
         private static readonly object syncLock = new object();
+        public GH_Structure<GH_Number> existingPopTree = new GH_Structure<GH_Number>();
 
         /// <summary>
         /// Main constructor
@@ -76,6 +77,8 @@ namespace Biomorpher
         protected override void SolveInstance(IGH_DataAccess DA)
         {
 
+            DA.GetDataTree("InitialPop", out existingPopTree);
+
             // Make the DA global
             if (solveinstanceCounter == 0)
             {
@@ -123,12 +126,6 @@ namespace Biomorpher
             return hasData;
         }
 
-
-        public bool GetExistingPopulation(Chromosome[] chromosomes)
-        {
-
-            return false;
-        }
 
         /// <summary>
         /// Sets the current slider values for a geven input chromosome

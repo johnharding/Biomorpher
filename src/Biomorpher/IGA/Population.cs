@@ -8,6 +8,8 @@ using GalapagosComponents;
 using Grasshopper.Kernel.Data;
 using System.Windows.Controls;
 using System.Windows;
+using Grasshopper.Kernel.Types;
+using Grasshopper.Kernel;
 
 namespace Biomorpher.IGA
 {
@@ -64,12 +66,48 @@ namespace Biomorpher.IGA
             popSliders = new List<GH_NumberSlider>(sliders);
             popGenePools = new List<GalapagosGeneListObject>(genePools);
 
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
+            }
 
-            bool isExisting = owner.GetExistingPopulation(chromosomes);
-            if (!isExisting)
+            
+            bool isExisting = false;
+            
+            GH_Structure<GH_Number> tree = owner.existingPopTree;
+            if(tree.Branches.Count == popSize)
+            {
+                if (tree.Branches[0].Count == chromosomes[0].GetGenes().Length)
+                {
+                    isExisting = true;
+                }
+            }
+
+
+            if(isExisting)
+            {
+                for (int i = 0; i < tree.Branches.Count; i++)
+                {
+                    // Set up a feature vector of doubles
+                    List<double> featureVector = new List<double>();
+
+                    for (int j = 0; j < tree.get_Branch(i).Count; j++)
+                    {
+                        double myDouble;
+                        GH_Convert.ToDouble(tree.get_Branch(i)[j], out myDouble, GH_Conversion.Primary);
+                        featureVector.Add(myDouble);
+                    }
+
+                    chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
+                    chromosomes[i].GenerateExistingGenes(featureVector);
+                }
+            }
+
+            else
             {
                 GenerateRandomPop();
             }
+
         }
 
         /// <summary>
@@ -104,7 +142,6 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
                 chromosomes[i].GenerateRandomGenes();
             }
         }

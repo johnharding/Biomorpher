@@ -119,6 +119,22 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
+        /// Sets the initial genes according to input data
+        /// </summary>
+        /// <param name="hapsberg"></param>
+        public void GenerateExistingGenes(List<double> hapsberg)
+        {
+            for (int i = 0; i < genes.Length; i++)
+            {
+                // apply bounds
+                double val = hapsberg[i];
+                if (val > 1.0) val = 1.0;
+                if (val < 0.0) val = 0.0;
+                genes[i] = val;
+            }
+        }
+
+        /// <summary>
         /// Returns the fitness value for this chromosome
         /// </summary>
         /// <returns></returns>
