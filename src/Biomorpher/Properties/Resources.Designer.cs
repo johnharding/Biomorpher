@@ -63,9 +63,9 @@ namespace Biomorpher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap BiomorpherIcon_24 {
+        internal static System.Drawing.Bitmap BiomorpherIcon2_24 {
             get {
-                object obj = ResourceManager.GetObject("BiomorpherIcon_24", resourceCulture);
+                object obj = ResourceManager.GetObject("BiomorpherIcon2_24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,19 @@ namespace Biomorpher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap BiomorpherIcon2_24 {
+        internal static System.Drawing.Bitmap BiomorpherIcon2_240 {
             get {
-                object obj = ResourceManager.GetObject("BiomorpherIcon2_24", resourceCulture);
+                object obj = ResourceManager.GetObject("BiomorpherIcon2_240", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap BiomorpherReaderIcon_24 {
+            get {
+                object obj = ResourceManager.GetObject("BiomorpherReaderIcon_24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

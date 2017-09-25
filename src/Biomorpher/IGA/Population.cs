@@ -75,12 +75,18 @@ namespace Biomorpher.IGA
             bool isExisting = false;
             
             GH_Structure<GH_Number> tree = owner.existingPopTree;
+
             if(tree.Branches.Count == popSize)
             {
                 if (tree.Branches[0].Count == chromosomes[0].GetGenes().Length)
                 {
                     isExisting = true;
                 }
+                owner.AddWarning("Current popuation size, wrong gene size");
+            }
+            else
+            {
+                if (tree.DataCount > 0) owner.AddWarning("existing population data must be same struture as population and gene count");
             }
 
 

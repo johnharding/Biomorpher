@@ -89,6 +89,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BiomorpherReader.cs" />
     <Compile Include="BiomorpherWindow.xaml.cs">
       <DependentUpon>BiomorpherWindow.xaml</DependentUpon>
     </Compile>
@@ -103,6 +104,7 @@
     <Compile Include="IGA\Chromosome.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IGA\OutputData.cs" />
     <Compile Include="IGA\Population.cs" />
     <Compile Include="IGA\Friends.cs" />
     <Compile Include="RoundedRectangle.cs" />
@@ -175,7 +177,7 @@
     <Resource Include="Resources\BiomorpherIcon2_240.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\newIcon.png" />
+    <None Include="Resources\BiomorpherReaderIcon_24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

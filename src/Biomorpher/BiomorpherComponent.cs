@@ -26,9 +26,14 @@ namespace Biomorpher
         public bool GO = false;
         private IGH_DataAccess deej;
         public int solveinstanceCounter;
-        private GH_Structure<GH_Number> myNumbers, myNumbers2, myNumbers3;
+        private GH_Structure<GH_Number> clusterNumbers, historicNumbers, populationNumbers;
         private static readonly object syncLock = new object();
         public GH_Structure<GH_Number> existingPopTree = new GH_Structure<GH_Number>();
+
+        private List<GH_NumberSlider> cSliders = new List<GH_NumberSlider>();
+        private List<GalapagosGeneListObject> cGenePools = new List<GalapagosGeneListObject>();
+
+        private OutputData myOutputData = new OutputData();
 
         /// <summary>
         /// Main constructor
@@ -65,9 +70,7 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddGenericParameter("Population", "Population", "Current population genes", GH_ParamAccess.tree);
-            pm.AddGenericParameter("Clusters", "Clusters", "Current K-means++ clusters)", GH_ParamAccess.tree);
-            pm.AddGenericParameter("History", "History", "Historic population genes", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Data", "Data", "Output data containing population, cluster, historic and genome information", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -85,10 +88,14 @@ namespace Biomorpher
                 deej = DA;
             }
 
-            // Output cluster info
-            if (myNumbers3 != null) DA.SetDataTree(0, myNumbers3);
-            if(myNumbers!=null) DA.SetDataTree(1, myNumbers);
-            if (myNumbers2 != null) DA.SetDataTree(2, myNumbers2);
+            // Output info
+            if (populationNumbers != null)  myOutputData.SetPopulationData(populationNumbers);
+            if (historicNumbers != null)    myOutputData.SetHistoricData(historicNumbers);
+            if (clusterNumbers!=null)       myOutputData.SetClusterData(clusterNumbers);
+            if (cSliders!=null)             myOutputData.SetSliderData(cSliders);
+            if (cGenePools!=null)           myOutputData.SetGenePoolData(cGenePools);
+
+            DA.SetData(0, myOutputData);            
 
             solveinstanceCounter++;
 
@@ -122,6 +129,9 @@ namespace Biomorpher
                     
                 }
             }
+
+            cSliders = sliders;
+            cGenePools = genePools;
 
             return hasData;
         }
@@ -241,10 +251,10 @@ namespace Biomorpher
         /// <param name="pop">Uses the given population to set the cluster output data</param>
         public void SetComponentOut(Population pop, List<BioBranch> BioBranches)
         {
-            
-            myNumbers3 = new GH_Structure<GH_Number>();
 
             // Curent pop
+            populationNumbers = new GH_Structure<GH_Number>();
+            
             for (int i = 0; i < pop.chromosomes.Length; i++)
             {
                 GH_Path myPath = new GH_Path(i);
@@ -256,11 +266,12 @@ namespace Biomorpher
                     myList.Add(myGHNumber);
                 }
 
-                myNumbers3.AppendRange(myList, myPath);
+                populationNumbers.AppendRange(myList, myPath);
             }
 
 
-            myNumbers = new GH_Structure<GH_Number>();
+            // Cluster data
+            clusterNumbers = new GH_Structure<GH_Number>();
 
             for (int i = 0; i < 12; i++)
             {
@@ -280,7 +291,7 @@ namespace Biomorpher
                             myList.Add(myGHNumber);
                         }
 
-                        myNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
+                        clusterNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
                         localCounter++;
                     }   
 
@@ -288,10 +299,8 @@ namespace Biomorpher
             }
 
 
-
-            myNumbers2 = new GH_Structure<GH_Number>();
-            
-
+            // Historic pop
+            historicNumbers = new GH_Structure<GH_Number>();
 
             for (int i = 0; i < BioBranches.Count; i++)
             {
@@ -308,11 +317,15 @@ namespace Biomorpher
                         }
 
                         GH_Path myPath = new GH_Path(i, j, k);
-                        myNumbers2.AppendRange(myList, myPath);
+                        historicNumbers.AppendRange(myList, myPath);
 
                     }
+
                 }
             }
+
+
+
 
             this.ExpireSolution(true);
         }
@@ -453,6 +466,16 @@ namespace Biomorpher
         {
             this.Params.Input[0].RemoveAllSources();
             ExpireSolution(true);
+        }
+
+
+        /// <summary>
+        /// Add a warning to the component
+        /// </summary>
+        /// <param name="text"></param>
+        public void AddWarning(string text)
+        {
+            this.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, text);
         }
 
         //TODO: send to grasshopper group from a window link (in About)

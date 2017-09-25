@@ -1607,7 +1607,7 @@ namespace Biomorpher
             
             BitmapImage b = new BitmapImage();
             b.BeginInit();
-            b.UriSource = new Uri(@"Images\newIcon.png", UriKind.Relative);
+            b.UriSource = new Uri(@"Resources\BiomorpherIcon2_240.png", UriKind.Relative);
             b.EndInit();
 
             Image myImage = new Image();
