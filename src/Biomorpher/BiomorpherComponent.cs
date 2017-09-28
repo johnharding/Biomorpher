@@ -70,6 +70,9 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
+            pm.AddGenericParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Historic", "Historic", "Historic biomorpher populations", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Clusters", "Clusters", "K-means clusters", GH_ParamAccess.tree);
             pm.AddGenericParameter("Data", "Data", "Output data containing population, cluster, historic and genome information", GH_ParamAccess.item);
         }
 
@@ -95,7 +98,25 @@ namespace Biomorpher
             if (cSliders!=null)             myOutputData.SetSliderData(cSliders);
             if (cGenePools!=null)           myOutputData.SetGenePoolData(cGenePools);
 
-            DA.SetData(0, myOutputData);            
+
+
+
+            if (myOutputData.GetPopulationData() != null)
+            {
+                DA.SetDataTree(0, myOutputData.GetPopulationData());
+            }
+            else
+            {
+                //this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Data contains no population");
+                //return;
+            }
+
+            if (myOutputData.GetHistoricData() != null) DA.SetDataTree(1, myOutputData.GetHistoricData());
+            if (myOutputData.GetClusterData() != null) DA.SetDataTree(2, myOutputData.GetClusterData());
+
+
+            DA.SetData(3, myOutputData);            
+
 
             solveinstanceCounter++;
 

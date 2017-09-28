@@ -24,11 +24,15 @@ namespace Biomorpher
     {
         public Grasshopper.GUI.Canvas.GH_Canvas canvas;
         private static readonly object syncLock = new object();
+        private IGH_DataAccess deej;
 
-        private OutputData localData;
+        private OutputData localData = new OutputData();
 
-        private List<GH_NumberSlider> cSliders = new List<GH_NumberSlider>();
-        private List<GalapagosGeneListObject> cGenePools = new List<GalapagosGeneListObject>();
+        private List<GH_NumberSlider> sliders = new List<GH_NumberSlider>();
+        private List<GalapagosGeneListObject> genepools = new List<GalapagosGeneListObject>();
+
+        private GH_Integer branch, designID;
+        private GH_Path historicPath;
 
         /// <summary>
         /// Main constructor
@@ -47,13 +51,9 @@ namespace Biomorpher
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
             pm.AddGenericParameter("Data", "Data", "Biomorpher saved data", GH_ParamAccess.item);
-            pm.AddIntegerParameter("Branch", "Branch", "Evolutionary branch (usually zero)", GH_ParamAccess.item, 0);
-            pm.AddIntegerParameter("Generation", "Generation", "Generation", GH_ParamAccess.item, 0);
-            pm.AddIntegerParameter("Design", "Design", "Design ID from the population", GH_ParamAccess.item, 0);
+            pm.AddPathParameter("HistoricPath", "HistoricPath", "Optional: if none provided, final population is used", GH_ParamAccess.item);
+            pm.AddIntegerParameter("DesignID", "DesignID", "Design ID from the population", GH_ParamAccess.item, 0);
 
-            //pm[0].WireDisplay = GH_ParamWireDisplay.faint;
-            //pm[1].WireDisplay = GH_ParamWireDisplay.faint;
-            //pm[2].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].Optional = true;
         }
         
@@ -63,9 +63,8 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddNumberParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.item);
-            pm.AddNumberParameter("Historic", "Historic", "Historic biomorpher populations", GH_ParamAccess.item);
-            pm.AddNumberParameter("Clusters", "Clusters", "K-means clusters", GH_ParamAccess.item);
+           
+            //pm[1].Simplify = true;
         }
 
         /// <summary>
@@ -74,11 +73,61 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
- 
-            if(!DA.GetData<OutputData>("Data", ref localData)){return;}
 
-            //DA.SetData("Population", localData.GetPopulationData());
+            if (!DA.GetData<OutputData>("Data", ref localData)) { return; }
+            if (!DA.GetData<GH_Path>("HistoricPath", ref historicPath))
+            {
+                historicPath = null;
+            }
+            if (!DA.GetData<GH_Integer>("DesignID", ref designID)) { return; };
+
+
+
+
+
+
+            if(historicPath == null)
+            {
+                this.Message = "Final population";
+
+                GH_Structure<GH_Number> numberTree = localData.GetPopulationData();
+                
+                //GH_Path 
+                List<double> genes = new List<double>();
+                for (int i = 0; i < numberTree.get_Branch(i).Count; i++)
+                {
+                    double myDouble;
+                    GH_Convert.ToDouble(numberTree.get_Branch(designID.Value)[i], out myDouble, GH_Conversion.Primary);
+                    genes.Add(myDouble);
+                }
+
+                //lock (syncLock)
+                //{
+                this.Locked = true;
+
+                canvas.Document.Enabled = false;
+                SetSliders(genes, localData.GetSliders(), localData.GetGenePools());
+                canvas.Document.Enabled = true;
+                
+                ExpireSolution(true);
+                canvas.Document.SolutionEnd += new GH_Document.SolutionEndEventHandler(EnableComponent);
+                //}
+            }
+
+            else
+            {
+                this.Message = "Historic population";
+            }
+
+            //GH_Path myPath = new GH_Path(i, j, k);
+
         }
+
+        public void EnableComponent(object sender, GH_SolutionEventArgs e)
+        {
+            this.Locked = false;
+        }
+
 
         /// <summary>
         /// Sets the current slider values for a geven input chromosome
@@ -86,9 +135,9 @@ namespace Biomorpher
         /// <param name="chromo"></param>
         /// <param name="sliders"></param>
         /// <param name="genePools"></param>
-        public void SetSliders(Chromosome chromo, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
+        public void SetSliders(List<double> genes, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
-            double[] genes = chromo.GetGenes();
+
             int sCount = sliders.Count;
 
             for (int i = 0; i < sCount; i++)
@@ -117,7 +166,8 @@ namespace Biomorpher
             }
         }
 
-       
+
+
 
 
 
