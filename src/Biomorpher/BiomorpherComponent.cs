@@ -33,7 +33,7 @@ namespace Biomorpher
         private List<GH_NumberSlider> cSliders = new List<GH_NumberSlider>();
         private List<GalapagosGeneListObject> cGenePools = new List<GalapagosGeneListObject>();
 
-        private OutputData myOutputData = new OutputData();
+        private BiomorpherData myOutputData = new BiomorpherData();
 
         /// <summary>
         /// Main constructor
@@ -70,10 +70,11 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
+            pm.AddTextParameter("GenoGuids", "GenoGuids", "GUIDs of the sliders and genepools to be manipulated", GH_ParamAccess.list);
             pm.AddGenericParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.tree);
             pm.AddGenericParameter("Historic", "Historic", "Historic biomorpher populations", GH_ParamAccess.tree);
             pm.AddGenericParameter("Clusters", "Clusters", "K-means clusters", GH_ParamAccess.tree);
-            pm.AddGenericParameter("Data", "Data", "Output data containing population, cluster, historic and genome information", GH_ParamAccess.item);
+            //pm.RegisterParam(new BiomorpherDataParam(), "Data", "Data", "Output data containing population, cluster, historic and genome information");
         }
 
         /// <summary>
@@ -100,10 +101,15 @@ namespace Biomorpher
 
 
 
+            if (myOutputData.GetPopulationData() != null)
+            {
+                DA.SetDataList(0, myOutputData.GetGenoGUIDs());
+            }
+
 
             if (myOutputData.GetPopulationData() != null)
             {
-                DA.SetDataTree(0, myOutputData.GetPopulationData());
+                DA.SetDataTree(1, myOutputData.GetPopulationData());
             }
             else
             {
@@ -111,11 +117,14 @@ namespace Biomorpher
                 //return;
             }
 
-            if (myOutputData.GetHistoricData() != null) DA.SetDataTree(1, myOutputData.GetHistoricData());
-            if (myOutputData.GetClusterData() != null) DA.SetDataTree(2, myOutputData.GetClusterData());
+            if (myOutputData.GetHistoricData() != null) DA.SetDataTree(2, myOutputData.GetHistoricData());
+            if (myOutputData.GetClusterData() != null) DA.SetDataTree(3, myOutputData.GetClusterData());
 
 
-            DA.SetData(3, myOutputData);            
+
+            // Wrap up the output data and pass it as biomorphergoo
+            //BiomorpherGoo mywrap = new BiomorpherGoo(myOutputData);
+            //DA.SetData(3, mywrap);          
 
 
             solveinstanceCounter++;

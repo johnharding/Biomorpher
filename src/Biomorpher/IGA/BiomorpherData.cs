@@ -10,16 +10,16 @@ using System.Threading.Tasks;
 
 namespace Biomorpher.IGA
 {
-    class OutputData
+    public class BiomorpherData
     {
-        private GH_Structure<GH_Number> populationData;
-        private GH_Structure<GH_Number> historicData;
-        private GH_Structure<GH_Number> clusterData;
-        private List<GH_NumberSlider> sliderData;
-        private List<GalapagosGeneListObject>genepoolData;
-        private List<object> slidergenepoolData;
+        public GH_Structure<GH_Number> populationData;
+        public GH_Structure<GH_Number> historicData;
+        public GH_Structure<GH_Number> clusterData;
+        public List<GH_NumberSlider> sliderData;
+        public List<GalapagosGeneListObject> genepoolData;
+        public int fish;
         
-        public OutputData(){}
+        public BiomorpherData(){}
 
         public void SetPopulationData(GH_Structure<GH_Number> incoming){ populationData = new GH_Structure<GH_Number>(incoming, false);}
         public void SetHistoricData(GH_Structure<GH_Number> incoming){ historicData = new GH_Structure<GH_Number>(incoming, false);}
@@ -32,5 +32,16 @@ namespace Biomorpher.IGA
         public GH_Structure<GH_Number> GetClusterData() { return clusterData; }
         public List<GH_NumberSlider> GetSliders() { return sliderData; }
         public List<GalapagosGeneListObject> GetGenePools() { return genepoolData; }
+
+        public List<Guid> GetGenoGUIDs()
+        {
+            List<Guid> myList = new List<Guid>();
+            for (int i = 0; i < sliderData.Count; i++)
+            {
+                myList.Add(sliderData[i].InstanceGuid);
+            }
+
+            return myList;
+        }
     }
 }

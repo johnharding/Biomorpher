@@ -26,13 +26,15 @@ namespace Biomorpher
         private static readonly object syncLock = new object();
         private IGH_DataAccess deej;
 
-        private OutputData localData = new OutputData();
+        
 
         private List<GH_NumberSlider> sliders = new List<GH_NumberSlider>();
         private List<GalapagosGeneListObject> genepools = new List<GalapagosGeneListObject>();
 
         private GH_Integer branch, designID;
         private GH_Path historicPath;
+
+        BiomorpherDataParam myParam;
 
         /// <summary>
         /// Main constructor
@@ -50,11 +52,23 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-            pm.AddGenericParameter("Data", "Data", "Biomorpher saved data", GH_ParamAccess.item);
+            // Register the default settings for Embryo
+            //myParam = new BiomorpherDataParam();
+            //localSettings = new OutputData();
+            //myParam.PersistentData.Append(new BiomorpherGoo(localData));
+            //pm.AddParameter(myParam, "Data", "Data", "Biomorpher saved data", GH_ParamAccess.item);
+
+
+            pm.AddTextParameter("GenoGuids", "GenoGuids", "GUIDs of the sliders and genepools to be manipulated", GH_ParamAccess.list);
+            pm.AddNumberParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Historic", "Historic", "Historic biomorpher populations", GH_ParamAccess.tree);
+
+
             pm.AddPathParameter("HistoricPath", "HistoricPath", "Optional: if none provided, final population is used", GH_ParamAccess.item);
             pm.AddIntegerParameter("DesignID", "DesignID", "Design ID from the population", GH_ParamAccess.item, 0);
 
-            pm[1].Optional = true;
+            pm[2].Optional = true;
+            pm[3].Optional = true;
         }
         
         /// <summary>
@@ -74,23 +88,44 @@ namespace Biomorpher
         protected override void SolveInstance(IGH_DataAccess DA)
         {
 
-            if (!DA.GetData<OutputData>("Data", ref localData)) { return; }
+            // Get settings
+            //BiomorpherGoo temp = new BiomorpherGoo();
+            //if (!DA.GetData("Data", ref temp)) { return; }
+            //localData = (BiomorpherData)temp.Value;
+            //private BiomorpherData localData = new BiomorpherData();
+
+            List<string> genoGuids = new List<string>();
+            GH_Structure<GH_Number> populationData;
+            GH_Structure<GH_Number> historicData;
+
+            if (!DA.GetDataList<string>("GenoGuids", genoGuids)) { return; }
+            if (!DA.GetDataTree("Population", out populationData)) { return; }
+            if (!DA.GetDataTree("Historic", out historicData)) { return; }
+
+
+            if (populationData == null)
+            {
+                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Data contains no population!");
+                return;
+            }
+
+
             if (!DA.GetData<GH_Path>("HistoricPath", ref historicPath))
             {
                 historicPath = null;
             }
+
+
             if (!DA.GetData<GH_Integer>("DesignID", ref designID)) { return; };
 
 
-
-
-
+            
 
             if(historicPath == null)
             {
                 this.Message = "Final population";
 
-                GH_Structure<GH_Number> numberTree = localData.GetPopulationData();
+                GH_Structure<GH_Number> numberTree = populationData;
                 
                 //GH_Path 
                 List<double> genes = new List<double>();
@@ -101,17 +136,48 @@ namespace Biomorpher
                     genes.Add(myDouble);
                 }
 
-                //lock (syncLock)
-                //{
-                this.Locked = true;
+                // Catch an equal amount of sliders and genes/guids
+                if (genes.Count != genoGuids.Count)
+                {
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Guid count does not equal chromosome gene count");
+                    return;
+                }
+
+                //this.Locked = true;
+
+                List<GH_NumberSlider> theSliders = new List<GH_NumberSlider>();
+                List<GalapagosGeneListObject> theGenePools = new List<GalapagosGeneListObject>();
+
+                bool flag = false;
+
+                foreach (string myGuid in genoGuids)
+                {
+                    try
+                    {
+                        System.Guid me = new Guid(myGuid);
+                        GH_NumberSlider slidy = OnPingDocument().FindObject<GH_NumberSlider>(me, true);
+                        if (slidy == null) flag = true;
+                        theSliders.Add(slidy);
+                    }
+                    catch
+                    {
+                        flag = true;
+                    }
+                }
+
+                if (flag)
+                {
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "No slider or genepool found at specified guid. Has the definition been altered?");
+                    return;
+                }    
 
                 canvas.Document.Enabled = false;
-                SetSliders(genes, localData.GetSliders(), localData.GetGenePools());
+                SetSliders(genes, theSliders, theGenePools);
                 canvas.Document.Enabled = true;
                 
-                ExpireSolution(true);
-                canvas.Document.SolutionEnd += new GH_Document.SolutionEndEventHandler(EnableComponent);
-                //}
+                //ExpireSolution(true);
+                //canvas.Document.SolutionEnd += new GH_Document.SolutionEndEventHandler(EnableComponent);
+
             }
 
             else

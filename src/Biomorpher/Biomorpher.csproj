@@ -101,10 +101,12 @@
     <Compile Include="BiomorpherComponent.cs" />
     <Compile Include="BiomorpherInfo.cs" />
     <Compile Include="IGA\BioBranch.cs" />
+    <Compile Include="IGA\BiomorpherDataParam.cs" />
+    <Compile Include="IGA\BiomorpherGoo.cs" />
     <Compile Include="IGA\Chromosome.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="IGA\OutputData.cs" />
+    <Compile Include="IGA\BiomorpherData.cs" />
     <Compile Include="IGA\Population.cs" />
     <Compile Include="IGA\Friends.cs" />
     <Compile Include="RoundedRectangle.cs" />
