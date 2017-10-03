@@ -41,6 +41,11 @@ namespace Biomorpher.IGA
                 myList.Add(sliderData[i].InstanceGuid);
             }
 
+            for (int i = 0; i < genepoolData.Count; i++)
+            {
+                myList.Add(genepoolData[i].InstanceGuid);
+            }
+
             return myList;
         }
     }

@@ -277,8 +277,6 @@ namespace Biomorpher
 
             //////////////////////////////////////////////////////////////////////////
 
-
-
             // 1. Create a new population using fitness values (also resets fitnesses)
             Generation++;
             population.RoulettePop();
@@ -634,7 +632,7 @@ namespace Biomorpher
             border_head.Child = label_head;
             sp.Children.Add(border_head);
 
-            // K-means description
+            // Settings description
             Border _border = new Border();
             _border.Margin = new Thickness(margin_w, 0, margin_w, 0);
             TextBlock _txt = new TextBlock();
@@ -645,7 +643,6 @@ namespace Biomorpher
             _label.Content = _txt;
             _border.Child = _label;
             sp.Children.Add(_border);
-
 
 
             // Create sliders with labels
@@ -662,30 +659,77 @@ namespace Biomorpher
             sp.Children.Add(border_mutation);
 
 
+    
+
             // Now for the buttons
             DockPanel dp_buttons = new DockPanel();
-            dp_buttons.LastChildFill = false;
-            Border border_buttons = new Border();
-            border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
+            //dp_buttons.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+            dp_buttons.LastChildFill = false; 
             //dp_buttons.Arrange(new Rect(200, 200, 200, 200));
 
-            //GO button
-            Button button_go = createButton("b_tab1_Go", "Go", Tab1_secondary.Width * 0.3, new RoutedEventHandler(tab1_Go_Click));
+            //GO (random) button
+            Button button_go = createButton("b_tab1_Go", "Go (Random)", Tab1_secondary.Width*0.25, new RoutedEventHandler(tab1_Go_Click));
             DockPanel.SetDock(button_go, Dock.Left);
             dp_buttons.Children.Add(button_go);
 
+            //GO2 (existing) button
+            Button button_go2 = createButton("b_tab1_Go2", "Go (Initial)", Tab1_secondary.Width*0.25, new RoutedEventHandler(tab1_Go2_Click));
+            DockPanel.SetDock(button_go2, Dock.Left);
+            dp_buttons.Children.Add(button_go2);
+
+            //GO3 (existing) button
+            Button button_go3 = createButton("b_tab1_Go3", "Go (Current)", Tab1_secondary.Width * 0.25, new RoutedEventHandler(tab1_Go2_Click));
+            DockPanel.SetDock(button_go3, Dock.Right);
+            dp_buttons.Children.Add(button_go3);
+
+
+            
+
             //EXIT button
+            /*
             Button button_exit = createButton("b_tab1_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
             DockPanel.SetDock(button_exit, Dock.Right);
             dp_buttons.Children.Add(button_exit);
+            */
+
+            Border border_buttons = new Border();
+            border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
             border_buttons.Child = dp_buttons;
-            
             sp.Children.Add(border_buttons);
+
+
+            //Header
+            Border border_head2 = new Border();
+            border_head2.Margin = new Thickness(margin_w, 20, margin_w, 0);
+            Label label_head2 = new Label();
+            label_head2.FontSize = fontsize;
+            label_head2.Content = "Initialise";
+            border_head2.Child = label_head2;
+            sp.Children.Add(border_head2);
+
+
+            
+
+            // Buttons description
+            Border _borderX = new Border();
+            _borderX.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            TextBlock _txtX = new TextBlock();
+            _txtX.TextWrapping = TextWrapping.Wrap;
+            _txtX.FontSize = fontsize2;
+            _txtX.Inlines.Add("Go 1: Random initial population, or initial population (if supplied and equal to population count)");
+            _txtX.Inlines.Add("\nGo 2: Initial population based on current parameter state");
+            Label _labelX = new Label();
+            _labelX.Content = _txtX;
+            _borderX.Child = _labelX;
+            sp.Children.Add(_borderX);
+
+
+
 
             
             // K-means text
             Border border_kmeans = new Border();
-            border_kmeans.Margin = new Thickness(margin_w, 50, margin_w, 0);
+            border_kmeans.Margin = new Thickness(margin_w, 20, margin_w, 0);
             Label label_kmeans = new Label();
             label_kmeans.FontSize = fontsize;
             label_kmeans.Content = "K-means Clusters";
@@ -700,7 +744,7 @@ namespace Biomorpher
             //txt.Foreground = Brushes.White;
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.Inlines.Add("Designs are clustered into 12 groups based on parameter (n-dimensional) similarity. Click on the 'design' tab to see representative closest to centroid of each group");
+            txt.Inlines.Add("Designs are clustered into 12 groups based on parameter (n-dimensional) similarity. Click on the 'design' tab to see representative closest to centroid of each group. 'K++ means' algorithm used.");
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
@@ -1818,6 +1862,28 @@ namespace Biomorpher
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void tab1_Go_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (!GO)
+            {
+                RunInit();
+
+                //Disable sliders in tab 1
+                Slider s_popSize = (Slider)controls["s_tab1_popSize"];
+                s_popSize.IsEnabled = false;
+
+            }
+
+            GO = true;
+        }
+
+
+        /// <summary>
+        /// Handle the event when the Go2 button is clicked (existing population)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
         {
 
             if (!GO)
