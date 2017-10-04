@@ -667,21 +667,52 @@ namespace Biomorpher
             dp_buttons.LastChildFill = false; 
             //dp_buttons.Arrange(new Rect(200, 200, 200, 200));
 
+
+            int wid = 84;
+
             //GO (random) button
-            Button button_go = createButton("b_tab1_Go", "Go (Random)", Tab1_secondary.Width*0.25, new RoutedEventHandler(tab1_Go_Click));
-            DockPanel.SetDock(button_go, Dock.Left);
-            dp_buttons.Children.Add(button_go);
+            DockPanel dock_go = new DockPanel();
+            Button button_go = createButton("b_tab1_Go", "Go 1", wid, new RoutedEventHandler(tab1_Go_Click));
+            button_go.ToolTip = "Using a random initial population";
+            DockPanel.SetDock(button_go, Dock.Top);
+            Label label_go = new Label();
+            //TextBlock txt_go = new TextBlock();
+            //txt_go.FontSize = fontsize2;
+            //txt_go.Inlines.Add("Random/initial");
+            //txt_go.TextAlignment = TextAlignment.Center;
+            label_go.Content = "Random";
+            DockPanel.SetDock(label_go, Dock.Bottom);
+            dock_go.Children.Add(button_go);
+            dock_go.Children.Add(label_go);
+            DockPanel.SetDock(dock_go, Dock.Left);
+            dp_buttons.Children.Add(dock_go);
+
 
             //GO2 (existing) button
-            Button button_go2 = createButton("b_tab1_Go2", "Go (Initial)", Tab1_secondary.Width*0.25, new RoutedEventHandler(tab1_Go2_Click));
-            DockPanel.SetDock(button_go2, Dock.Left);
-            dp_buttons.Children.Add(button_go2);
+            DockPanel dock_go2 = new DockPanel();
+            Button button_go2 = createButton("b_tab1_Go2", "Go 2", wid, new RoutedEventHandler(tab1_Go2_Click));
+            button_go2.ToolTip = "Attempt to use an existing population if supplied and containing matching population count";
+            DockPanel.SetDock(button_go2, Dock.Top);
+            Label label_go2 = new Label();
+            label_go2.Content = "Initial";
+            DockPanel.SetDock(label_go2, Dock.Bottom);
+            dock_go2.Children.Add(button_go2);
+            dock_go2.Children.Add(label_go2);
+            DockPanel.SetDock(dock_go2, Dock.Left);
+            dp_buttons.Children.Add(dock_go2);
 
-            //GO3 (existing) button
-            Button button_go3 = createButton("b_tab1_Go3", "Go (Current)", Tab1_secondary.Width * 0.25, new RoutedEventHandler(tab1_Go2_Click));
-            DockPanel.SetDock(button_go3, Dock.Right);
-            dp_buttons.Children.Add(button_go3);
-
+            //GO2 (existing) button
+            DockPanel dock_go3 = new DockPanel();
+            Button button_go3 = createButton("b_tab1_Go3", "Go 3", wid, new RoutedEventHandler(tab1_Go2_Click));
+            button_go3.ToolTip = "Create an initial population using the current parameter state only";
+            DockPanel.SetDock(button_go3, Dock.Top);
+            Label label_go3 = new Label();
+            label_go3.Content = "Current";
+            DockPanel.SetDock(label_go3, Dock.Bottom);
+            dock_go3.Children.Add(button_go3);
+            dock_go3.Children.Add(label_go3);
+            DockPanel.SetDock(dock_go3, Dock.Left);
+            dp_buttons.Children.Add(dock_go3);
 
             
 
@@ -698,6 +729,8 @@ namespace Biomorpher
             sp.Children.Add(border_buttons);
 
 
+            /*
+            
             //Header
             Border border_head2 = new Border();
             border_head2.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -706,9 +739,6 @@ namespace Biomorpher
             label_head2.Content = "Initialise";
             border_head2.Child = label_head2;
             sp.Children.Add(border_head2);
-
-
-            
 
             // Buttons description
             Border _borderX = new Border();
@@ -723,7 +753,7 @@ namespace Biomorpher
             _borderX.Child = _labelX;
             sp.Children.Add(_borderX);
 
-
+            */
 
 
             
