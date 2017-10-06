@@ -74,7 +74,6 @@ namespace Biomorpher
             pm.AddGenericParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.tree);
             pm.AddGenericParameter("Historic", "Historic", "Historic biomorpher populations", GH_ParamAccess.tree);
             pm.AddGenericParameter("Clusters", "Clusters", "K-means clusters", GH_ParamAccess.tree);
-            //pm.RegisterParam(new BiomorpherDataParam(), "Data", "Data", "Output data containing population, cluster, historic and genome information");
         }
 
         /// <summary>
@@ -99,13 +98,10 @@ namespace Biomorpher
             if (cSliders!=null)             myOutputData.SetSliderData(cSliders);
             if (cGenePools!=null)           myOutputData.SetGenePoolData(cGenePools);
 
-
-
             if (myOutputData.GetPopulationData() != null)
             {
                 DA.SetDataList(0, myOutputData.GetGenoGUIDs());
             }
-
 
             if (myOutputData.GetPopulationData() != null)
             {
@@ -118,14 +114,7 @@ namespace Biomorpher
             }
 
             if (myOutputData.GetHistoricData() != null) DA.SetDataTree(2, myOutputData.GetHistoricData());
-            if (myOutputData.GetClusterData() != null) DA.SetDataTree(3, myOutputData.GetClusterData());
-
-
-
-            // Wrap up the output data and pass it as biomorphergoo
-            //BiomorpherGoo mywrap = new BiomorpherGoo(myOutputData);
-            //DA.SetData(3, mywrap);          
-
+            if (myOutputData.GetClusterData() != null) DA.SetDataTree(3, myOutputData.GetClusterData());    
 
             solveinstanceCounter++;
 

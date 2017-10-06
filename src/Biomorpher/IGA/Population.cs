@@ -57,7 +57,7 @@ namespace Biomorpher.IGA
         /// <param name="popSize"></param>
         /// <param name="sliders"></param>
         /// <param name="genePools"></param>
-        public Population(int popSize, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools, BiomorpherComponent Owner)
+        public Population(int popSize, List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools, BiomorpherComponent Owner, int runType)
         {
 
             owner = Owner;
@@ -72,46 +72,59 @@ namespace Biomorpher.IGA
             }
 
             
-            bool isExisting = false;
-            
-            GH_Structure<GH_Number> tree = owner.existingPopTree;
-
-            if(tree.Branches.Count == popSize)
+            // Random, Initial or Current population
+            switch (runType)
             {
-                if (tree.Branches[0].Count == chromosomes[0].GetGenes().Length)
-                {
-                    isExisting = true;
-                }
-                owner.AddWarning("Current popuation size, wrong gene size");
-            }
-            else
-            {
-                if (tree.DataCount > 0) owner.AddWarning("existing population data must be same struture as population and gene count");
-            }
+                case 0:
+                    GenerateRandomPop();
+                    break;
 
+                case 1:
+                    bool isExisting = false;
 
-            if(isExisting)
-            {
-                for (int i = 0; i < tree.Branches.Count; i++)
-                {
-                    // Set up a feature vector of doubles
-                    List<double> featureVector = new List<double>();
+                    GH_Structure<GH_Number> tree = owner.existingPopTree;
 
-                    for (int j = 0; j < tree.get_Branch(i).Count; j++)
+                    if (tree != null && tree.Branches.Count == popSize)
                     {
-                        double myDouble;
-                        GH_Convert.ToDouble(tree.get_Branch(i)[j], out myDouble, GH_Conversion.Primary);
-                        featureVector.Add(myDouble);
+                        if (tree.Branches[0].Count == chromosomes[0].GetGenes().Length)
+                        {
+                            isExisting = true;
+                        }
+                        owner.AddWarning("Current popuation size, wrong gene size");
                     }
 
-                    chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
-                    chromosomes[i].GenerateExistingGenes(featureVector);
-                }
-            }
 
-            else
-            {
-                GenerateRandomPop();
+                    if (isExisting)
+                    {
+                        for (int i = 0; i < tree.Branches.Count; i++)
+                        {
+                            // Set up a feature vector of doubles
+                            List<double> featureVector = new List<double>();
+
+                            for (int j = 0; j < tree.get_Branch(i).Count; j++)
+                            {
+                                double myDouble;
+                                GH_Convert.ToDouble(tree.get_Branch(i)[j], out myDouble, GH_Conversion.Primary);
+                                featureVector.Add(myDouble);
+                            }
+
+                            chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
+                            chromosomes[i].GenerateExistingGenes(featureVector);
+                        }
+                    }
+                    else
+                    {
+                        GenerateRandomPop();
+                        owner.AddWarning("existing population data must be same structure as population and gene count; random population substituted.");
+                    }
+                    break;
+
+                case 2:
+                    GenerateCurrentPop();
+                    break;
+
+                default:
+                    break;
             }
 
         }
@@ -152,6 +165,15 @@ namespace Biomorpher.IGA
             }
         }
 
+
+        public void GenerateCurrentPop()
+        {
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                chromosomes[i].GenerateCurrentGenes();
+            }
+        }
+
         /// <summary>
         /// Replaces the population with a new one based on fitness using Roulette Wheel selection
         /// </summary>
@@ -161,8 +183,8 @@ namespace Biomorpher.IGA
             double fitSum;
             double totalFitness = 0.0;
 
-            // Set up a fresh population  
-            Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools, owner);
+            // Set up a fresh population.
+            Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools, owner, -1);
 
             // find the total fitness
             for (int i = 0; i < chromosomes.Length; i++)

@@ -135,6 +135,37 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
+        /// Sets the initial genes according to current parameter states
+        /// </summary>
+        public void GenerateCurrentGenes()
+        {
+            double[] genes = GetGenes();
+            int sCount = chromoSliders.Count;
+
+            for (int i = 0; i < sCount; i++)
+            {
+                double min = (double)chromoSliders[i].Slider.Minimum;
+                double max = (double)chromoSliders[i].Slider.Maximum;
+                double range = max - min;
+
+                genes[i] = ((double)chromoSliders[i].Slider.Value - min) / range;
+            }
+
+            // Set the gene pool values
+            // Note that we use the back end of the genes, beyond the slider count
+            int geneIndex = sCount;
+
+            for (int i = 0; i < chromoGenePools.Count; i++)
+            {
+                for (int j = 0; j < chromoGenePools[i].Count; j++)
+                {
+                    genes[geneIndex] = (double)chromoGenePools[i].get_NormalisedValue(j);
+                    geneIndex++;
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the fitness value for this chromosome
         /// </summary>
         /// <returns></returns>
