@@ -220,6 +220,7 @@ namespace Biomorpher
         
         /// <summary>
         /// Instantiate the population and intialise the window
+        /// Runtype 0: Random, 1: Existing 2: Current
         /// </summary>
         public void RunInit(int runType)
         {
@@ -230,6 +231,9 @@ namespace Biomorpher
 
             // 2. Create initial population
             population = new Population(popSize, sliders, genePools, owner, runType);
+
+            // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
+            if(runType == 2) population.JigglePop(0.001);
 
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
