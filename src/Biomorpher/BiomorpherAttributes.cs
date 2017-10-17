@@ -59,10 +59,13 @@ namespace Biomorpher
         {
             if ((ContentBox.Contains(e.CanvasLocation)))
             {
-                myMainWindow = new BiomorpherWindow(MyOwner);
-                myMainWindow.Show();
-                
-                return GH_ObjectResponse.Handled;
+                if(Owner.Params.Input[0].SourceCount != 0 && Owner.Params.Input[1].SourceCount !=0)
+                {
+                    myMainWindow = new BiomorpherWindow(MyOwner);
+                    myMainWindow.Show();
+
+                    return GH_ObjectResponse.Handled;
+                }
             }
 
             return GH_ObjectResponse.Ignore;

@@ -1095,7 +1095,8 @@ namespace Biomorpher
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
-            txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data");
+            txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data below. ");
+            txt_dcl.Inlines.Add("\n\nUse the radio buttons to optimise for criteria using the whole population (note: negates artificial selection).");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
