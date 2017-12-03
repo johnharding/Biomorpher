@@ -297,7 +297,9 @@ namespace Biomorpher.IGA
                         value /= (double)toBeOptimisedCount;
 
                         // Set the fitness of this chromosome based on 1-value (minimise) or value (maximise)
-                        chromosomes[j].CummulateFitness(value);
+                        // If the fitness is 1.0, then it has been selected using a tickbox. 
+                        if(chromosomes[j].GetFitness()!=1.0)
+                            chromosomes[j].CummulateFitness(value);
 
                         // Check that we are within bounds
                         if (chromosomes[j].GetFitness() > 1.0 || chromosomes[j].GetFitness() < 0.0)

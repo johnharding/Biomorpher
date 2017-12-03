@@ -260,7 +260,6 @@ namespace Biomorpher
         }
 
 
-
         /// <summary>
         /// When this gets called (probably via a button being triggered) we advance a generation 
         /// </summary>
@@ -272,7 +271,7 @@ namespace Biomorpher
             if (isPerformanceCriteriaBased)
             {
                 GetPhenotypes(false); // We have to do this to make sure we have performance for the whole population.
-                population.ResetAllFitness();
+                //population.ResetAllFitness();
                 population.SetPerformanceBasedFitness(controls, performanceCount);
             }
 
@@ -1072,6 +1071,19 @@ namespace Biomorpher
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);
 
+            NumericUpDown myNumericUpDown = new NumericUpDown();
+            myNumericUpDown.Width = 32;
+            myNumericUpDown.ToolTip = "Increases the number of generations calculated.";
+            myNumericUpDown.UpDownButtonsWidth = 16;
+            myNumericUpDown.Value = 1;
+            myNumericUpDown.Minimum = 1;
+            myNumericUpDown.Maximum = 49;
+            myNumericUpDown.Background = new SolidColorBrush(Color.FromArgb(255, 211, 211, 211));
+            //myNumericUpDown.IsReadOnly = true;
+            myNumericUpDown.Margin = new Thickness(4);
+            controls.Add("myNumericUpDown", myNumericUpDown);
+            dp_buttons.Children.Add(myNumericUpDown);
+
             //EXIT2 button
             Button button_exit = createButton("b_tab2_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
             DockPanel.SetDock(button_exit, Dock.Right);
@@ -1082,7 +1094,7 @@ namespace Biomorpher
 
             //Header 2
             Border border_data = new Border();
-            border_data.Margin = new Thickness(margin_w, 50, margin_w, 0);
+            border_data.Margin = new Thickness(margin_w, 40, margin_w, 0);
             Label label_data = new Label();
             label_data.FontSize = fontsize;
             label_data.Content = "Design Properties";
@@ -1138,7 +1150,6 @@ namespace Biomorpher
                 RadioButton radButtonMin = new RadioButton();
                 RadioButton radButtonMax = new RadioButton();
                 
-
                 radButtonNon.IsChecked = true;
 
                 radButtonNon.ToolTip = "no optimisation";
@@ -2030,12 +2041,20 @@ namespace Biomorpher
                 //Run now moved to before we start to uncheck checkboxes
                 //In order to maintin fitness values
                 if (isPerformanceCriteriaBased)
-                    Run(true);
+                {
+                    NumericUpDown nup = (NumericUpDown)controls["myNumericUpDown"];
+                    for (int i = 0; i < nup.Value; i++)
+                    {
+                        Run(true);
+                    }
+                }
+
                 else
+                {
                     Run(false);
+                }
 
-
-                //Extract indexes from names of checked boxes and uncheck all
+                //Extract indices from names of checked boxes and uncheck all
                 for (int i = 0; i < 12; i++)
                 {
                     //The name of the checkbox control
