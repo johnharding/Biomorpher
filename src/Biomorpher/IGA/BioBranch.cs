@@ -92,7 +92,27 @@ namespace Biomorpher.IGA
             //Canvas.SetTop(OriginCurve, 0);
             Canvas.SetZIndex(OriginCurve, -1);
             canvas.Children.Add(OriginCurve);
-            
+
+
+            //Add outline circle
+            double s = 8;
+            System.Windows.Shapes.Ellipse nodule = new System.Windows.Shapes.Ellipse();
+            nodule.Height = s;
+            nodule.Width = s;
+            nodule.Fill = Brushes.LightGray;
+            System.Windows.Shapes.Ellipse nodule2 = new System.Windows.Shapes.Ellipse();
+            nodule2.Height = s;
+            nodule2.Width = s;
+            nodule2.Fill = Brushes.LightGray;
+
+            Canvas.SetLeft(nodule, P1.X-s/2);
+            Canvas.SetTop(nodule, P1.Y-s/2);
+            canvas.Children.Add(nodule);
+
+            Canvas.SetLeft(nodule2, P4.X-s/2);
+            Canvas.SetTop(nodule2, P4.Y-s/2);
+            canvas.Children.Add(nodule2);
+
             
         }
 

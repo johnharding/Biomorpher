@@ -186,14 +186,14 @@ namespace Biomorpher
             pngHeight = 0;
 
             Topmost = true;
-            PopSize = 100;
+            PopSize = 64;
             MutateProbability = 0.01;
             Generation = 0;
             ParentCount = 0;
             performanceCount = 0;
             GO = false;
             HighlightedCluster = 0;
-            fontsize = 20;
+            fontsize = 18;
             fontsize2 = 12;
             margin_w = 20;
             rgb_performance = new Color[6] { Color.FromArgb(255, 236, 28, 59), Color.FromArgb(255, 121, 0, 120), Color.FromArgb(255, 17, 141, 200), Color.FromArgb(255, 36, 180, 66), Color.FromArgb(255, 222, 231, 31), Color.FromArgb(255, 243, 57, 0) };
@@ -768,7 +768,7 @@ namespace Biomorpher
                 //Border
                 Border border = new Border();
                 border.BorderBrush = Brushes.LightGray;
-                border.BorderThickness = new Thickness(0.3);
+                border.BorderThickness = new Thickness(0.5);
                 border.Padding = new Thickness(5);
 
                 //Master Dock panel
@@ -1073,14 +1073,16 @@ namespace Biomorpher
 
             NumericUpDown myNumericUpDown = new NumericUpDown();
             myNumericUpDown.Width = 32;
-            myNumericUpDown.ToolTip = "Increases the number of generations calculated.";
+            myNumericUpDown.ToolTip = "Increases the number of generations calculated (performance based only).";
             myNumericUpDown.UpDownButtonsWidth = 16;
             myNumericUpDown.Value = 1;
             myNumericUpDown.Minimum = 1;
             myNumericUpDown.Maximum = 49;
             myNumericUpDown.Background = new SolidColorBrush(Color.FromArgb(255, 211, 211, 211));
             //myNumericUpDown.IsReadOnly = true;
-            myNumericUpDown.Margin = new Thickness(4);
+            //myNumericUpDown.Margin = new Thickness(4);
+            //myNumericUpDown.BorderBrush = Brushes.Black;
+            //myNumericUpDown.BorderThickness = new Thickness(1);
             controls.Add("myNumericUpDown", myNumericUpDown);
             dp_buttons.Children.Add(myNumericUpDown);
 
@@ -1108,7 +1110,7 @@ namespace Biomorpher
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
             txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data below. ");
-            txt_dcl.Inlines.Add("\n\nUse the radio buttons to optimise for criteria using the whole population (note: negates artificial selection).");
+            txt_dcl.Inlines.Add("\n\nUse the radio buttons to optimise for criteria using the whole population (artificial selection can also be used).");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
@@ -1418,10 +1420,12 @@ namespace Biomorpher
 
                 TagExtrema(thisPop);
 
-                if (isOptimisationRun && thisDesign.isRepresentative) flag = true;
-                if (!isOptimisationRun && thisDesign.isRepresentative && thisDesign.isChecked) flag = true;
+                if (isOptimisationRun && thisDesign.isRepresentative && thisDesign.isOptimal) flag = true;
+                if (thisDesign.isRepresentative && thisDesign.isChecked) flag = true;
+                // Let's do for all. 
+                //if (thisDesign.isRepresentative) flag = true;
 
-                // Now just show those representatives that are checked
+                // Now just show those representatives that are representatives.
                 if (flag)
                 {
                     StackPanel sp = new StackPanel();
@@ -1435,15 +1439,16 @@ namespace Biomorpher
                     ViewportBasic vp4 = new ViewportBasic(thisDesign, this);
                     vp4.Background = Brushes.White;
 
-                    if(thisDesign.isSoupDragon || !isOptimisationRun)
-                        vp4.BorderThickness = new Thickness(1.2);
-                    else
-                        vp4.BorderThickness = new Thickness(0.6);
+                    //if(thisDesign.isOptimal || !isOptimisationRun)
+                    vp4.BorderThickness = new Thickness(1.0);
 
-                    if (thisDesign.isSoupDragon)
-                        vp4.BorderBrush = Brushes.Red;
-                    else
-                        vp4.BorderBrush = Brushes.LightGray;
+                    //else
+                    //vp4.BorderThickness = new Thickness(0.6);
+
+                    if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.Red;}
+                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Black;}
+                    else {vp4.BorderBrush = Brushes.LightGray;}
+
                     border.Child = vp4;
                     border.Height = 120;
                     sp.Children.Add(border);
@@ -1479,11 +1484,10 @@ namespace Biomorpher
 
             }
 
-            // Update shift
+            // Update X shift
             if (myGrid.Width > _historyY)
-                _historyY = (int)myGrid.Width;
-            
-                    
+                _historyY = (int)myGrid.Width + 50;
+                  
             // Set the left side based on the startY position for the new branch
             Canvas.SetLeft(myGrid, BioBranches[biobranchID].StartY);
             int yLocation = (generation - 1) * gridHeight + vMargin;
@@ -1552,10 +1556,10 @@ namespace Biomorpher
                 RadioButton radButtonMax = (RadioButton)controls["RADBUTTONMAX" + p];
 
                 if (radButtonMin.IsChecked == true)
-                    thisPop.chromosomes[minID].isSoupDragon = true;
+                    thisPop.chromosomes[minID].isOptimal = true;
 
                 if (radButtonMax.IsChecked == true)
-                    thisPop.chromosomes[maxID].isSoupDragon = true;
+                    thisPop.chromosomes[maxID].isOptimal = true;
             }
         }
 

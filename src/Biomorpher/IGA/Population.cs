@@ -370,7 +370,7 @@ namespace Biomorpher.IGA
             {
                 chromosomes[i].SetFitness(0.0);
                 chromosomes[i].isChecked = false;
-                chromosomes[i].isSoupDragon = false;
+                chromosomes[i].isOptimal = false;
             }
         }
 
