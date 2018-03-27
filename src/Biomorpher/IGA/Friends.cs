@@ -61,6 +61,7 @@ namespace Biomorpher.IGA
             }
         }
 
+
         /// <summary>
         /// Returns a double between [0.0, 1.0)
         /// </summary>
@@ -165,6 +166,14 @@ namespace Biomorpher.IGA
             //define vertices
             for (int i = 0; i < rhinoMesh.Vertices.Count; i++)
             {
+                /* TODO SharpDX update
+                SharpDX.Vector3 me;
+                me.X = rhinoMesh.Vertices[i].X;
+                me.Y = rhinoMesh.Vertices[i].Y;
+                me.Z = rhinoMesh.Vertices[i].Z;
+                wpfMesh.Positions.Add(me);
+                */
+                 
                 wpfMesh.Positions.Add(new Point3D(rhinoMesh.Vertices[i].X, rhinoMesh.Vertices[i].Y, rhinoMesh.Vertices[i].Z));
             }
 

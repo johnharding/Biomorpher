@@ -27,7 +27,7 @@ namespace Biomorpher
         private int ID;
         private BiomorpherWindow W;
         private HelixViewport3D hVp3D;
-
+        //HelixToolkit.Wpf.SharpDX.Viewport3DX hVp3D;
         public Viewport3d(List<Mesh> meshes, int id, BiomorpherWindow w, bool hasViewcube)
         {
             ID = id;
@@ -39,6 +39,7 @@ namespace Biomorpher
         private void create3DViewPort(List<Mesh> rMesh, bool hasViewcube)
         {
             hVp3D = new HelixViewport3D();
+            //hVp3D = new HelixToolkit.Wpf.SharpDX.Viewport3DX();
  
             //Settings
             hVp3D.ShowFrameRate = false;
@@ -67,13 +68,14 @@ namespace Biomorpher
                     MeshGeometry3D wMesh = new MeshGeometry3D();
                     DiffuseMaterial material = new DiffuseMaterial();
                     Friends.ConvertRhinotoWpfMesh(rMesh[i], wMesh, material);
-
                     GeometryModel3D model = new GeometryModel3D(wMesh, material);
 
                     model.BackMaterial = material;
                     ModelVisual3D v = new ModelVisual3D();
                     v.Content = model;
+                    
                     vis.Add(v);
+
                 }
             }
 

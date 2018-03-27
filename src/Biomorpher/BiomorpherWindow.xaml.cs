@@ -24,6 +24,8 @@ using GalapagosComponents;
 using Grasshopper.Kernel.Data;
 using Grasshopper;
 using System.IO;
+using System.Windows.Interop;
+using Rhino;
 
 namespace Biomorpher
 {
@@ -224,6 +226,7 @@ namespace Biomorpher
         /// </summary>
         public void RunInit(int runType)
         {
+
             // 1. Initialise population history
             BioBranches = new List<BioBranch>();
             biobranchID = 0;
@@ -761,15 +764,19 @@ namespace Biomorpher
             int columnCount = 4;
             int gridCount = rowCount * columnCount;
             Grid grid = createGrid(rowCount, columnCount, Tab2_primary.Width, Tab2_primary.Height);
-
+            
             //For each grid cell: create border with padding, a dock panel and add a checkbox
             for (int i = 0; i < gridCount; i++)
             {
+                //Outer border
+                Border oBorder = new Border();
+                oBorder.Padding = new Thickness(4);
+
                 //Border
                 Border border = new Border();
                 border.BorderBrush = Brushes.LightGray;
                 border.BorderThickness = new Thickness(0.5);
-                border.Padding = new Thickness(5);
+                border.Padding = new Thickness(2);
 
                 //Master Dock panel
                 DockPanel dp = new DockPanel();
@@ -810,11 +817,11 @@ namespace Biomorpher
 
                 //Set the dockpanel as the child of the border element
                 border.Child = dp;
-
+                oBorder.Child = border;
                 //Add the border to the grid
-                Grid.SetRow(border, (int)(i / columnCount));
-                Grid.SetColumn(border, i % columnCount);
-                grid.Children.Add(border);
+                Grid.SetRow(oBorder, (int)(i / columnCount));
+                Grid.SetColumn(oBorder, i % columnCount);
+                grid.Children.Add(oBorder);
             }
 
 
@@ -976,7 +983,7 @@ namespace Biomorpher
             int numCircles = colours.Count;
             int dOuter = 16;
             int dOffset = 3;
-            int topOffset = 5;
+            int topOffset = 8;
 
             Canvas canvas = new Canvas();
             canvas.Background = new SolidColorBrush(Colors.White);
@@ -1110,7 +1117,7 @@ namespace Biomorpher
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
             txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data below. ");
-            txt_dcl.Inlines.Add("\n\nUse the radio buttons to optimise for criteria using the whole population (artificial selection can also be used).");
+            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for criteria using the whole population (artificial selection can also be used).");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
@@ -1495,8 +1502,9 @@ namespace Biomorpher
             _historycanvas.Children.Add(myGrid); // See xaml for history canvas
 
             // Now set some node points
-            BioBranches[biobranchID].Twigs[j].HistoryNodeIN = new System.Windows.Point(BioBranches[biobranchID].StartY + vportWidth, 20 + yLocation + vportHeight / 2);
-            BioBranches[biobranchID].Twigs[j].HistoryNodeOUT = new System.Windows.Point(BioBranches[biobranchID].StartY + myGrid.Width, 20 + yLocation + vportHeight / 2);
+            // TODO: Why is this StartY used in the X coordinate?
+            BioBranches[biobranchID].Twigs[j].HistoryNodeIN = new System.Windows.Point(BioBranches[biobranchID].StartY + vportWidth -10, 20 + yLocation + vportHeight / 2);
+            BioBranches[biobranchID].Twigs[j].HistoryNodeOUT = new System.Windows.Point(BioBranches[biobranchID].StartY + myGrid.Width + 10, 20 + yLocation + vportHeight / 2);
 
             // Set the pngHeight to the maximum so far
             int soupdragon = yLocation + gridHeight;
@@ -1514,8 +1522,6 @@ namespace Biomorpher
             HistoryCanvas.Height = _historycanvas.Height;
 
         }
-
-
 
         /// <summary>
         /// Tag extrema values during optimisation
@@ -1562,9 +1568,6 @@ namespace Biomorpher
                     thisPop.chromosomes[maxID].isOptimal = true;
             }
         }
-
-
-
 
         /// <summary>
         /// Create settings panel for Tab 3
@@ -1618,7 +1621,7 @@ namespace Biomorpher
 
             // Note header
             Border border_head2 = new Border();
-            border_head2.Margin = new Thickness(margin_w, 50, margin_w, 0);
+            border_head2.Margin = new Thickness(margin_w, 40, margin_w, 0);
             Label label_head2 = new Label();
             label_head2.FontSize = fontsize;
             label_head2.Content = "Notes";
@@ -1629,14 +1632,15 @@ namespace Biomorpher
             Border border_txt = new Border();
             border_txt.Margin = new Thickness(margin_w, 10, margin_w, 0);
             TextBox myTextbox = new TextBox();
-            myTextbox.MinHeight = 400;
-            myTextbox.BorderThickness = new Thickness(0);
+            myTextbox.MinHeight = 100;
+            myTextbox.BorderThickness = new Thickness(0.5);
+            myTextbox.BorderBrush = Brushes.DarkGray;
             myTextbox.IsManipulationEnabled = true;
             myTextbox.TextWrapping = TextWrapping.Wrap;
             myTextbox.SnapsToDevicePixels = true;
             myTextbox.AcceptsReturn = true;
             myTextbox.AcceptsTab = true;
-            myTextbox.Background = Brushes.GhostWhite;
+            myTextbox.Background = Brushes.LightGray;
             border_txt.Child = myTextbox;
             sp3.Children.Add(border_txt);
 
@@ -1644,7 +1648,6 @@ namespace Biomorpher
             Tab3_secondary.Child = sp3;
 
         }
-
 
         #endregion
 
@@ -1846,6 +1849,31 @@ namespace Biomorpher
         #endregion
 
         #region EVENT HANDLERS
+
+        /*
+        System.Windows.Point last;
+        void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            HistoryCanvas.ReleaseMouseCapture();
+        }
+
+        void MyCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!HistoryCanvas.IsMouseCaptured)
+                return;
+            var t = (TranslateTransform)((TransformGroup)HistoryCanvas.RenderTransform).Children.First(tr => tr is TranslateTransform);
+            Vector v = last - e.GetPosition(HistoryCanvas);
+            t.X -= v.X;
+            t.Y -= v.Y;
+            last = e.GetPosition(HistoryCanvas);
+        }
+        void MyCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            last = e.GetPosition(HistoryCanvas);
+            HistoryCanvas.CaptureMouse();
+        }
+        */
+
 
         //Tab 1 Popsize event handler
         private void tab1_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

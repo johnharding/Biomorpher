@@ -165,7 +165,9 @@ namespace Biomorpher.IGA
             }
         }
 
-
+        /// <summary>
+        /// Generates a new popuation based on current design
+        /// </summary>
         public void GenerateCurrentPop()
         {
             for (int i = 0; i < chromosomes.Length; i++)

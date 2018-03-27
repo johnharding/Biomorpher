@@ -95,7 +95,7 @@ namespace Biomorpher.IGA
 
 
             //Add outline circle
-            double s = 8;
+            double s = 6;
             System.Windows.Shapes.Ellipse nodule = new System.Windows.Shapes.Ellipse();
             nodule.Height = s;
             nodule.Width = s;

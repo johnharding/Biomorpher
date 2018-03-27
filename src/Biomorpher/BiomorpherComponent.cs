@@ -236,22 +236,27 @@ namespace Biomorpher
             List<double> performas = new List<double>();
             List<string> criteria = new List<string>();
 
+            // Cap at eight criteria max.
+            int pCount = 0;
+
             foreach (IGH_Param param in Params.Input[2].Sources)
             {
                 foreach (Object myObj in param.VolatileData.AllData(true))
                 {
-                    if (myObj is GH_Number)
+                    if (myObj is GH_Number && pCount < 8)
                     {
                         GH_Number temp = (GH_Number)myObj;
                         performas.Add(temp.Value);
                         criteria.Add(param.NickName);
+                        pCount++;
                     }
 
-                    else if (myObj is GH_Integer)
+                    else if (myObj is GH_Integer && pCount < 8)
                     {
                         GH_Integer temp = (GH_Integer)myObj;
                         performas.Add((double)temp.Value);
                         criteria.Add(param.NickName);
+                        pCount++;
                     }
                 }
             }
