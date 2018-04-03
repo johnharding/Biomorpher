@@ -213,15 +213,13 @@
     <None Include="Resources\BiomorpherIcon2_24.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\BioIcon2_240.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\BiomorpherIcon2_240.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BiomorpherReaderIcon_24.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\BioIcon3_240.png" />
     <Content Include="sharpdx_direct3d11_1_effects_arm.dll" />
     <Content Include="sharpdx_direct3d11_1_effects_x64.dll" />
     <Content Include="sharpdx_direct3d11_1_effects_x86.dll" />

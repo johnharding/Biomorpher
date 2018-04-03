@@ -205,6 +205,7 @@ namespace Biomorpher
             controls = new Dictionary<string, FrameworkElement>();
 
             //Initialise Tab 1 Start settings (i.e. popsize and mutation sliders)
+            tab1_primary_initial();
             tab1_secondary_settings();
 
             //Make sure that tab 3 graphics are clipped to bounds
@@ -622,6 +623,27 @@ namespace Biomorpher
             return canvas;
         }
 
+        //An initial background for tab 1.
+        public void tab1_primary_initial()
+        {
+            
+            
+            BitmapImage b = new BitmapImage();
+            b.BeginInit();
+            b.UriSource = new Uri(@"Resources\BioIcon3_240.png", UriKind.Relative);
+            b.EndInit();
+            Image myImage = new Image();
+            myImage.Source = b;
+            myImage.Width = 180;
+            myImage.Height = 180;
+
+            Grid gp = new Grid();
+            Grid.SetColumn(gp, 1);
+            Grid.SetRow(gp, 1);
+            gp.Children.Add(myImage);
+
+            Tab1_primary.Child = gp;
+        }
 
         //Create settings panel for Tab 1
         public void tab1_secondary_settings()
@@ -650,6 +672,7 @@ namespace Biomorpher
             _border.Child = _label;
             sp.Children.Add(_border);
 
+            // Initial population can be random, from a previous run or based on the current parameter state.
 
             // Create sliders with labels
             Border border_popSize = new Border();
@@ -665,12 +688,11 @@ namespace Biomorpher
             sp.Children.Add(border_mutation);
 
 
-            // Now for the buttons
+            // Now for the three buttons
             DockPanel dp_buttons = new DockPanel();
             //dp_buttons.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             dp_buttons.LastChildFill = false; 
             //dp_buttons.Arrange(new Rect(200, 200, 200, 200));
-            
 
             int wid = 84;
 
@@ -702,6 +724,7 @@ namespace Biomorpher
             DockPanel.SetDock(dock_go2, Dock.Left);
             dp_buttons.Children.Add(dock_go2);
 
+
             //GO3 button
             DockPanel dock_go3 = new DockPanel();
             Button button_go3 = createButton("b_tab1_Go3", "Go", wid, new RoutedEventHandler(tab1_Go3_Click));
@@ -721,7 +744,7 @@ namespace Biomorpher
             border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
 
-            
+
             // K-means text
             Border border_kmeans = new Border();
             border_kmeans.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -743,6 +766,26 @@ namespace Biomorpher
             label.Content = txt;
             border.Child = label;
             sp.Children.Add(border);
+
+
+            // Now for the ShowAll12 designs checkbox
+            Border border_showall12 = new Border();
+            border_showall12.Margin = new Thickness(margin_w, 20, margin_w, 10);
+            DockPanel dp_showall12 = new DockPanel();
+            Label label_showall12 = new Label();
+            label_showall12.HorizontalContentAlignment = HorizontalAlignment.Left;
+            label_showall12.Content = "Show all 12 cluster centres in history?";
+            DockPanel.SetDock(label_showall12, Dock.Left);
+            dp_showall12.Children.Add(label_showall12);
+            CheckBox cb_showall12 = new CheckBox();
+            cb_showall12.Name = "cb_showall12";
+            cb_showall12.IsChecked = false;
+            controls.Add(cb_showall12.Name, cb_showall12);
+            cb_showall12.HorizontalAlignment = HorizontalAlignment.Right;
+            DockPanel.SetDock(cb_showall12, Dock.Right);
+            dp_showall12.Children.Add(cb_showall12);
+            border_showall12.Child = dp_showall12;
+            sp.Children.Add(border_showall12);
             
 
             //Add the stackpanel to the secondary area of Tab 0
@@ -1424,13 +1467,22 @@ namespace Biomorpher
                 Population thisPop = BioBranches[biobranchID].Twigs[j];
                 Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
 
-
                 TagExtrema(thisPop);
 
-                if (isOptimisationRun && thisDesign.isRepresentative && thisDesign.isOptimal) flag = true;
-                if (thisDesign.isRepresentative && thisDesign.isChecked) flag = true;
-                // Let's do for all. 
-                //if (thisDesign.isRepresentative) flag = true;
+                // Show all 12 cluster centroids?
+                CheckBox myCb = (CheckBox)controls["cb_showall12"];
+
+                if ((bool) myCb.IsChecked)
+                {
+                    if (thisDesign.isRepresentative) flag = true;
+                }
+
+                else
+                {
+                    if (isOptimisationRun && thisDesign.isRepresentative && thisDesign.isOptimal) flag = true;
+                    if (thisDesign.isRepresentative && thisDesign.isChecked) flag = true;
+                }
+                
 
                 // Now just show those representatives that are representatives.
                 if (flag)
@@ -1997,7 +2049,6 @@ namespace Biomorpher
 
             RunNewBranch();
         }
-
 
         /// <summary>
         /// Event handler for all checkboxes in tab 2
