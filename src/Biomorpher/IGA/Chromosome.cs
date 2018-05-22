@@ -63,6 +63,16 @@ namespace Biomorpher.IGA
         public bool isOptimal;
 
         /// <summary>
+        /// A design that is min for the population
+        /// </summary>
+        public bool isMinimum;
+
+        /// <summary>
+        /// A design that is max for the population
+        /// </summary>
+        public bool isMaximum;
+
+        /// <summary>
         /// The associated cluster centroid representative ID (could be itself).
         /// </summary>
         public int clusterId;
@@ -104,6 +114,8 @@ namespace Biomorpher.IGA
             isRepresentative = false;
             isChecked = false;
             isOptimal = false;
+            isMinimum = false;
+            isMaximum = false;
 
             clusterId = -1;
             distToRepresentative = -1.0;
@@ -193,6 +205,8 @@ namespace Biomorpher.IGA
             clone.distToRepresentative = this.distToRepresentative;
             clone.isChecked = this.isChecked;
             clone.isOptimal = this.isOptimal;
+            clone.isMinimum = this.isMinimum;
+            clone.isMaximum = this.isMaximum;
 
             // Clone phenotype mesh
             if (this.phenotype != null)
@@ -231,8 +245,11 @@ namespace Biomorpher.IGA
                     genes[i] = Friends.GetRandomDouble();
                 }
             }
-
         }
+
+
+
+
 
         /// <summary>
         /// Returns the genes for this chromosome
@@ -260,6 +277,17 @@ namespace Biomorpher.IGA
         {
             return criteria;
         }
+
+        /// <summary>
+        /// Sets a new set of gene values. MUST be same length else old genes are maintained.
+        /// </summary>
+        /// <param name="newgenes"></param>
+        public void SetGenes(double[] newgenes)
+        {
+            if(genes.Length == newgenes.Length)
+                newgenes.CopyTo(genes, 0);
+        }
+
 
         /// <summary>
         /// Sets the phenotype for this chromosome (geometry and performance criteria)

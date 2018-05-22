@@ -40,6 +40,22 @@ namespace Biomorpher.IGA
         public Path OriginCurve { get; set; }
 
         /// <summary>
+        /// Mins out of the entire run
+        /// </summary>
+        public double[] minPerformanceValues { get; set; }
+
+        /// <summary>
+        /// Maxes out of the entire run
+        /// </summary>
+        public double[] maxPerformanceValues { get; set; }
+
+        /// <summary>
+        /// Performance count
+        /// </summary>
+        public int performanceCount { get; set; }
+
+
+        /// <summary>
         /// Contructor for a BioBranch
         /// </summary>
         /// <param name="parentBranchIndex">Every BioBranch has a parent branch. Use -1 for initial branch</param>
@@ -51,15 +67,18 @@ namespace Biomorpher.IGA
             this.ParentBranchIndex = parentBranchIndex;
             this.ParentTwigIndex = parentTwigIndex;
             StartY = startY; // used for the history bit
+            performanceCount = 0;
         }
 
         /// <summary>
         /// Adds a new population 'twig'
         /// </summary>
         /// <param name="pop">Population that will be copied and stored</param>
-        public void AddTwig(Population pop)
+        public void AddTwig(Population pop, int pCount)
         {
             Twigs.Add(new Population(pop)); // copy of the current pop
+            performanceCount = pCount;
+            PerformAnalytics();
         }
 
 
@@ -114,6 +133,58 @@ namespace Biomorpher.IGA
             canvas.Children.Add(nodule2);
 
             
+        }
+
+        /// <summary>
+        /// Crunch some data for this branch.
+        /// </summary>
+        public void PerformAnalytics()
+        {
+
+            // Calculate min and max for the entire set.
+            
+            
+            minPerformanceValues = new double[performanceCount];
+            maxPerformanceValues = new double[performanceCount];
+
+            
+
+            for(int p=0; p<minPerformanceValues.Length; p++)
+            {
+                minPerformanceValues[p] = 9999999999d;
+                maxPerformanceValues[p] = -9999999999d;
+            }
+
+
+            for(int j=0; j<Twigs.Count; j++)
+            {
+                for(int k=0; k<Twigs[j].chromosomes.Length; k++)
+                {
+                   Chromosome thisDesign = Twigs[j].chromosomes[k];
+                   if(thisDesign.isRepresentative)
+                   {
+                       for(int p=0; p<thisDesign.GetPerformas().Count; p++)
+                       {
+                           if(thisDesign.GetPerformas()[p] < minPerformanceValues[p])
+                           {
+                               minPerformanceValues[p] = thisDesign.GetPerformas()[p];
+                           }
+
+                           if (thisDesign.GetPerformas()[p] > maxPerformanceValues[p])
+                           {
+                               maxPerformanceValues[p] = thisDesign.GetPerformas()[p];
+                           }
+                       }
+                   }
+
+                }
+
+            }
+
+
+            //Cluster size?
+
+
         }
 
     }

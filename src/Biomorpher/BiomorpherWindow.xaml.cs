@@ -114,6 +114,23 @@ namespace Biomorpher
         }
 
         /// <summary>
+        /// Crossover probability
+        /// </summary>
+        private double crossoverProbability;
+        public double CrossoverProbability
+        {
+            get { return crossoverProbability; }
+            set
+            {
+                if (value != crossoverProbability)
+                {
+                    crossoverProbability = value;
+                    OnPropertyChanged("CrossoverProbability");
+                }
+            }
+        }
+
+        /// <summary>
         /// Current generation (i.e. twigID)
         /// </summary>
         private int generation;
@@ -189,6 +206,7 @@ namespace Biomorpher
 
             Topmost = true;
             PopSize = 64;
+            CrossoverProbability = 0.10;
             MutateProbability = 0.01;
             Generation = 0;
             ParentCount = 0;
@@ -236,9 +254,6 @@ namespace Biomorpher
             // 2. Create initial population
             population = new Population(popSize, sliders, genePools, owner, runType);
 
-            // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
-            if(runType == 2) population.JigglePop(0.001);
-
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
 
@@ -258,6 +273,9 @@ namespace Biomorpher
             tab2_secondary_settings();
 
             tab3_secondary_settings();
+            tab3b_secondary_settings();
+
+            //tab3a_plotcanvas();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches);
@@ -278,17 +296,23 @@ namespace Biomorpher
                 //population.ResetAllFitness();
                 population.SetPerformanceBasedFitness(controls, performanceCount);
             }
+            else
+            {
+                NumericUpDown myNumericUpDown = (NumericUpDown) controls["myNumericUpDown"];
+                myNumericUpDown.Value = 1; 
+            }
 
             // 9. Add old population to history.
-            BioBranches[biobranchID].AddTwig(population);
+            BioBranches[biobranchID].AddTwig(population, performanceCount);
 
             //////////////////////////////////////////////////////////////////////////
 
             // 1. Create a new population using fitness values (also resets fitnesses)
             Generation++;
             population.RoulettePop();
-            
-            // 2. Mutate population using user preferences
+
+            // 2. Crossover and Mutate population using user preferences
+            population.CrossoverPop(crossoverProbability);
             population.MutatePop(mutateProbability);
 
             // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
@@ -310,6 +334,8 @@ namespace Biomorpher
             tab2_updatePerforms();
 
             tab3_primary_update(isPerformanceCriteriaBased);
+
+            tab3a_plotcanvas();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches);   
@@ -338,6 +364,8 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_updatePerforms();
 
+            tab3a_plotcanvas();
+
         }
 
 
@@ -347,6 +375,12 @@ namespace Biomorpher
         /// </summary>
         public void GetPhenotypes(bool clusterRepsOnly)
         {
+            bool dsiablePreview;
+            CheckBox cb = (CheckBox) controls["cb_disablepreview"];
+            dsiablePreview = (bool) cb.IsChecked;
+
+            if (dsiablePreview)
+                owner.OnPingDocument().PreviewMode = GH_PreviewMode.Disabled;
 
             // Get geometry for each chromosome in the initial population
             // TODO: Don't repeat code like this!
@@ -380,6 +414,9 @@ namespace Biomorpher
 
             // TODO: Fill up null performance values instead, because this way if you have a null performance value it kills all the others.
             population.RepairPerforms();
+
+            if (dsiablePreview)
+                owner.OnPingDocument().PreviewMode = GH_PreviewMode.Shaded;
 
         }
 
@@ -634,8 +671,8 @@ namespace Biomorpher
             b.EndInit();
             Image myImage = new Image();
             myImage.Source = b;
-            myImage.Width = 180;
-            myImage.Height = 180;
+            myImage.Width = 120;
+            myImage.Height = 120;
 
             Grid gp = new Grid();
             Grid.SetColumn(gp, 1);
@@ -681,12 +718,41 @@ namespace Biomorpher
             border_popSize.Child = dp_popSize;
             sp.Children.Add(border_popSize);
 
+            Border border_crossover = new Border();
+            border_crossover.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            DockPanel dp_crossover = createSlider("Crossover rate", "s_tab1_crossover", 0.00, 1.00, CrossoverProbability, false, new RoutedPropertyChangedEventHandler<double>(tab1_crossover_ValueChanged));
+            border_crossover.Child = dp_crossover;
+            sp.Children.Add(border_crossover);
+
             Border border_mutation = new Border();
             border_mutation.Margin = new Thickness(margin_w, 0, margin_w, 0);
-            DockPanel dp_mutation = createSlider("Mutation probability", "s_tab1_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(tab1_mutation_ValueChanged));
+            DockPanel dp_mutation = createSlider("Mutation rate", "s_tab1_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(tab1_mutation_ValueChanged));
             border_mutation.Child = dp_mutation;
             sp.Children.Add(border_mutation);
 
+
+            /*
+            //Launch Header
+            Border border_launch = new Border();
+            border_launch.Margin = new Thickness(margin_w, 20, margin_w, 0);
+            Label label_launch = new Label();
+            label_launch.FontSize = fontsize;
+            label_launch.Content = "Launch";
+            border_launch.Child = label_launch;
+            sp.Children.Add(border_launch);
+            
+            // Buttons description
+            Border _butdesborder = new Border();
+            _butdesborder.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            TextBlock _butdestxt = new TextBlock();
+            _butdestxt.TextWrapping = TextWrapping.Wrap;
+            _butdestxt.FontSize = fontsize2;
+            _butdestxt.Inlines.Add("Initial population: 1.Randomised 2.Based on current parameter state 3.Based on an initial supplied population.");
+            Label _butdeslabel = new Label();
+            _butdeslabel.Content = _butdestxt;
+            _butdesborder.Child = _butdeslabel;
+            sp.Children.Add(_butdesborder);
+            */
 
             // Now for the three buttons
             DockPanel dp_buttons = new DockPanel();
@@ -711,23 +777,8 @@ namespace Biomorpher
             dp_buttons.Children.Add(dock_go);
 
             //GO2 button
-            DockPanel dock_go2 = new DockPanel();
-            Button button_go2 = createButton("b_tab1_Go2", "Go", wid, new RoutedEventHandler(tab1_Go2_Click));
-            button_go2.ToolTip = "Attempts to use an existing population (if supplied and matching population size)";
-            DockPanel.SetDock(button_go2, Dock.Top);
-            Label label_go2 = new Label();
-            label_go2.Content = "Initial";
-            label_go2.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
-            DockPanel.SetDock(label_go2, Dock.Bottom);
-            dock_go2.Children.Add(button_go2);
-            dock_go2.Children.Add(label_go2);
-            DockPanel.SetDock(dock_go2, Dock.Left);
-            dp_buttons.Children.Add(dock_go2);
-
-
-            //GO3 button
             DockPanel dock_go3 = new DockPanel();
-            Button button_go3 = createButton("b_tab1_Go3", "Go", wid, new RoutedEventHandler(tab1_Go3_Click));
+            Button button_go3 = createButton("b_tab1_Go3", "Go", wid, new RoutedEventHandler(tab1_Go2_Click));
             button_go3.ToolTip = "Uses an initial population from the current parameter state";
             DockPanel.SetDock(button_go3, Dock.Top);
             Label label_go3 = new Label();
@@ -738,6 +789,20 @@ namespace Biomorpher
             dock_go3.Children.Add(label_go3);
             DockPanel.SetDock(dock_go3, Dock.Left);
             dp_buttons.Children.Add(dock_go3);
+
+            //GO3 button
+            DockPanel dock_go2 = new DockPanel();
+            Button button_go2 = createButton("b_tab1_Go2", "Go", wid, new RoutedEventHandler(tab1_Go3_Click));
+            button_go2.ToolTip = "Attempts to use an existing population (if supplied and matching population size)";
+            DockPanel.SetDock(button_go2, Dock.Top);
+            Label label_go2 = new Label();
+            label_go2.Content = "Supplied";
+            label_go2.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
+            DockPanel.SetDock(label_go2, Dock.Bottom);
+            dock_go2.Children.Add(button_go2);
+            dock_go2.Children.Add(label_go2);
+            DockPanel.SetDock(dock_go2, Dock.Left);
+            dp_buttons.Children.Add(dock_go2);
 
             Border border_buttons = new Border();
             border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -786,7 +851,28 @@ namespace Biomorpher
             dp_showall12.Children.Add(cb_showall12);
             border_showall12.Child = dp_showall12;
             sp.Children.Add(border_showall12);
-            
+
+
+            // Now for the ShowAll12 designs checkbox
+            Border border_disablepreview = new Border();
+            border_disablepreview.Padding = new Thickness(0);
+            border_disablepreview.BorderThickness = new Thickness(margin_w, 0, margin_w, 0);
+            DockPanel dp_disablepreview = new DockPanel();
+            Label label_disablepreview = new Label();
+            label_disablepreview.HorizontalContentAlignment = HorizontalAlignment.Left;
+            label_disablepreview.Content = "Disable Grasshopper preview (faster)";
+            DockPanel.SetDock(label_disablepreview, Dock.Left);
+            dp_disablepreview.Children.Add(label_disablepreview);
+            CheckBox cb_disablepreview = new CheckBox();
+            cb_disablepreview.Name = "cb_disablepreview";
+            cb_disablepreview.IsChecked = false;
+            controls.Add(cb_disablepreview.Name, cb_disablepreview);
+            cb_disablepreview.HorizontalAlignment = HorizontalAlignment.Right;
+            DockPanel.SetDock(cb_disablepreview, Dock.Right);
+            dp_disablepreview.Children.Add(cb_disablepreview);
+            border_disablepreview.Child = dp_disablepreview;
+            sp.Children.Add(border_disablepreview);
+
 
             //Add the stackpanel to the secondary area of Tab 0
             Tab1_secondary.Child = sp;
@@ -1121,6 +1207,10 @@ namespace Biomorpher
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);
 
+            Border spacer = new Border();
+            spacer.Width = 4;
+            dp_buttons.Children.Add(spacer);
+
             NumericUpDown myNumericUpDown = new NumericUpDown();
             myNumericUpDown.Width = 32;
             myNumericUpDown.ToolTip = "Increases the number of generations calculated (performance based only).";
@@ -1128,7 +1218,7 @@ namespace Biomorpher
             myNumericUpDown.Value = 1;
             myNumericUpDown.Minimum = 1;
             myNumericUpDown.Maximum = 49;
-            myNumericUpDown.Background = new SolidColorBrush(Color.FromArgb(255, 211, 211, 211));
+            myNumericUpDown.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
             //myNumericUpDown.IsReadOnly = true;
             //myNumericUpDown.Margin = new Thickness(4);
             //myNumericUpDown.BorderBrush = Brushes.Black;
@@ -1273,8 +1363,10 @@ namespace Biomorpher
         /// <summary>
         /// Adds performance name criteria, value and coloured dot to a given list of borders
         /// </summary>
+        /// <param name="thisPop"></param>
         /// <param name="yourBorders"></param>
         /// <param name="clusterID"></param>
+        /// <param name="isHistory"></param>
         public void AddPerformanceInfo(Population thisPop, List<Border> yourBorders, int clusterID, bool isHistory)
         {
 
@@ -1305,7 +1397,7 @@ namespace Biomorpher
                         label_p = "  " + roundedPerf.ToString();
 
                     // 6 colours MAX!
-                    string tooltiptext = "(pop average = " + thisPop.AveragePerformanceValues[i]+")";
+                    string tooltiptext = "(pop average = " + thisPop.Performance_Averages[i]+")";
                     DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 6], isHistory, i);
                 
                     yourBorders[i].Child = dp_p;
@@ -1609,6 +1701,9 @@ namespace Biomorpher
                     }
                 }
 
+                thisPop.chromosomes[minID].isMinimum = true;
+                thisPop.chromosomes[maxID].isMaximum = true;
+
                 // Get the associated min/max radio buttons
                 RadioButton radButtonMin = (RadioButton)controls["RADBUTTONMIN" + p];
                 RadioButton radButtonMax = (RadioButton)controls["RADBUTTONMAX" + p];
@@ -1618,6 +1713,7 @@ namespace Biomorpher
 
                 if (radButtonMax.IsChecked == true)
                     thisPop.chromosomes[maxID].isOptimal = true;
+
             }
         }
 
@@ -1638,7 +1734,6 @@ namespace Biomorpher
             border_head.Child = label_head;
             sp3.Children.Add(border_head);
 
-
             // History description
             Border border = new Border();
             border.Margin = new Thickness(margin_w, 0, margin_w, 0);
@@ -1650,7 +1745,6 @@ namespace Biomorpher
             label.Content = txt;
             border.Child = label;
             sp3.Children.Add(border);
-
 
             // Buttons
             DockPanel dp_buttons = new DockPanel();
@@ -1670,7 +1764,7 @@ namespace Biomorpher
             border_buttons.Child = dp_buttons;
             sp3.Children.Add(border_buttons);
 
-
+            /*
             // Note header
             Border border_head2 = new Border();
             border_head2.Margin = new Thickness(margin_w, 40, margin_w, 0);
@@ -1692,12 +1786,207 @@ namespace Biomorpher
             myTextbox.SnapsToDevicePixels = true;
             myTextbox.AcceptsReturn = true;
             myTextbox.AcceptsTab = true;
-            myTextbox.Background = Brushes.LightGray;
+            myTextbox.Background = Brushes.White;
             border_txt.Child = myTextbox;
             sp3.Children.Add(border_txt);
+            */
 
             //Add the stackpanels to the secondary area of Tab 3
             Tab3_secondary.Child = sp3;
+
+        }
+
+        #endregion
+
+        #region UI TAB 3a (PLOT)
+
+        /// <summary>
+        /// Plot graph
+        /// </summary>
+        public void tab3a_plotcanvas()
+        {
+            PlotCanvas.Children.Clear();
+            
+            int totalGenerations = BioBranches[biobranchID].Twigs.Count;
+
+            // Could be an array, but potentially more risky in case of early events.
+            List<System.Windows.Shapes.Polyline> myPoly = new List<System.Windows.Shapes.Polyline>();
+            for (int p = 0; p < performanceCount; p++)
+            {
+
+                    myPoly.Add(new System.Windows.Shapes.Polyline());
+                    myPoly[p].StrokeThickness = 1.5;
+                    myPoly[p].Stroke = new SolidColorBrush(rgb_performance[p % 6]);
+                    PlotCanvas.Children.Add(myPoly[p]);
+
+            }
+
+            // j indicates generation
+            for (int j = 0; j < BioBranches[biobranchID].Twigs.Count; j++)
+            {
+
+                double xPos = (Convert.ToDouble(j) / totalGenerations) * PlotCanvas.Width + 5;
+
+                // k indicates chromosome (design)
+                for (int k = 0; k < BioBranches[biobranchID].Twigs[j].chromosomes.Length; k++)
+                {
+                    Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
+
+                    if (thisDesign.isRepresentative)
+                    {
+                        List<double> myPerforms = thisDesign.GetPerformas();
+
+                        for (int p = 0; p < myPerforms.Count; p++)
+                        {
+
+                            CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
+                            if ((bool)checkBox.IsChecked)
+                            {
+
+                                System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
+
+                                myCircle.Fill = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
+
+                                double minP = BioBranches[biobranchID].minPerformanceValues[p];
+                                double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
+                                double yPos = PlotCanvas.Height - ((myPerforms[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
+
+                                myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
+
+                                PlotCanvas.Children.Add(myCircle);
+
+                            }
+                        }
+                    }
+                }
+
+                //Polylines
+                for (int p = 0; p < performanceCount; p++)
+                {
+                    
+                    CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
+                    if ((bool)checkBox.IsChecked)
+                    {
+                        double minP = BioBranches[biobranchID].minPerformanceValues[p];
+                        double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
+                        double yPos = PlotCanvas.Height - ((BioBranches[biobranchID].Twigs[j].Performance_Averages[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
+
+                        myPoly[p].Points.Add(new System.Windows.Point(xPos, yPos));
+
+                        System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
+                        myCircle.Fill = Brushes.White;
+                        myCircle.StrokeThickness = 1.5;
+                        myCircle.Stroke = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
+                        myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 4, 4);
+                        myCircle.ToolTip = "pop average = " + BioBranches[biobranchID].Twigs[j].Performance_Averages[p];
+                        PlotCanvas.Children.Add(myCircle);
+
+                    }
+                }
+
+                //bool flipflop = false;
+                //flipflop = !flipflop;
+
+                MinGraphLabels.Children.Clear();
+                MaxGraphLabels.Children.Clear();
+
+                // Now for the legend
+                for (int p = 0; p < performanceCount; p++)
+                {
+                    CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
+                    if ((bool)checkBox.IsChecked)
+                    {
+                        TextBlock myTextBlock = new TextBlock();
+                        myTextBlock.Foreground = new SolidColorBrush(rgb_performance[p % 6]);
+                        myTextBlock.Text = BioBranches[biobranchID].maxPerformanceValues[p].ToString();
+                        myTextBlock.UseLayoutRounding = true;
+                        myTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+                        MaxGraphLabels.Children.Add(myTextBlock);
+
+                        TextBlock myTextBlock2 = new TextBlock();
+                        myTextBlock2.Foreground = new SolidColorBrush(rgb_performance[p % 6]);
+                        myTextBlock2.Text = BioBranches[biobranchID].minPerformanceValues[p].ToString();
+                        myTextBlock2.UseLayoutRounding = true;
+                        myTextBlock2.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+                        MinGraphLabels.Children.Add(myTextBlock2);
+                    }
+                }
+                
+                
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// Create settings panel for Tab 3
+        /// </summary>
+        public void tab3b_secondary_settings()
+        {
+            StackPanel sp3b = new StackPanel();
+            controls.Add("SP3b", sp3b);
+
+            //Header
+            Border border_head = new Border();
+            border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            Label label_head = new Label();
+            label_head.FontSize = fontsize;
+            label_head.Content = "Performance History";
+            border_head.Child = label_head;
+            sp3b.Children.Add(border_head);
+
+            // History description
+            Border border = new Border();
+            border.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            TextBlock txt = new TextBlock();
+            txt.TextWrapping = TextWrapping.Wrap;
+            txt.FontSize = fontsize2;
+            txt.Inlines.Add("Recorded history of (quantitative) performance.");
+            Label label = new Label();
+            label.Content = txt;
+            border.Child = label;
+            sp3b.Children.Add(border);
+
+
+            // Now for the soupdragons...
+            StackPanel soupdragon = new StackPanel();
+            string[][] criteria = getRepresentativeCriteria(population);
+
+            // 
+
+            for (int i = 0; i < performanceCount; i++)
+            {
+
+                Border myBorder = new Border();
+                myBorder.Margin = new Thickness(margin_w + 5, 0, margin_w, 0);
+                
+                DockPanel myPanel = new DockPanel();
+                myPanel.LastChildFill = false;
+                DockPanel dp_p = createColourCodedLabel(criteria[0][i].ToString(), "none", rgb_performance[i % 6], false, i);
+                DockPanel.SetDock(dp_p, Dock.Left);
+                myPanel.Children.Add(dp_p);
+
+                
+                CheckBox myCheck = new CheckBox();
+                myCheck.IsChecked = true;
+                myCheck.Click += new RoutedEventHandler(replot);
+                controls.Add("PLOTCHECKBOX" + i, myCheck);
+
+                DockPanel.SetDock(myCheck, Dock.Right);
+                myPanel.Children.Add(myCheck);
+
+                myBorder.Child = myPanel;
+                soupdragon.Children.Add(myBorder);
+            }
+
+            // Bring the soupdragons together and add to the overall stackpanel
+            soupdragon.Orientation = Orientation.Vertical;
+            sp3b.Children.Add(soupdragon);
+
+
+            //Add the stackpanels to the secondary area of Tab 3
+            Tab3b_secondary.Child = sp3b;
 
         }
 
@@ -1832,9 +2121,10 @@ namespace Biomorpher
             string format = "{0:0.00}";
             if (isIntSlider)
             {
-                slider.TickFrequency = 1.0;
+                slider.TickFrequency = 2;
                 format = "{0:0}";
             }
+
 
             //Add slider to control dictionary
             controls.Add(controlName, slider);
@@ -1869,7 +2159,7 @@ namespace Biomorpher
             
             Slider slider = (Slider)controls[controlName];
             slider.ValueChanged += handler;
-
+     
             return dp;
         }
 
@@ -1935,6 +2225,14 @@ namespace Biomorpher
             PopSize = val;
         }
 
+        //Tab 1 CrossoverProbability event handler
+        private void tab1_crossover_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Slider s = (Slider)sender;
+            double val = s.Value;
+            CrossoverProbability = val;
+        }
+
         //Tab 1 MutateProbability event handler
         private void tab1_mutation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -1943,6 +2241,15 @@ namespace Biomorpher
             MutateProbability = val;
         }
 
+        /// <summary>
+        /// When a graph button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void replot(object sender, RoutedEventArgs e)
+        {
+            tab3a_plotcanvas();
+        }
 
         /// <summary>
         /// Handle event when the "GO!" button is clicked in tab 1 
@@ -1971,7 +2278,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
+        public void tab1_Go3_Click(object sender, RoutedEventArgs e)
         {
 
             if (!GO)
@@ -1992,7 +2299,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab1_Go3_Click(object sender, RoutedEventArgs e)
+        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
         {
 
             if (!GO)
@@ -2232,7 +2539,15 @@ namespace Biomorpher
             }
         }
 
-     
+        private void chartGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            PlotCanvas.Width = chartGrid.ActualWidth;
+            PlotCanvas.Height = chartGrid.ActualHeight;
+
+            // Only if evolution has started do we do this bit.
+            if(GO)
+                tab3a_plotcanvas();
+        }
 
         #endregion
 

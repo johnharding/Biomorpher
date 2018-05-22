@@ -11,12 +11,13 @@
         Title="Biomorpher" 
         Height="720" 
         Width="1280"
-        WindowTransitionsEnabled="False"
+        WindowTransitionsEnabled="True"
         BorderBrush="{DynamicResource AccentColorBrush}"
-        BorderThickness="1">
+        BorderThickness="1" 
+        WindowStartupLocation="CenterScreen">
 
     <Grid Background="White">
-        <Border Background="LightGray" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
+        <Border Background="WhiteSmoke" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
         <TabControl x:Name="tabControl">
 
             <TabItem Header="Population" x:Name="Tab1">
@@ -26,14 +27,14 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Designs" x:Name="Tab2" Margin="8,0,-8,0">
+            <TabItem Header="Designs" x:Name="Tab2" Margin="5,0,-5,0">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="History" x:Name="Tab3" Margin="16,0,-16,0">
+            <TabItem Header="History" x:Name="Tab3" Margin="10,0,-10,0">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
@@ -45,7 +46,47 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="About" x:Name="Tab4" Margin="24,0,-24,0">
+            <TabItem Header="Plot" x:Name="Tab3b" Margin="15,0,-15,0">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3b_secondary"/>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3b_primary" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="40"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid x:Name="chartGrid" SizeChanged="chartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
+                                <Border BorderThickness="1" BorderBrush="LightGray">
+                                    <Canvas x:Name="PlotCanvas" ClipToBounds="True"/>
+                                </Border>
+                            </Grid>
+
+                            <Border Grid.Column="0" Grid.Row="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel x:Name="MaxGraphLabels" Grid.Row="0"></StackPanel>
+                                    <StackPanel x:Name="MinGraphLabels" Grid.Row="1" VerticalAlignment="Bottom"></StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <TextBlock FontSize="12" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="420,5,424,17" Height="18">Generation</TextBlock>
+                        </Grid>
+                    </Border>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="About" x:Name="Tab4" Margin="20,0,-20,0">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab4_secondary"/>
                     <Border BorderThickness="0" Padding ="60" Width="Auto" Height="Auto" x:Name="Tab4_primary"/>
@@ -69,7 +110,7 @@
                 <ResourceDictionary Source="pack://application:,,,
              /MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,
-             /MahApps.Metro;component/Styles/Accents/Teal.xaml" />
+             /MahApps.Metro;component/Styles/Accents/Mauve.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </controls:MetroWindow.Resources>

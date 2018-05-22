@@ -334,7 +334,7 @@ namespace Biomorpher
                     {
 
                         List<GH_Number> myList = new List<GH_Number>();
-                        for (int c = 0; c < pop.chromosomes[j].GetGenes().Length; c++)
+                        for (int c = 0; c < pop.chromosomes[k].GetGenes().Length; c++)
                         {
                             GH_Number myGHNumber = new GH_Number(BioBranches[i].Twigs[j].chromosomes[k].GetGenes()[c]);
                             myList.Add(myGHNumber);

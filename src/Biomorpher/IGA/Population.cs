@@ -49,7 +49,7 @@ namespace Biomorpher.IGA
         /// <summary>
         /// List containing average performance values for this population
         /// </summary>
-        public List<double> AveragePerformanceValues { get; set; }
+        public List<double> Performance_Averages { get; set; }
 
         /// <summary>
         /// Construct a new population of chromosomes using sliders and genepools
@@ -114,13 +114,15 @@ namespace Biomorpher.IGA
                     }
                     else
                     {
-                        GenerateRandomPop();
-                        owner.AddWarning("existing population data must be same structure as population and gene count; random population substituted.");
+                        GenerateCurrentPop();
+                        JigglePop(0.001);
+                        owner.AddWarning("existing population data must be same structure as population and gene count; Current parameter state substituted.");
                     }
                     break;
 
                 case 2:
                     GenerateCurrentPop();
+                    JigglePop(0.001);
                     break;
 
                 default:
@@ -147,7 +149,7 @@ namespace Biomorpher.IGA
             // clone the slider and genepool pointers
             popSliders = new List<GH_NumberSlider>(pop.popSliders);
             popGenePools = new List<GalapagosGeneListObject>(pop.popGenePools);
-            AveragePerformanceValues = new List<double>(pop.AveragePerformanceValues);
+            Performance_Averages = new List<double>(pop.Performance_Averages);
 
             // clone the owner
             owner = pop.owner;
@@ -320,11 +322,11 @@ namespace Biomorpher.IGA
         public void SetAveragePerformanceValues(int pCount, bool isClusterRepsOnly)
         {
             // Declare a brand new list
-            AveragePerformanceValues = new List<double>();
+            Performance_Averages = new List<double>();
 
             for (int p = 0; p < pCount; p++)
             {
-                AveragePerformanceValues.Add(0.0);
+                Performance_Averages.Add(0.0);
 
                 for (int i = 0; i < chromosomes.Length; i++)
                 {
@@ -332,20 +334,20 @@ namespace Biomorpher.IGA
                     {
                         if (chromosomes[i].isRepresentative)
                         {
-                            AveragePerformanceValues[p] += chromosomes[i].GetPerformas()[p];
+                            Performance_Averages[p] += chromosomes[i].GetPerformas()[p];
                         }
                     }
 
                     else
                     {
-                        AveragePerformanceValues[p] += chromosomes[i].GetPerformas()[p];
+                        Performance_Averages[p] += chromosomes[i].GetPerformas()[p];
                     }
                 }
 
-                if (isClusterRepsOnly) AveragePerformanceValues[p] /= 12;
-                else AveragePerformanceValues[p] /= chromosomes.Length;
+                if (isClusterRepsOnly) Performance_Averages[p] /= 12;
+                else Performance_Averages[p] /= chromosomes.Length;
 
-                AveragePerformanceValues[p] = Math.Round(AveragePerformanceValues[p], 3);
+                Performance_Averages[p] = Math.Round(Performance_Averages[p], 3);
 
             }
         }
@@ -363,6 +365,45 @@ namespace Biomorpher.IGA
             }
         }
 
+
+        /// <summary>
+        /// Single point crossover
+        /// </summary>
+        /// <param name="probability"></param>
+        public void CrossoverPop(double probability)
+        {
+            if (probability > 0)
+            {
+                int size = chromosomes[0].GetGenes().Length;
+
+                for (int i = 0; i < chromosomes.Length; i += 2)
+                {
+
+                    if (Friends.GetRandomDouble() < probability)
+                    {
+
+                        int splice = Friends.GetRandomInt(0, size);
+
+                        double[] limbo1 = new double[size];
+                        double[] limbo2 = new double[size];
+
+                        chromosomes[i].GetGenes().CopyTo(limbo1, 0);
+                        chromosomes[i + 1].GetGenes().CopyTo(limbo2, 0);
+
+                        for (int s = splice; s < size; s++)
+                        {
+                            limbo1[s] = chromosomes[i + 1].GetGenes()[s];
+                            limbo2[s] = chromosomes[i].GetGenes()[s];
+                        }
+
+                        chromosomes[i].SetGenes(limbo1);
+                        chromosomes[i + 1].SetGenes(limbo2);
+                    }
+                }
+            }
+        }
+
+
         /// <summary>
         /// Resets all the fitness values to zero at the start of a new generation
         /// </summary>
@@ -373,6 +414,8 @@ namespace Biomorpher.IGA
                 chromosomes[i].SetFitness(0.0);
                 chromosomes[i].isChecked = false;
                 chromosomes[i].isOptimal = false;
+                chromosomes[i].isMinimum = false;
+                chromosomes[i].isMaximum = false;
             }
         }
 
