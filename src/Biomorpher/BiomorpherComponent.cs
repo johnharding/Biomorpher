@@ -53,8 +53,8 @@ namespace Biomorpher
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
-            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here: currently meshes only please", GH_ParamAccess.tree);
-            pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design", GH_ParamAccess.tree);
+            pm.AddGeometryParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
             pm.AddNumberParameter("InitialPop", "InitialPop", "Optional initial population (non-random)", GH_ParamAccess.tree);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
@@ -245,18 +245,24 @@ namespace Biomorpher
                 {
                     if (myObj is GH_Number && pCount < 8)
                     {
-                        GH_Number temp = (GH_Number)myObj;
-                        performas.Add(temp.Value);
-                        criteria.Add(param.NickName);
-                        pCount++;
+                        if(!criteria.Contains(param.NickName))
+                        {
+                            GH_Number temp = (GH_Number)myObj;
+                            performas.Add(temp.Value);
+                            criteria.Add(param.NickName);
+                            pCount++;
+                        }
                     }
 
                     else if (myObj is GH_Integer && pCount < 8)
                     {
-                        GH_Integer temp = (GH_Integer)myObj;
-                        performas.Add((double)temp.Value);
-                        criteria.Add(param.NickName);
-                        pCount++;
+                        if (!criteria.Contains(param.NickName))
+                        {
+                            GH_Integer temp = (GH_Integer)myObj;
+                            performas.Add((double)temp.Value);
+                            criteria.Add(param.NickName);
+                            pCount++;
+                        }
                     }
                 }
             }

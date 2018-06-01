@@ -20,21 +20,21 @@
         <Border Background="WhiteSmoke" BorderThickness="0" Width="300" HorizontalAlignment="Right"/>
         <TabControl x:Name="tabControl">
 
-            <TabItem Header="Population" x:Name="Tab1">
+            <TabItem Header="Population" x:Name="Tab1" FontFamily="Roboto Light">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab1_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary" />
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Designs" x:Name="Tab2" Margin="5,0,-5,0">
+            <TabItem Header="Designs" x:Name="Tab2" Margin="5,0,-5,0" FontFamily="Roboto Light">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab2_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="History" x:Name="Tab3" Margin="10,0,-10,0">
+            <TabItem Header="History" x:Name="Tab3" Margin="10,0,-10,0" FontFamily="Roboto Light">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
@@ -46,7 +46,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Plot" x:Name="Tab3b" Margin="15,0,-15,0">
+            <TabItem Header="Plot" x:Name="Tab3b" Margin="15,0,-15,0" FontFamily="Roboto Light">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab3b_secondary"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3b_primary" >
@@ -58,7 +58,7 @@
                             </Grid.RowDefinitions>
 
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="70"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
@@ -80,13 +80,13 @@
                                 </Grid>
                             </Border>
 
-                            <TextBlock FontSize="12" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="420,5,424,17" Height="18">Generation</TextBlock>
+                            <TextBlock FontSize="12" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="249,5,250,10" Height="25" Width="363" TextAlignment="Center">Generation</TextBlock>
                         </Grid>
                     </Border>
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="About" x:Name="Tab4" Margin="20,0,-20,0">
+            <TabItem Header="About" x:Name="Tab4" Margin="20,0,-20,0" FontFamily="Roboto Light">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Right" Width="300" x:Name="Tab4_secondary"/>
                     <Border BorderThickness="0" Padding ="60" Width="Auto" Height="Auto" x:Name="Tab4_primary"/>

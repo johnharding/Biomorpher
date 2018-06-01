@@ -693,7 +693,7 @@ namespace Biomorpher
             border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
             Label label_head = new Label();
             label_head.FontSize = fontsize;
-            label_head.Content = "Settings";
+            label_head.Content = "Initial Settings";
             border_head.Child = label_head;
             sp.Children.Add(border_head);
 
@@ -835,7 +835,7 @@ namespace Biomorpher
 
             // Now for the ShowAll12 designs checkbox
             Border border_showall12 = new Border();
-            border_showall12.Margin = new Thickness(margin_w, 20, margin_w, 10);
+            border_showall12.Margin = new Thickness(margin_w, 20, margin_w, 0);
             DockPanel dp_showall12 = new DockPanel();
             Label label_showall12 = new Label();
             label_showall12.HorizontalContentAlignment = HorizontalAlignment.Left;
@@ -1439,7 +1439,7 @@ namespace Biomorpher
                 diameter = 6;
                 topOffset = 6;
                 margin = 6;
-                fSize = 8;
+                fSize = 10;
             }
             else
             {
@@ -1890,22 +1890,26 @@ namespace Biomorpher
                 MinGraphLabels.Children.Clear();
                 MaxGraphLabels.Children.Clear();
 
+
+                
+
                 // Now for the legend
                 for (int p = 0; p < performanceCount; p++)
                 {
                     CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
                     if ((bool)checkBox.IsChecked)
                     {
+
                         TextBlock myTextBlock = new TextBlock();
                         myTextBlock.Foreground = new SolidColorBrush(rgb_performance[p % 6]);
-                        myTextBlock.Text = BioBranches[biobranchID].maxPerformanceValues[p].ToString();
+                        myTextBlock.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[p]);
                         myTextBlock.UseLayoutRounding = true;
                         myTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
                         MaxGraphLabels.Children.Add(myTextBlock);
 
                         TextBlock myTextBlock2 = new TextBlock();
                         myTextBlock2.Foreground = new SolidColorBrush(rgb_performance[p % 6]);
-                        myTextBlock2.Text = BioBranches[biobranchID].minPerformanceValues[p].ToString();
+                        myTextBlock2.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[p]);
                         myTextBlock2.UseLayoutRounding = true;
                         myTextBlock2.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
                         MinGraphLabels.Children.Add(myTextBlock2);
@@ -1938,7 +1942,7 @@ namespace Biomorpher
 
             // History description
             Border border = new Border();
-            border.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            border.Margin = new Thickness(margin_w, 0, margin_w, 12);
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;

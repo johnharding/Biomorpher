@@ -25,6 +25,7 @@ namespace Biomorpher.IGA
         /// A dummy helix viewport, used to share the camera settings
         /// </summary>
         public static HelixViewport3D dummyHelix = new HelixViewport3D();
+        private static System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-us");
 
         /// <summary>
         /// Biomorpher version
@@ -32,7 +33,7 @@ namespace Biomorpher.IGA
         /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
-            return "0.5.0";
+            return "1.0.0";
         }
 
 
@@ -218,6 +219,66 @@ namespace Biomorpher.IGA
 
         }
 
+
+        /// <summary>
+        /// https://stackoverflow.com/questions/374316/round-a-double-to-x-significant-figures
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="digits"></param>
+        /// <returns></returns>
+        public static double RoundToSignificantDigits(this double d, int digits)
+        {
+            if (d == 0)
+                return 0;
+
+            double scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(d))) + 1);
+            return scale * Math.Round(d / scale, digits);
+        }
+
+
+        /// <summary>
+        /// https://stackoverflow.com/questions/374316/round-a-double-to-x-significant-figures
+        /// </summary>
+        /// <param name="d"></param>
+        /// <param name="digits"></param>
+        /// <returns></returns>
+        public static double TruncateToSignificantDigits(this double d, int digits)
+        {
+            if (d == 0)
+                return 0;
+
+            double scale = Math.Pow(10, Math.Floor(Math.Log10(Math.Abs(d))) + 1 - digits);
+            return scale * Math.Truncate(d / scale);
+        }
+
+        /// <summary>
+        /// Generates an axis label appropriate for the graph plotter
+        /// </summary>
+        /// <param name="theValue"></param>
+        /// <returns></returns>
+        public static string AxisLabelText(double theValue)
+        {
+            String theText;
+
+            if (theValue > 99999999 || theValue < -9999999)
+            {
+                theText = theValue.ToString("E02", ci);
+            }
+
+            else
+            {
+                if (theValue < 1.0 && theValue > -1.0)
+                {
+                    theText = Friends.TruncateToSignificantDigits(theValue, 7).ToString();
+                }
+                else
+                {
+                    theText = Friends.RoundToSignificantDigits(theValue, 8).ToString();
+                }
+            }
+
+            return theText;
+        }
 
     }
 
