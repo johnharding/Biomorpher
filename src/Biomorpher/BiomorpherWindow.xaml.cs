@@ -293,7 +293,6 @@ namespace Biomorpher
             if (isPerformanceCriteriaBased)
             {
                 GetPhenotypes(false); // We have to do this to make sure we have performance for the whole population.
-                //population.ResetAllFitness();
                 population.SetPerformanceBasedFitness(controls, performanceCount);
             }
             else
@@ -310,6 +309,8 @@ namespace Biomorpher
             // 1. Create a new population using fitness values (also resets fitnesses)
             Generation++;
             population.RoulettePop();
+            Chromosome bestChromo = population.GetFittest(); // set to the best
+            population.ResetAllFitness();
 
             // 2. Crossover and Mutate population using user preferences
             population.CrossoverPop(crossoverProbability);
@@ -326,7 +327,7 @@ namespace Biomorpher
 
             // 5. Now get the average performance values. Cluster reps only bool here
             population.SetAveragePerformanceValues(performanceCount, true);
-
+            
             // 6. Update display of K-Means and representative meshes
             tab1_primary_update();
 
@@ -338,7 +339,11 @@ namespace Biomorpher
             tab3a_plotcanvas();
 
             // 7. Set component outputs
-            owner.SetComponentOut(population, BioBranches);   
+            owner.SetComponentOut(population, BioBranches);
+
+            // 8. Finally, set the current grasshopper instance to the best fitness.
+            SetInstance(bestChromo);
+
         }
 
         /// <summary>
@@ -662,9 +667,7 @@ namespace Biomorpher
 
         //An initial background for tab 1.
         public void tab1_primary_initial()
-        {
-            
-            
+        { 
             BitmapImage b = new BitmapImage();
             b.BeginInit();
             b.UriSource = new Uri(@"Resources\BioIcon3_240.png", UriKind.Relative);
@@ -730,35 +733,9 @@ namespace Biomorpher
             border_mutation.Child = dp_mutation;
             sp.Children.Add(border_mutation);
 
-
-            /*
-            //Launch Header
-            Border border_launch = new Border();
-            border_launch.Margin = new Thickness(margin_w, 20, margin_w, 0);
-            Label label_launch = new Label();
-            label_launch.FontSize = fontsize;
-            label_launch.Content = "Launch";
-            border_launch.Child = label_launch;
-            sp.Children.Add(border_launch);
-            
-            // Buttons description
-            Border _butdesborder = new Border();
-            _butdesborder.Margin = new Thickness(margin_w, 0, margin_w, 0);
-            TextBlock _butdestxt = new TextBlock();
-            _butdestxt.TextWrapping = TextWrapping.Wrap;
-            _butdestxt.FontSize = fontsize2;
-            _butdestxt.Inlines.Add("Initial population: 1.Randomised 2.Based on current parameter state 3.Based on an initial supplied population.");
-            Label _butdeslabel = new Label();
-            _butdeslabel.Content = _butdestxt;
-            _butdesborder.Child = _butdeslabel;
-            sp.Children.Add(_butdesborder);
-            */
-
             // Now for the three buttons
             DockPanel dp_buttons = new DockPanel();
-            //dp_buttons.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             dp_buttons.LastChildFill = false; 
-            //dp_buttons.Arrange(new Rect(200, 200, 200, 200));
 
             int wid = 84;
 

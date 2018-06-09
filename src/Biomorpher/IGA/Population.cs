@@ -220,9 +220,27 @@ namespace Biomorpher.IGA
             {
                 chromosomes[i] = newPop.chromosomes[i].Clone();
             }
+            
 
-            // Make sure to reset all the fitnesses here (selection has now already occured).
-            ResetAllFitness();
+        }
+
+        /// <summary>
+        /// Gets the fittest design there is (or at least one of them).
+        /// </summary>
+        /// <returns></returns>
+        public Chromosome GetFittest()
+        {
+            double fittest = 0d;
+            int ID = 0;
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                if(chromosomes[i].GetFitness()>fittest)
+                {
+                    fittest = chromosomes[i].GetFitness();
+                    ID = i;
+                }
+            }
+            return chromosomes[ID];
         }
 
 
