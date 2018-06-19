@@ -33,7 +33,7 @@ namespace Biomorpher.IGA
         /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
-            return "1.0.0";
+            return "0.5.0";
         }
 
 
@@ -277,7 +277,7 @@ namespace Biomorpher.IGA
                 }
             }
 
-            return theText;
+            return theText + " ";
         }
 
     }

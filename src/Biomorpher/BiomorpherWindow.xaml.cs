@@ -309,20 +309,21 @@ namespace Biomorpher
             // 1. Create a new population using fitness values (also resets fitnesses)
             Generation++;
             population.RoulettePop();
-            Chromosome bestChromo = population.GetFittest(); // set to the best
+            //
             population.ResetAllFitness();
 
             // 2. Crossover and Mutate population using user preferences
             population.CrossoverPop(crossoverProbability);
             population.MutatePop(mutateProbability);
 
+            // Now to display the new population...
             // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
             population.JigglePop(0.001);
 
             // 3. Perform K-means clustering
             population.KMeansClustering(12);
 
-            // 4. Get geometry for cluster reps only
+            // 4. Get geometry for cluster reps only for the display period
             GetPhenotypes(true);
 
             // 5. Now get the average performance values. Cluster reps only bool here
@@ -341,8 +342,15 @@ namespace Biomorpher
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches);
 
-            // 8. Finally, set the current grasshopper instance to the best fitness.
-            SetInstance(bestChromo);
+            // 8. Finally, if performance based
+            // Set the current grasshopper instance to the best fitness.
+            // As the population has mutated and crossover, we have to do this again.
+            if (isPerformanceCriteriaBased)
+            {
+                population.SetPerformanceBasedFitness(controls, performanceCount);
+                SetInstance(population.GetFittest());
+                population.ResetAllFitness();
+            }
 
         }
 
@@ -1867,9 +1875,6 @@ namespace Biomorpher
                 MinGraphLabels.Children.Clear();
                 MaxGraphLabels.Children.Clear();
 
-
-                
-
                 // Now for the legend
                 for (int p = 0; p < performanceCount; p++)
                 {
@@ -2255,6 +2260,28 @@ namespace Biomorpher
 
 
         /// <summary>
+        /// Handle the event when the Go3 button is clicked (existing population)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (!GO)
+            {
+                RunInit(2);
+
+                //Disable sliders in tab 1
+                Slider s_popSize = (Slider)controls["s_tab1_popSize"];
+                s_popSize.IsEnabled = false;
+
+            }
+
+            GO = true;
+        }
+
+
+        /// <summary>
         /// Handle the event when the Go2 button is clicked (existing population)
         /// </summary>
         /// <param name="sender"></param>
@@ -2275,26 +2302,6 @@ namespace Biomorpher
             GO = true;
         }
 
-        /// <summary>
-        /// Handle the event when the Go3 button is clicked (existing population)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (!GO)
-            {
-                RunInit(2);
-
-                //Disable sliders in tab 1
-                Slider s_popSize = (Slider)controls["s_tab1_popSize"];
-                s_popSize.IsEnabled = false;
-
-            }
-
-            GO = true;
-        }
 
         /// <summary>
         /// Closes the window

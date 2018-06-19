@@ -71,9 +71,9 @@ namespace Biomorpher
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
             pm.AddTextParameter("GenoGuids", "GenoGuids", "GUIDs of the sliders and genepools to be manipulated", GH_ParamAccess.list);
-            pm.AddGenericParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.tree);
-            pm.AddGenericParameter("Historic", "Historic", "Historic biomorpher populations", GH_ParamAccess.tree);
-            pm.AddGenericParameter("Clusters", "Clusters", "K-means clusters", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Population", "Population", "Current biomorpher population as normalised genes", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Historic", "Historic", "Historic biomorpher populations as normalised genes", GH_ParamAccess.tree);
+            pm.AddGenericParameter("Clusters", "Clusters", "K-means clusters as normalised genes", GH_ParamAccess.tree);
         }
 
         /// <summary>

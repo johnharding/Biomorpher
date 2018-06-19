@@ -111,6 +111,7 @@ namespace Biomorpher.IGA
                             chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
                             chromosomes[i].GenerateExistingGenes(featureVector);
                         }
+
                     }
                     else
                     {
@@ -561,9 +562,9 @@ namespace Biomorpher.IGA
             List<int> centroidChromoIndexes = new List<int>();
 
             // 1. Choose random initial centroid
-            int rndCentroidChromo = Friends.GetRandomInt(0, chromosomes.Length);
+            //int rndCentroidChromo = Friends.GetRandomInt(0, chromosomes.Length);
+            int rndCentroidChromo = 0; // Just choose the first one to keep some continuity
             centroidChromoIndexes.Add(rndCentroidChromo);
-
 
             while(centroidChromoIndexes.Count < numClusters)
             {
