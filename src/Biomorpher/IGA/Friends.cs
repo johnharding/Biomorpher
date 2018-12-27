@@ -33,7 +33,7 @@ namespace Biomorpher.IGA
         /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
-            return "0.5.0";
+            return "0.6.0";
         }
 
 
@@ -215,8 +215,6 @@ namespace Biomorpher.IGA
             {
                 material.Brush = new SolidColorBrush(Color.FromArgb((byte)220, (byte)51, (byte)188, (byte)188));
             }
-
-
         }
 
 

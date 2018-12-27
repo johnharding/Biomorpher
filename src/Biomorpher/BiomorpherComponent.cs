@@ -54,14 +54,19 @@ namespace Biomorpher
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
             pm.AddGeometryParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
-            pm.AddNumberParameter("Performance", "Performance", "List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
-            pm.AddNumberParameter("InitialPop", "InitialPop", "Optional initial population (non-random)", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Performance", "Performance", "(Optional) List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
+            pm.AddNumberParameter("InitialPop", "InitialPop", "(Optional) initial population (non-random)", GH_ParamAccess.tree);
+            //pm.AddIntegerParameter("Selection", "Selection", "(Optional) selection choice for each generation", GH_ParamAccess.list);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
+            pm[3].WireDisplay = GH_ParamWireDisplay.faint;
+            //pm[4].WireDisplay = GH_ParamWireDisplay.faint;
+
             pm[2].Optional = true;
             pm[3].Optional = true;
+            //pm[4].Optional = true;
         }
         
         /// <summary>
@@ -274,6 +279,38 @@ namespace Biomorpher
             return performas.Count;
         }
 
+        /*
+         * Get choice method to be implemented later.
+         * 
+        /// <summary>
+        /// Gets
+        /// </summary>
+        /// <returns></returns>
+        public List<int> GetGhoice()
+        {
+            // Collect the object at the current instance
+            List<int> choices = new List<int>();
+            
+            // Thank you Dimitrie :)
+            foreach (IGH_Param param in Params.Input[4].Sources)
+            {
+                foreach (Object myObj in param.VolatileData.AllData(true)) // AllData flattens the tree
+                {
+                    if (myObj is Grasshopper.Kernel.Types.GH_Number)
+                    {
+                        GH_Number thisChoice = (GH_Number)myObj;
+                        int x = (int)thisChoice.Value;
+                        if(x>=0 && x<=11)
+                        {
+                            choices.Add(x);
+                        }            
+                    }
+                }
+            }
+
+            return choices;
+        }
+        */
 
         /// <summary>
         /// Population cluster data for the component output. Outputs normalised genes values.

@@ -916,7 +916,7 @@ namespace Biomorpher
                 {
                     //Create checkbox with an event handler
                     string cb_name = "cb_tab2_" + i;
-                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(tab2_SelectParents_Check), i);
+                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
                     DockPanel.SetDock(cb, Dock.Right);
                     dp_sub.Children.Add(cb);
@@ -1188,7 +1188,7 @@ namespace Biomorpher
 
 
             //Evolve button
-            Button button_evo = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.3, new RoutedEventHandler(tab2_Evolve_Click));
+            Button button_evo = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.3, new RoutedEventHandler(Tab2_Evolve_Click));
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);
 
@@ -1520,7 +1520,7 @@ namespace Biomorpher
 
             myButton.Content = "reinstate";
             myButton.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            myButton.Click += new RoutedEventHandler(reinstatePopClick);
+            myButton.Click += new RoutedEventHandler(ReinstatePopClick);
 
             Border border_buttons = new Border();
             border_buttons.Margin = new Thickness(0, 10, 0, 0);
@@ -2320,7 +2320,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void reinstatePopClick(object sender, RoutedEventArgs e)
+        public void ReinstatePopClick(object sender, RoutedEventArgs e)
         {
             // Get info from the sender button
             Button myButton = (Button)sender;
@@ -2350,7 +2350,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab2_SelectParents_Check(object sender, RoutedEventArgs e)
+        public void Tab2_SelectParents_Check(object sender, RoutedEventArgs e)
         {
             CheckBox checkbox = sender as CheckBox;          //Get the checkbox that triggered the event
 
@@ -2401,12 +2401,28 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab2_Evolve_Click(object sender, RoutedEventArgs e)
+        public void Tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button)sender;
-
             bool isPerformanceCriteriaBased = isRadioMinMaxButtonChecked();
 
+            // Try and get data from the choice input (for next release??)
+            // Currently adds too much clutter to the biomorpher component.
+            /*
+            List<int> choice = owner.GetGhoice();
+
+            for (int i = 0; i < choice.Count; i++ )
+            {
+                string cb_name = "cb_tab2_" + choice[i];
+                CheckBox cb = (CheckBox)controls[cb_name];
+
+                if (cb.IsChecked == false)
+                {
+                    cb.IsChecked = true;
+                    parentCount++;
+                }
+            }
+            */
 
             //Test if minimum one parent is selected
             if (ParentCount < 1 && !isPerformanceCriteriaBased)
@@ -2446,7 +2462,6 @@ namespace Biomorpher
                         cb.IsChecked = false;
                     }
                 }
-
 
                 //Set parent count to zero
                 ParentCount = 0;
