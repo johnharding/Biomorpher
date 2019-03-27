@@ -7,7 +7,7 @@ using Biomorpher.IGA;
 
 namespace Biomorpher
 {
-    class BiomorpherInfo : Grasshopper.Kernel.GH_AssemblyInfo
+    public class BiomorpherInfo : Grasshopper.Kernel.GH_AssemblyInfo
     {
         public override string Description
         {

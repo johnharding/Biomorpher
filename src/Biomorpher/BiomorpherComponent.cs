@@ -53,7 +53,7 @@ namespace Biomorpher
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
-            pm.AddGeometryParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
+            pm.AddMeshParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
             pm.AddNumberParameter("Performance", "Performance", "(Optional) List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
             pm.AddNumberParameter("InitialPop", "InitialPop", "(Optional) initial population (non-random)", GH_ParamAccess.tree);
             //pm.AddIntegerParameter("Selection", "Selection", "(Optional) selection choice for each generation", GH_ParamAccess.list);
