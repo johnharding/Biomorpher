@@ -57,6 +57,7 @@ namespace Biomorpher
             hVp3D.Children.Add(lights);
             hVp3D.IsInertiaEnabled = true;
             hVp3D.ZoomExtentsWhenLoaded = true;
+            hVp3D.Background = new SolidColorBrush(Color.FromArgb(255, 157, 163, 170));
             //hVp3D.Camera = Friends.dummyHelix.Camera;
 
             List<ModelVisual3D> vis = new List<ModelVisual3D>();
