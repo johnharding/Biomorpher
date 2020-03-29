@@ -200,7 +200,7 @@ namespace Biomorpher
             Title = "Biomorpher " + Friends.VerionInfo();
 
             _historycanvas = new Canvas();
-            _historycanvas.Background = Brushes.White;
+            _historycanvas.Background = Friends.RhinoGrey();
             HistoryCanvas.Children.Add(_historycanvas);
             _historyY = 0;
             pngHeight = 0;
@@ -644,7 +644,7 @@ namespace Biomorpher
                 System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
                 circle.Height = diameter;
                 circle.Width = diameter;
-                circle.Fill = Brushes.SlateGray; //colour
+                //circle.Fill = Brushes.SlateGray; //colour
 
                 //Calculate angle
                 double angle = (2 * Math.PI * i) / clusterItems;
@@ -654,7 +654,7 @@ namespace Biomorpher
                 //Lines
                 System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
                 ln.StrokeThickness = 1;
-                ln.Stroke = Brushes.SlateGray;
+                ln.Stroke = Brushes.White;
                 ln.X1 = width / 2.0 + 0;
                 ln.Y1 = width / 2.0;
                 ln.X2 = (width / 2.0) + xCoord + 0;
@@ -671,8 +671,8 @@ namespace Biomorpher
             System.Windows.Shapes.Ellipse circle2 = new System.Windows.Shapes.Ellipse();
             circle2.Height = diameter;
             circle2.Width = diameter;
-            circle2.Fill = Brushes.White; //colour
-            circle2.Stroke = Brushes.SlateGray;
+            circle2.Fill = Friends.RhinoGrey(); //colour
+            circle2.Stroke = Brushes.White;
             circle2.StrokeThickness = 1;
             Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0)+0);
             Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0));
@@ -905,7 +905,7 @@ namespace Biomorpher
                 string dp_name = "dp_tab" + tabIndex + "_" + i;
                 dp.Name = dp_name;
 
-                //Sub Dock panel
+                //Sub Dock panel (this the top band that contains number, perfs & checkbox)
                 DockPanel dp_sub = new DockPanel();
                 string dp_sub_name = "dp_sub_tab" + tabIndex + "_" + i;
                 dp_sub.Name = dp_sub_name;
@@ -913,8 +913,8 @@ namespace Biomorpher
                 //Label
                 Label l = new Label();
                 int index = i;
-                l.Content = index.ToString();
-                l.FontSize = fontsize;
+                l.Content = " " + index.ToString();
+                l.FontSize = fontsize2;
                 l.Foreground = Brushes.LightGray;
                 l.HorizontalAlignment = HorizontalAlignment.Left;
                 DockPanel.SetDock(l, Dock.Left);
@@ -925,6 +925,7 @@ namespace Biomorpher
                     //Create checkbox with an event handler
                     string cb_name = "cb_tab2_" + i;
                     CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
+                    cb.Background = Friends.RhinoGrey();
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
                     DockPanel.SetDock(cb, Dock.Right);
                     dp_sub.Children.Add(cb);
@@ -1105,10 +1106,10 @@ namespace Biomorpher
             int numCircles = colours.Count;
             int dOuter = 16;
             int dOffset = 3;
-            int topOffset = 8;
+            int topOffset = 6;
 
             Canvas canvas = new Canvas();
-            canvas.Background = new SolidColorBrush(Colors.White);
+            //canvas.Background = Friends.;
 
             //Add circles
             for(int i=0; i<numCircles; i++)
@@ -1122,17 +1123,16 @@ namespace Biomorpher
                 extremaCircle.StrokeThickness = 0.5;
                 if (isExtrema[i])
                 {
-                    extremaCircle.Stroke = Brushes.Gray;
+                    extremaCircle.Stroke = Brushes.White;
                 }
                 else
                 {
-                    extremaCircle.Stroke = Brushes.White;
+                    extremaCircle.Stroke = Friends.RhinoGrey();
                 }                
 
                 Canvas.SetLeft(extremaCircle, distFromLeft);
                 Canvas.SetTop(extremaCircle, topOffset);
                 canvas.Children.Add(extremaCircle);
-
 
                 //Performance circle
                 System.Windows.Shapes.Ellipse performanceCircle = new System.Windows.Shapes.Ellipse();
@@ -1145,6 +1145,7 @@ namespace Biomorpher
                 Canvas.SetLeft(performanceCircle, (distFromLeft+dOffset) );
                 Canvas.SetTop(performanceCircle, (topOffset + dOffset));
                 canvas.Children.Add(performanceCircle);
+
             }
 
             return canvas;
@@ -1218,11 +1219,6 @@ namespace Biomorpher
             //myNumericUpDown.BorderThickness = new Thickness(1);
             controls.Add("myNumericUpDown", myNumericUpDown);
             dp_buttons.Children.Add(myNumericUpDown);
-
-            //EXIT2 button
-            Button button_exit = createButton("b_tab2_Exit", "Exit", Tab1_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
-            DockPanel.SetDock(button_exit, Dock.Right);
-            dp_buttons.Children.Add(button_exit);
 
             border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
@@ -1579,12 +1575,13 @@ namespace Biomorpher
                     border.BorderBrush = Brushes.White;
                     border.BorderThickness = new Thickness(0.3);
                     border.Padding = new Thickness(2);
-                    
-                    ViewportBasic vp4 = new ViewportBasic(thisDesign, this);
-                    vp4.Background = Brushes.White;
 
-                    //if(thisDesign.isOptimal || !isOptimisationRun)
-                    vp4.BorderThickness = new Thickness(1.0);
+                    ViewportBasic vp4 = new ViewportBasic(thisDesign, this)
+                    {
+                        Background = Friends.RhinoGrey(),
+                        //if(thisDesign.isOptimal || !isOptimisationRun)
+                        BorderThickness = new Thickness(1.0)
+                    };
 
                     //else
                     //vp4.BorderThickness = new Thickness(0.6);
@@ -1750,39 +1747,8 @@ namespace Biomorpher
             DockPanel.SetDock(button_ExportPNG, Dock.Left);
             dp_buttons.Children.Add(button_ExportPNG);
 
-            Button button_exit = createButton("b_tab3_Exit", "Exit", Tab3_secondary.Width * 0.3, new RoutedEventHandler(Exit_Click));
-            DockPanel.SetDock(button_exit, Dock.Right);
-            dp_buttons.Children.Add(button_exit);
-
             border_buttons.Child = dp_buttons;
             sp3.Children.Add(border_buttons);
-
-            /*
-            // Note header
-            Border border_head2 = new Border();
-            border_head2.Margin = new Thickness(margin_w, 40, margin_w, 0);
-            Label label_head2 = new Label();
-            label_head2.FontSize = fontsize;
-            label_head2.Content = "Notes";
-            border_head2.Child = label_head2;
-            sp3.Children.Add(border_head2);
-
-            // Notes
-            Border border_txt = new Border();
-            border_txt.Margin = new Thickness(margin_w, 10, margin_w, 0);
-            TextBox myTextbox = new TextBox();
-            myTextbox.MinHeight = 100;
-            myTextbox.BorderThickness = new Thickness(0.5);
-            myTextbox.BorderBrush = Brushes.DarkGray;
-            myTextbox.IsManipulationEnabled = true;
-            myTextbox.TextWrapping = TextWrapping.Wrap;
-            myTextbox.SnapsToDevicePixels = true;
-            myTextbox.AcceptsReturn = true;
-            myTextbox.AcceptsTab = true;
-            myTextbox.Background = Brushes.White;
-            border_txt.Child = myTextbox;
-            sp3.Children.Add(border_txt);
-            */
 
             //Add the stackpanels to the secondary area of Tab 3
             Tab3_secondary.Child = sp3;
@@ -2310,19 +2276,6 @@ namespace Biomorpher
             GO = true;
         }
 
-
-        /// <summary>
-        /// Closes the window
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-      
-        public void Exit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-
         /// <summary>
         /// Reinstates an old population and makes a new biobranch
         /// </summary>
@@ -2435,7 +2388,7 @@ namespace Biomorpher
             //Test if minimum one parent is selected
             if (ParentCount < 1 && !isPerformanceCriteriaBased)
             {
-                MessageBoxResult message = MessageBox.Show(this, "Select a minimum of one parent design using the checkboxes, or else select performance criteria to optimise");
+                MessageBoxResult message = MessageBox.Show(this, "Manually select designs or performance criteria to optimise.");
             }
 
             else
