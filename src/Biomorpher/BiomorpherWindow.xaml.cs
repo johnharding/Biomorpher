@@ -34,9 +34,9 @@ namespace Biomorpher
     /// </summary>
     public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
-
+      
         #region FIELDS & PROPERTIES
-
+        
         // Fields
         private bool GO;
         private Population population;
@@ -51,7 +51,7 @@ namespace Biomorpher
         /// Progress bar window
         /// </summary>
         //private ProgressWindow myProgressWindow = new ProgressWindow();
-        
+
         /// <summary>
         /// Component itself will be passed to this
         /// </summary>
@@ -197,6 +197,7 @@ namespace Biomorpher
 
             // Initial Window things
             InitializeComponent();
+            Title = "Biomorpher " + Friends.VerionInfo();
 
             _historycanvas = new Canvas();
             _historycanvas.Background = Brushes.White;
@@ -235,7 +236,7 @@ namespace Biomorpher
         }
 
         #endregion
-
+        
         #region MAIN METHODS
 
         
@@ -545,7 +546,9 @@ namespace Biomorpher
 
         #region UI TAB 1 (POPULATION)
 
-        //Update display of K-Means clustering
+        /// <summary>
+        /// Update display of K-Means clustering
+        /// </summary>
         public void tab1_primary_update()
         {
             //Run through the 12 designs
@@ -575,14 +578,19 @@ namespace Biomorpher
         }
 
 
-        //Create canvas to visualise K-Means clustering for a specific ID
+        /// <summary>
+        /// Create canvas to visualise K-Means clustering for a specific ID
+        /// </summary>
+        /// <param name="clusterIndex"></param>
+        /// <param name="colour"></param>
+        /// <returns></returns>
         public Canvas createKMeansVisualisation(int clusterIndex, SolidColorBrush colour)
         {
             int width = 150;
             int diameter = 8;
 
             Canvas canvas = new Canvas();
-            canvas.Background = new SolidColorBrush(Colors.White);
+            canvas.Background = Friends.RhinoGrey();
             string name = "canvas" + clusterIndex;
             canvas.Name = name;
             canvas.Width = width;
@@ -2476,7 +2484,6 @@ namespace Biomorpher
         /// <returns></returns>
         public bool isRadioMinMaxButtonChecked()
         {
-
             bool isOneChecked = false;
 
             try
@@ -2493,7 +2500,7 @@ namespace Biomorpher
                 }
             }
 
-            catch { }
+            catch{}
 
             return isOneChecked;
         }

@@ -36,6 +36,15 @@ namespace Biomorpher.IGA
             return "0.7.0";
         }
 
+        /// <summary>
+        /// Colour of Rhino Viewport Grey.
+        /// </summary>
+        /// <returns></returns>
+        public static Brush RhinoGrey()
+        {
+            return new SolidColorBrush(Color.FromArgb(255, 157, 163, 170));
+        }
+
 
         /// <summary>
         /// Master random number generator
