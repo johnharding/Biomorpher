@@ -769,6 +769,12 @@ namespace Biomorpher
             DockPanel.SetDock(dock_go, Dock.Left);
             dp_buttons.Children.Add(dock_go);
 
+            // Add a little gap between buttons
+            Border littlegap = new Border();
+            littlegap.Width = 2;
+            DockPanel.SetDock(littlegap, Dock.Left);
+            dp_buttons.Children.Add(littlegap);
+
             //GO2 button
             DockPanel dock_go3 = new DockPanel();
             Button button_go3 = createButton("b_tab1_Go3", "Go", wid, new RoutedEventHandler(tab1_Go2_Click));
@@ -782,6 +788,12 @@ namespace Biomorpher
             dock_go3.Children.Add(label_go3);
             DockPanel.SetDock(dock_go3, Dock.Left);
             dp_buttons.Children.Add(dock_go3);
+
+            /// Add a little gap between buttons
+            Border littlegap2 = new Border();
+            littlegap2.Width = 2;
+            DockPanel.SetDock(littlegap2, Dock.Left);
+            dp_buttons.Children.Add(littlegap2);
 
             //GO3 button
             DockPanel dock_go2 = new DockPanel();
@@ -825,7 +837,6 @@ namespace Biomorpher
             border.Child = label;
             sp.Children.Add(border);
 
-
             // Now for the ShowAll12 designs checkbox
             Border border_showall12 = new Border();
             border_showall12.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -838,6 +849,7 @@ namespace Biomorpher
             CheckBox cb_showall12 = new CheckBox();
             cb_showall12.Name = "cb_showall12";
             cb_showall12.IsChecked = true;
+            cb_showall12.Background = Friends.RhinoGrey();
             controls.Add(cb_showall12.Name, cb_showall12);
             cb_showall12.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_showall12, Dock.Right);
@@ -846,7 +858,7 @@ namespace Biomorpher
             sp.Children.Add(border_showall12);
 
 
-            // Now for the ShowAll12 designs checkbox
+            // Now for the disable preview checkbox
             Border border_disablepreview = new Border();
             border_disablepreview.Padding = new Thickness(0);
             border_disablepreview.BorderThickness = new Thickness(margin_w, 0, margin_w, 0);
@@ -856,9 +868,11 @@ namespace Biomorpher
             label_disablepreview.Content = "Disable Grasshopper preview (faster)";
             DockPanel.SetDock(label_disablepreview, Dock.Left);
             dp_disablepreview.Children.Add(label_disablepreview);
+           
             CheckBox cb_disablepreview = new CheckBox();
             cb_disablepreview.Name = "cb_disablepreview";
             cb_disablepreview.IsChecked = true;
+            cb_disablepreview.Background = Friends.RhinoGrey();
             controls.Add(cb_disablepreview.Name, cb_disablepreview);
             cb_disablepreview.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_disablepreview, Dock.Right);
@@ -2056,7 +2070,10 @@ namespace Biomorpher
             b.Width = width;
             b.HorizontalAlignment = HorizontalAlignment.Left;
             b.Click += handler;
-
+            b.Background = Friends.RhinoGrey();
+            b.BorderBrush = Brushes.LightGray;
+            b.Padding = new Thickness(3);
+            b.BorderThickness = new Thickness(1);
             controls.Add(name, b);
             return b;
         }
