@@ -198,6 +198,7 @@ namespace Biomorpher
             // Initial Window things
             InitializeComponent();
             Title = "Biomorpher " + Friends.VerionInfo();
+            WindowTransitionsEnabled = false;
 
             _historycanvas = new Canvas();
             _historycanvas.Background = Friends.RhinoGrey();
@@ -577,7 +578,6 @@ namespace Biomorpher
             }
         }
 
-
         /// <summary>
         /// Create canvas to visualise K-Means clustering for a specific ID
         /// </summary>
@@ -597,17 +597,20 @@ namespace Biomorpher
             canvas.Height = width;
 
             //Add outline circle
+            /*
             System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
             outline.Height = width;
             outline.Width = width;
             outline.StrokeThickness = 1;
-            outline.Stroke = Brushes.SlateGray;
+            outline.Stroke = Brushes.White;
 
             Canvas.SetLeft(outline, 0);
-            Canvas.SetTop(outline, 0);
+            Canvas.SetTop(outline, -12);
             canvas.Children.Add(outline);
+            */
 
             //Add chromosome dots
+            // Include the cluster representative here to avoid division by zero
             List<double> distances = new List<double>();
             for (int i = 0; i < population.chromosomes.Length; i++)
             {
@@ -618,36 +621,33 @@ namespace Biomorpher
                 }
             }
 
-            int clusterItems = distances.Count;
-
             //Map distances to width domain
-            double distMin = distances.Min();
             double distMax = distances.Max();
-            double distRange = distMax - distMin;
 
             List<double> distancesMapped = new List<double>();
+
             for (int i = 0; i < distances.Count; i++)
             {
-                double d_normal = 0.0;
-                if (distRange != 0.0)
+                // Now don't include the representative
+                if (distances[i] != 0.0)
                 {
-                    d_normal = (distances[i] - distMin) / (distRange);
+                    double d_normal = (distances[i] / distMax);
+                    double d_map = (d_normal * (((width) / 2.0)-5))+5;
+                    distancesMapped.Add(d_map);
                 }
-                double d_map = d_normal * (width / 2.0);
-                distancesMapped.Add(d_map);
             }
 
             //Create shapes and add to canvas
-            for (int i = 0; i < clusterItems; i++)
+            for (int i = 0; i < distancesMapped.Count; i++)
             {
                 //Circles
                 System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
                 circle.Height = diameter;
                 circle.Width = diameter;
-                //circle.Fill = Brushes.SlateGray; //colour
+                circle.Fill = Brushes.White;
 
                 //Calculate angle
-                double angle = (2 * Math.PI * i) / clusterItems;
+                double angle = (2 * Math.PI * i) / distancesMapped.Count;
                 double xCoord = distancesMapped[i] * Math.Cos(angle);
                 double yCoord = distancesMapped[i] * Math.Sin(angle);
 
@@ -656,14 +656,14 @@ namespace Biomorpher
                 ln.StrokeThickness = 1;
                 ln.Stroke = Brushes.White;
                 ln.X1 = width / 2.0 + 0;
-                ln.Y1 = width / 2.0;
+                ln.Y1 = (width / 2.0) -12;
                 ln.X2 = (width / 2.0) + xCoord + 0;
-                ln.Y2 = (width / 2.0) + yCoord;
+                ln.Y2 = (width / 2.0) + yCoord -12;
                 canvas.Children.Add(ln);
 
                 //drawing order
                 Canvas.SetLeft(circle, (width / 2.0) + xCoord - (diameter / 2.0) + 0);
-                Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0));
+                Canvas.SetTop(circle, (width / 2.0) + yCoord - (diameter / 2.0) -12);
                 canvas.Children.Add(circle);
             }
 
@@ -671,11 +671,11 @@ namespace Biomorpher
             System.Windows.Shapes.Ellipse circle2 = new System.Windows.Shapes.Ellipse();
             circle2.Height = diameter;
             circle2.Width = diameter;
-            circle2.Fill = Friends.RhinoGrey(); //colour
+            circle2.Fill = Friends.RhinoGrey();
             circle2.Stroke = Brushes.White;
             circle2.StrokeThickness = 1;
             Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0)+0);
-            Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0));
+            Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0) -12);
             canvas.Children.Add(circle2);
 
             return canvas;
@@ -837,7 +837,7 @@ namespace Biomorpher
             dp_showall12.Children.Add(label_showall12);
             CheckBox cb_showall12 = new CheckBox();
             cb_showall12.Name = "cb_showall12";
-            cb_showall12.IsChecked = false;
+            cb_showall12.IsChecked = true;
             controls.Add(cb_showall12.Name, cb_showall12);
             cb_showall12.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_showall12, Dock.Right);
@@ -858,7 +858,7 @@ namespace Biomorpher
             dp_disablepreview.Children.Add(label_disablepreview);
             CheckBox cb_disablepreview = new CheckBox();
             cb_disablepreview.Name = "cb_disablepreview";
-            cb_disablepreview.IsChecked = false;
+            cb_disablepreview.IsChecked = true;
             controls.Add(cb_disablepreview.Name, cb_disablepreview);
             cb_disablepreview.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_disablepreview, Dock.Right);
@@ -1496,8 +1496,7 @@ namespace Biomorpher
 
             // Create the left hand side border
             Border dpborder = new Border();
-            dpborder.BorderBrush = Brushes.White;
-            dpborder.BorderThickness = new Thickness(0.3);
+            dpborder.BorderThickness = new Thickness(0);
             dpborder.Margin = new Thickness(30, 0, 0, 0);
             StackPanel dp = new StackPanel();
             dp.Orientation = Orientation.Vertical;
@@ -1513,6 +1512,7 @@ namespace Biomorpher
             dp.Children.Add(txt);
             
             Button myButton = new Button();
+            myButton.Background = Friends.RhinoGrey();
             myButton.Width = 70;
             myButton.Height = 16;
 
@@ -1522,7 +1522,7 @@ namespace Biomorpher
             myTag[1] = j;
             myButton.Tag = myTag;
 
-            myButton.Content = "reinstate";
+            myButton.Content = "Reinstate";
             myButton.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             myButton.Click += new RoutedEventHandler(ReinstatePopClick);
 
@@ -1572,14 +1572,14 @@ namespace Biomorpher
                     sp.VerticalAlignment = System.Windows.VerticalAlignment.Top;
 
                     Border border = new Border();
-                    border.BorderBrush = Brushes.White;
-                    border.BorderThickness = new Thickness(0.3);
+                    border.BorderThickness = new Thickness(0);
                     border.Padding = new Thickness(2);
 
                     ViewportBasic vp4 = new ViewportBasic(thisDesign, this)
                     {
                         Background = Friends.RhinoGrey(),
                         //if(thisDesign.isOptimal || !isOptimisationRun)
+                        BorderBrush = Brushes.White,
                         BorderThickness = new Thickness(1.0)
                     };
 
@@ -1587,8 +1587,8 @@ namespace Biomorpher
                     //vp4.BorderThickness = new Thickness(0.6);
 
                     if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.Red;}
-                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Black;}
-                    else {vp4.BorderBrush = Brushes.LightGray;}
+                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Orange; }
+                    else {vp4.BorderBrush = Brushes.White;}
 
                     border.Child = vp4;
                     border.Height = 120;

@@ -22,14 +22,14 @@
             <TabItem Header="Population" x:Name="Tab1" Margin="21,0,-21,0">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab1_secondary" Margin="0,10,0,0"/>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary" />
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary" Margin="0,10,0,0" />
                 </DockPanel>
             </TabItem>
 
             <TabItem Header="Designs" x:Name="Tab2" Margin="26,0,-26,0">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab2_secondary" Margin="0,10,0,0"/>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary"/>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary" Margin="0,10,0,0"/>
                 </DockPanel>
             </TabItem>
 
