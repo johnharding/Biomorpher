@@ -43,7 +43,7 @@ namespace Biomorpher
  
             //Settings
             hVp3D.ShowFrameRate = false;
-            hVp3D.ViewCubeOpacity = 0.1;
+            //hVp3D.ViewCubeOpacity = 0.1;
             hVp3D.ViewCubeTopText = "T";
             hVp3D.ViewCubeBottomText = "B";
             hVp3D.ViewCubeFrontText = "E";
@@ -57,8 +57,6 @@ namespace Biomorpher
             hVp3D.Children.Add(lights);
             hVp3D.IsInertiaEnabled = true;
             hVp3D.ZoomExtentsWhenLoaded = true;
-            //hVp3D.Background = Friends.RhinoGrey();
-            //hVp3D.Camera = Friends.dummyHelix.Camera;
 
             List<ModelVisual3D> vis = new List<ModelVisual3D>();
 
@@ -76,9 +74,9 @@ namespace Biomorpher
                     v.Content = model;
                     
                     vis.Add(v);
-
                 }
             }
+
 
             for (int i = 0; i < vis.Count; i++)
             {
@@ -87,7 +85,6 @@ namespace Biomorpher
 
             //Add viewport to user control
             this.AddChild(hVp3D);
-
 
             /*
             ContextMenu myMenu = new ContextMenu();
@@ -110,19 +107,31 @@ namespace Biomorpher
 
         }
 
-        
-
-
+        /// <summary>
+        /// Sets the camera
+        /// </summary>
+        /// <param name="cam"></param>
         public void SetCamera(ProjectionCamera cam)
         {
             hVp3D.Camera = cam;
         }
 
+        /// <summary>
+        /// Returns the camera
+        /// </summary>
+        /// <returns></returns>
         public ProjectionCamera GetCamera()
         {
             return hVp3D.Camera;
         }
 
+        /// <summary>
+        /// Enables the current helix viewport
+        /// </summary>
+        public void Enable()
+        {
+            hVp3D.IsEnabled = true;
+        }
 
         /// <summary>
         /// Matches this camera to the others
@@ -147,6 +156,7 @@ namespace Biomorpher
             }
 
         }
+
 
         /// <summary>
         /// Double click to set the Grasshopper instance
@@ -173,8 +183,9 @@ namespace Biomorpher
         protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseRightButtonDown(e);
+            hVp3D.ZoomExtents();
         }
-         */
+        */
 
     }
 }

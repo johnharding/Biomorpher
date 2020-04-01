@@ -105,7 +105,7 @@ namespace Biomorpher.IGA
             System.Windows.Point P4 = new System.Windows.Point(inNode.X, inNode.Y + randomY);
 
             OriginCurve.Data = Friends.MakeBezierGeometry(P1, P2, P3, P4);
-            OriginCurve.Stroke = Brushes.LightGray;
+            OriginCurve.Stroke = Brushes.White;
             OriginCurve.StrokeThickness = 0.6;
             //Canvas.SetLeft(OriginCurve, 0);
             //Canvas.SetTop(OriginCurve, 0);
@@ -118,11 +118,11 @@ namespace Biomorpher.IGA
             System.Windows.Shapes.Ellipse nodule = new System.Windows.Shapes.Ellipse();
             nodule.Height = s;
             nodule.Width = s;
-            nodule.Fill = Brushes.LightGray;
+            nodule.Fill = Brushes.White;
             System.Windows.Shapes.Ellipse nodule2 = new System.Windows.Shapes.Ellipse();
             nodule2.Height = s;
             nodule2.Width = s;
-            nodule2.Fill = Brushes.LightGray;
+            nodule2.Fill = Brushes.White;
 
             Canvas.SetLeft(nodule, P1.X-s/2);
             Canvas.SetTop(nodule, P1.Y-s/2);

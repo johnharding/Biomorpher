@@ -34,9 +34,9 @@ namespace Biomorpher
     /// </summary>
     public partial class BiomorpherWindow : MetroWindow, INotifyPropertyChanged
     {
-      
+
         #region FIELDS & PROPERTIES
-        
+
         // Fields
         private bool GO;
         private Population population;
@@ -207,7 +207,7 @@ namespace Biomorpher
             pngHeight = 0;
 
             Topmost = true;
-            PopSize = 64;
+            PopSize = 48;
             CrossoverProbability = 0.10;
             MutateProbability = 0.01;
             Generation = 0;
@@ -596,19 +596,6 @@ namespace Biomorpher
             canvas.Width = width;
             canvas.Height = width;
 
-            //Add outline circle
-            /*
-            System.Windows.Shapes.Ellipse outline = new System.Windows.Shapes.Ellipse();
-            outline.Height = width;
-            outline.Width = width;
-            outline.StrokeThickness = 1;
-            outline.Stroke = Brushes.White;
-
-            Canvas.SetLeft(outline, 0);
-            Canvas.SetTop(outline, -12);
-            canvas.Children.Add(outline);
-            */
-
             //Add chromosome dots
             // Include the cluster representative here to avoid division by zero
             List<double> distances = new List<double>();
@@ -910,7 +897,7 @@ namespace Biomorpher
 
                 //Border
                 Border border = new Border();
-                border.BorderBrush = Brushes.LightGray;
+                border.BorderBrush = Brushes.Black;
                 border.BorderThickness = new Thickness(0.5);
                 border.Padding = new Thickness(2);
 
@@ -929,7 +916,7 @@ namespace Biomorpher
                 int index = i;
                 l.Content = " " + index.ToString();
                 l.FontSize = fontsize2;
-                l.Foreground = Brushes.LightGray;
+                l.Foreground = Brushes.White;
                 l.HorizontalAlignment = HorizontalAlignment.Left;
                 DockPanel.SetDock(l, Dock.Left);
                 dp_sub.Children.Add(l);
@@ -1022,7 +1009,6 @@ namespace Biomorpher
                 DockPanel dp = (DockPanel)controls[dp_name];
                 Viewport3d vp3d = (Viewport3d)dp.Children[1];
                 vp3d.MatchCamera();
-
             }
         }
 
@@ -1242,7 +1228,7 @@ namespace Biomorpher
             border_data.Margin = new Thickness(margin_w, 40, margin_w, 0);
             Label label_data = new Label();
             label_data.FontSize = fontsize;
-            label_data.Content = "Design Properties";
+            label_data.Content = "Performance Optimisation";
             border_data.Child = label_data;
             sp.Children.Add(border_data);
 
@@ -1300,6 +1286,10 @@ namespace Biomorpher
                 radButtonNon.ToolTip = "no optimisation";
                 radButtonMin.ToolTip = "minimise";
                 radButtonMax.ToolTip = "maximise";
+
+                radButtonNon.Background = Friends.RhinoGrey();
+                radButtonMin.Background = Friends.RhinoGrey();
+                radButtonMax.Background = Friends.RhinoGrey();
 
                 controls.Add("RADBUTTONMIN" + i, radButtonMin);
                 controls.Add("RADBUTTONMAX" + i, radButtonMax);
@@ -1593,7 +1583,7 @@ namespace Biomorpher
                     {
                         Background = Friends.RhinoGrey(),
                         //if(thisDesign.isOptimal || !isOptimisationRun)
-                        BorderBrush = Brushes.White,
+                        BorderBrush = Brushes.Black,
                         BorderThickness = new Thickness(1.0)
                     };
 
@@ -1601,7 +1591,7 @@ namespace Biomorpher
                     //vp4.BorderThickness = new Thickness(0.6);
 
                     if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.Red;}
-                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Orange; }
+                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Yellow; }
                     else {vp4.BorderBrush = Brushes.White;}
 
                     border.Child = vp4;
@@ -1944,6 +1934,7 @@ namespace Biomorpher
                 
                 CheckBox myCheck = new CheckBox();
                 myCheck.IsChecked = true;
+                myCheck.Background = Friends.RhinoGrey();
                 myCheck.Click += new RoutedEventHandler(replot);
                 controls.Add("PLOTCHECKBOX" + i, myCheck);
 
@@ -2003,7 +1994,7 @@ namespace Biomorpher
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed.");
             txt_dcl2.Inlines.Add("\n\nThis work is sponsored by the 2016/17 UWE VC Early Career Researcher Development Award and was initially inspired by Richard Dawkins' Biomorphs from his 1986 book, The Blind Watchmaker: Why the Evidence of Evolution Reveals a Universe without Design.");
             txt_dcl2.Inlines.Add("\n\n\nDevelopment:\tJohn Harding & Cecilie Brandt Olsen");
-            txt_dcl2.Inlines.Add("\nCopyright:\t2017 John Harding & UWE");
+            txt_dcl2.Inlines.Add("\nCopyright:\t2020 John Harding");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
             txt_dcl2.Inlines.Add("\nLicence:\t\tMIT");
             txt_dcl2.Inlines.Add("\nSource:\t\thttp://github.com/johnharding/Biomorpher");
@@ -2071,7 +2062,7 @@ namespace Biomorpher
             b.HorizontalAlignment = HorizontalAlignment.Left;
             b.Click += handler;
             b.Background = Friends.RhinoGrey();
-            b.BorderBrush = Brushes.LightGray;
+            b.BorderBrush = Brushes.Black;
             b.Padding = new Thickness(3);
             b.BorderThickness = new Thickness(1);
             controls.Add(name, b);
@@ -2094,6 +2085,7 @@ namespace Biomorpher
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
+
 
             string format = "{0:0.00}";
             if (isIntSlider)
@@ -2532,4 +2524,5 @@ namespace Biomorpher
         #endregion
 
     }
+
 }
