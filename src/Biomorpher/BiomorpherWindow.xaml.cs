@@ -738,11 +738,9 @@ namespace Biomorpher
             DockPanel dp_buttons = new DockPanel();
             dp_buttons.LastChildFill = false; 
 
-            int wid = 84;
-
             //GO button
             DockPanel dock_go = new DockPanel();
-            Button button_go = createButton("b_tab1_Go", "Go", wid, new RoutedEventHandler(tab1_Go_Click));
+            Button button_go = createButton("b_tab1_Go", "Go", 125, new RoutedEventHandler(tab1_Go_Click));
             button_go.ToolTip = "Uses a random initial population";
             DockPanel.SetDock(button_go, Dock.Top);
             Label label_go = new Label();
@@ -756,13 +754,13 @@ namespace Biomorpher
 
             // Add a little gap between buttons
             Border littlegap = new Border();
-            littlegap.Width = 2;
+            littlegap.Width = 4;
             DockPanel.SetDock(littlegap, Dock.Left);
             dp_buttons.Children.Add(littlegap);
 
             //GO2 button
             DockPanel dock_go2 = new DockPanel();
-            Button button_go2 = createButton("b_tab1_Go2", "Go", wid, new RoutedEventHandler(tab1_Go2_Click));
+            Button button_go2 = createButton("b_tab1_Go2", "Go", 125, new RoutedEventHandler(tab1_Go2_Click));
             button_go2.ToolTip = "Creates an initial population from the current parameter state";
             DockPanel.SetDock(button_go2, Dock.Top);
             Label label_go2 = new Label();
@@ -823,7 +821,6 @@ namespace Biomorpher
             border_showall12.Child = dp_showall12;
             sp.Children.Add(border_showall12);
 
-
             // Now for the disable preview checkbox
             Border border_disablepreview = new Border();
             border_disablepreview.Padding = new Thickness(0);
@@ -845,7 +842,6 @@ namespace Biomorpher
             dp_disablepreview.Children.Add(cb_disablepreview);
             border_disablepreview.Child = dp_disablepreview;
             sp.Children.Add(border_disablepreview);
-
 
             //Add the stackpanel to the secondary area of Tab 0
             Tab1_secondary.Child = sp;
@@ -1180,7 +1176,7 @@ namespace Biomorpher
 
 
             //Evolve button
-            Button button_evo = createButton("b_tab2_Evolve", "Evolve", Tab2_secondary.Width * 0.3, new RoutedEventHandler(Tab2_Evolve_Click));
+            Button button_evo = createButton("b_tab2_Evolve", "Evolve", 125, new RoutedEventHandler(Tab2_Evolve_Click));
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);
 
@@ -1189,7 +1185,7 @@ namespace Biomorpher
             dp_buttons.Children.Add(spacer);
 
             NumericUpDown myNumericUpDown = new NumericUpDown();
-            myNumericUpDown.Width = 32;
+            myNumericUpDown.Width = 125;
             myNumericUpDown.ToolTip = "Increases the number of generations calculated (performance based only).";
             myNumericUpDown.UpDownButtonsWidth = 16;
             myNumericUpDown.Value = 1;
@@ -1198,7 +1194,7 @@ namespace Biomorpher
             myNumericUpDown.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
             //myNumericUpDown.IsReadOnly = true;
             //myNumericUpDown.Margin = new Thickness(4);
-            //myNumericUpDown.BorderBrush = Brushes.Black;
+            myNumericUpDown.BorderBrush = Brushes.Black;
             //myNumericUpDown.BorderThickness = new Thickness(1);
             controls.Add("myNumericUpDown", myNumericUpDown);
             dp_buttons.Children.Add(myNumericUpDown);
@@ -2055,7 +2051,6 @@ namespace Biomorpher
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
-
 
             string format = "{0:0.00}";
             if (isIntSlider)

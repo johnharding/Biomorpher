@@ -58,26 +58,8 @@ namespace Biomorpher.IGA
             // Return a string representation of the state (value) of this instance.
             public override string ToString()
             {
-                return "OutputDataSoup";
+                return "BiomorpherData";
             }
-
-
-            public override bool Write(GH_IO.Serialization.GH_IWriter writer)
-            {
-                return true;
-            }
-
-            // Deserialize this instance from a Grasshopper reader object.
-            public override bool Read(GH_IO.Serialization.GH_IReader reader)
-            {
-
-                this.Value = new BiomorpherData();
-                return true;
-            }
-
-            
-
-            
 
 
     }

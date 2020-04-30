@@ -11,13 +11,10 @@ namespace Biomorpher.IGA
 {
     public class BiomorpherDataParam : GH_PersistentParam<BiomorpherGoo>
     {
-
-        private BiomorpherData SoupData;
-
+        
         public BiomorpherDataParam() :
             base(new GH_InstanceDescription("BiomorpherData", "BiomorpherData", "BiomorpherData", "Params", "Util"))
         {
-            SoupData = new BiomorpherData();
         }
 
         public override System.Guid ComponentGuid
@@ -30,20 +27,19 @@ namespace Biomorpher.IGA
 
             get
             {
-                return GH_Exposure.hidden;
+                return GH_Exposure.senary;
             }
 
         }
 
-        /*
         protected override Bitmap Icon
         {
             get
             {
-                return Properties.Resources.
+                return Properties.Resources.ParamIcon2;
             }
         }
-        */
+
 
         protected override GH_GetterResult Prompt_Singular(ref BiomorpherGoo value)
         {
@@ -54,25 +50,6 @@ namespace Biomorpher.IGA
         {
             return GH_GetterResult.success;
         }
-
-        /*
-        public override bool Write(GH_IO.Serialization.GH_IWriter writer)
-        {
-            
-            //writer.SetString("soupdragon", "fishstix");
-            return base.Write(writer);
-        }
-
-        public override bool Read(GH_IO.Serialization.GH_IReader reader)
-        {
-            //string myText = null;
-            //reader.TryGetString("soupdragon", ref myText);
-            //this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, myText);
-
-
-            return base.Read(reader);
-        }
-        */
 
         
     }

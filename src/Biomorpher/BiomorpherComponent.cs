@@ -28,7 +28,7 @@ namespace Biomorpher
         public int solveinstanceCounter;
         private GH_Structure<GH_Number> clusterNumbers, historicNumbers, populationNumbers;
         private static readonly object syncLock = new object();
-        public GH_Structure<GH_Number> existingPopTree = new GH_Structure<GH_Number>();
+        private BiomorpherDataParam myParam;
 
         private List<GH_NumberSlider> cSliders = new List<GH_NumberSlider>();
         private List<GalapagosGeneListObject> cGenePools = new List<GalapagosGeneListObject>();
@@ -55,18 +55,12 @@ namespace Biomorpher
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
             pm.AddMeshParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
             pm.AddNumberParameter("Performance", "Performance", "(Optional) List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
-            pm.AddNumberParameter("InitialPop", "InitialPop", "(Optional) initial population (non-random)", GH_ParamAccess.tree);
-            //pm.AddIntegerParameter("Selection", "Selection", "(Optional) selection choice for each generation", GH_ParamAccess.list);
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
-            pm[3].WireDisplay = GH_ParamWireDisplay.faint;
-            //pm[4].WireDisplay = GH_ParamWireDisplay.faint;
 
             pm[2].Optional = true;
-            pm[3].Optional = true;
-            //pm[4].Optional = true;
         }
         
         /// <summary>
@@ -75,10 +69,8 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
-            pm.AddTextParameter("GenoGuids", "GenoGuids", "GUIDs of the sliders and genepools to be manipulated", GH_ParamAccess.list);
-            pm.AddGenericParameter("Population", "Population", "Current biomorpher population as normalised genes", GH_ParamAccess.tree);
-            pm.AddGenericParameter("Historic", "Historic", "Historic biomorpher populations as normalised genes", GH_ParamAccess.tree);
-            pm.AddGenericParameter("Clusters", "Clusters", "K-means clusters as normalised genes", GH_ParamAccess.tree);
+            myParam = new BiomorpherDataParam();
+            pm.AddParameter(myParam, "Solution", "Solution", "Biomorpher Solution Data for use in reader", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -87,8 +79,6 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-
-            DA.GetDataTree("InitialPop", out existingPopTree);
 
             // Make the DA global
             if (solveinstanceCounter == 0)
@@ -103,23 +93,7 @@ namespace Biomorpher
             if (cSliders!=null)             myOutputData.SetSliderData(cSliders);
             if (cGenePools!=null)           myOutputData.SetGenePoolData(cGenePools);
 
-            if (myOutputData.GetPopulationData() != null)
-            {
-                DA.SetDataList(0, myOutputData.GetGenoGUIDs());
-            }
-
-            if (myOutputData.GetPopulationData() != null)
-            {
-                DA.SetDataTree(1, myOutputData.GetPopulationData());
-            }
-            else
-            {
-                //this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Data contains no population");
-                //return;
-            }
-
-            if (myOutputData.GetHistoricData() != null) DA.SetDataTree(2, myOutputData.GetHistoricData());
-            if (myOutputData.GetClusterData() != null) DA.SetDataTree(3, myOutputData.GetClusterData());    
+            DA.SetData(0, new BiomorpherGoo(myOutputData));
 
             solveinstanceCounter++;
 
@@ -154,6 +128,7 @@ namespace Biomorpher
                 }
             }
 
+            // Store info within Component
             cSliders = sliders;
             cGenePools = genePools;
 
