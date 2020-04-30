@@ -46,11 +46,20 @@ namespace Biomorpher
         private int performanceCount;
         private int biobranchID;
         private static readonly object syncLock = new object();
+        private int fontsize;
+        private int fontsize2;
+        private int margin_w;
+        private Color[] rgb_performance;
 
         /// <summary>
-        /// Progress bar window
+        /// A dictionary, which contains the controls that need to be accessible from other methods after their creation (key to update controls)
         /// </summary>
-        //private ProgressWindow myProgressWindow = new ProgressWindow();
+        private Dictionary<string, FrameworkElement> controls;
+
+        /// <summary>
+        /// Progress bar window 
+        /// </summary>
+        // TODO private ProgressWindow myProgressWindow = new ProgressWindow();
 
         /// <summary>
         /// Component itself will be passed to this
@@ -164,17 +173,7 @@ namespace Biomorpher
             }
         }
 
-        /// <summary>
-        /// A dictionary, which contains the controls that need to be accessible from other methods after their creation (key to update controls)
-        /// </summary>
-        private Dictionary<string, FrameworkElement> controls;
 
-        //Font, spacing and colours
-        int fontsize;
-        int fontsize2;
-        int margin_w;
-        Color[] rgb_performance;
-        Color[] rgb_kmeans;
 
         #endregion
 
@@ -186,7 +185,6 @@ namespace Biomorpher
         /// <param name="Owner"></param>
         public BiomorpherWindow(BiomorpherComponent Owner)
         {
-
             // Set the component passed here to a field
             owner = Owner;
 
@@ -200,12 +198,14 @@ namespace Biomorpher
             Title = "Biomorpher " + Friends.VerionInfo();
             WindowTransitionsEnabled = false;
 
+            // Initialise history canvas
             _historycanvas = new Canvas();
             _historycanvas.Background = Friends.RhinoGrey();
             HistoryCanvas.Children.Add(_historycanvas);
             _historyY = 0;
             pngHeight = 0;
 
+            // Window settings
             Topmost = true;
             PopSize = 48;
             CrossoverProbability = 0.10;
@@ -218,9 +218,8 @@ namespace Biomorpher
             fontsize = 18;
             fontsize2 = 12;
             margin_w = 20;
-            rgb_performance = new Color[6] { Color.FromArgb(255, 236, 28, 59), Color.FromArgb(255, 121, 0, 120), Color.FromArgb(255, 17, 141, 200), Color.FromArgb(255, 36, 180, 66), Color.FromArgb(255, 222, 231, 31), Color.FromArgb(255, 243, 57, 0) };
-            rgb_kmeans = new Color[12] { Color.FromArgb(255, 192, 255, 255), Color.FromArgb(255, 179, 251, 251), Color.FromArgb(255, 132, 235, 235), Color.FromArgb(255, 70, 215, 215), Color.FromArgb(255, 18, 198, 198), Color.FromArgb(255, 0, 192, 192), Color.FromArgb(255, 7, 182, 189), Color.FromArgb(255, 25, 155, 180), Color.FromArgb(255, 51, 116, 167), Color.FromArgb(255, 79, 74, 153), Color.FromArgb(255, 104, 36, 140), Color.FromArgb(255, 122, 9, 131) };
-
+            rgb_performance = Friends.PerformanceColours();
+            
             // Dictionary of control elements
             controls = new Dictionary<string, FrameworkElement>();
 
@@ -556,9 +555,7 @@ namespace Biomorpher
             for (int i = 0; i < 12; i++)
             {
                 //Create canvas
-                SolidColorBrush brush = new SolidColorBrush();
-                brush.Color = rgb_kmeans[i];
-                Canvas canvas = createKMeansVisualisation(i, brush);
+                Canvas canvas = createKMeansVisualisation(i);
 
                 //The name of the control to add the canvas to
                 string dp_name = "dp_tab1_" + i;
@@ -582,9 +579,8 @@ namespace Biomorpher
         /// Create canvas to visualise K-Means clustering for a specific ID
         /// </summary>
         /// <param name="clusterIndex"></param>
-        /// <param name="colour"></param>
         /// <returns></returns>
-        public Canvas createKMeansVisualisation(int clusterIndex, SolidColorBrush colour)
+        public Canvas createKMeansVisualisation(int clusterIndex)
         {
             int width = 150;
             int diameter = 8;
@@ -668,7 +664,9 @@ namespace Biomorpher
             return canvas;
         }
 
-        //An initial background for tab 1.
+        /// <summary>
+        /// An initial background for tab 1.
+        /// </summary>
         public void tab1_primary_initial()
         { 
             BitmapImage b = new BitmapImage();
@@ -763,38 +761,19 @@ namespace Biomorpher
             dp_buttons.Children.Add(littlegap);
 
             //GO2 button
-            DockPanel dock_go3 = new DockPanel();
-            Button button_go3 = createButton("b_tab1_Go3", "Go", wid, new RoutedEventHandler(tab1_Go2_Click));
-            button_go3.ToolTip = "Uses an initial population from the current parameter state";
-            DockPanel.SetDock(button_go3, Dock.Top);
-            Label label_go3 = new Label();
-            label_go3.Content = "Current";
-            label_go3.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
-            DockPanel.SetDock(label_go3, Dock.Bottom);
-            dock_go3.Children.Add(button_go3);
-            dock_go3.Children.Add(label_go3);
-            DockPanel.SetDock(dock_go3, Dock.Left);
-            dp_buttons.Children.Add(dock_go3);
-
-            /// Add a little gap between buttons
-            Border littlegap2 = new Border();
-            littlegap2.Width = 2;
-            DockPanel.SetDock(littlegap2, Dock.Left);
-            dp_buttons.Children.Add(littlegap2);
-
-            //GO3 button
             DockPanel dock_go2 = new DockPanel();
-            Button button_go2 = createButton("b_tab1_Go2", "Go", wid, new RoutedEventHandler(tab1_Go3_Click));
-            button_go2.ToolTip = "Attempts to use an existing population (if supplied and matching population size)";
+            Button button_go2 = createButton("b_tab1_Go2", "Go", wid, new RoutedEventHandler(tab1_Go2_Click));
+            button_go2.ToolTip = "Creates an initial population from the current parameter state";
             DockPanel.SetDock(button_go2, Dock.Top);
             Label label_go2 = new Label();
-            label_go2.Content = "Supplied";
+            label_go2.Content = "Current";
             label_go2.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
             DockPanel.SetDock(label_go2, Dock.Bottom);
             dock_go2.Children.Add(button_go2);
             dock_go2.Children.Add(label_go2);
             DockPanel.SetDock(dock_go2, Dock.Left);
             dp_buttons.Children.Add(dock_go2);
+
 
             Border border_buttons = new Border();
             border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -858,7 +837,7 @@ namespace Biomorpher
            
             CheckBox cb_disablepreview = new CheckBox();
             cb_disablepreview.Name = "cb_disablepreview";
-            cb_disablepreview.IsChecked = true;
+            cb_disablepreview.IsChecked = false;
             cb_disablepreview.Background = Friends.RhinoGrey();
             controls.Add(cb_disablepreview.Name, cb_disablepreview);
             cb_disablepreview.HorizontalAlignment = HorizontalAlignment.Right;
@@ -1016,8 +995,8 @@ namespace Biomorpher
         //Create performance canvas for all representative designs
         private List<Canvas> createPerformanceCanvasAll()
         {
-            int alfaMin = 50;
-            int alfaMax = 255;
+            double alfaMin = 0.2;
+            double alfaMax = 1.0;
 
             double[][] performas = getRepresentativePerformas(population);
             int performasCount = performas[0].Length;
@@ -1054,7 +1033,7 @@ namespace Biomorpher
 
             for(int i=0; i<12; i++)
             {
-                List<Color> colours = new List<Color>();
+                List<double> tmaps = new List<double>();
                 List<bool> isExtrema = new List<bool>();
 
                 for (int j = 0; j < performasCount; j++)
@@ -1070,10 +1049,7 @@ namespace Biomorpher
 
                     double t_map = alfaMin + (t_normal * (alfaMax - alfaMin));
 
-
-                    //change alpha value. MODULO 6 MAXIMUM?
-                    Color c = Color.FromArgb(Convert.ToByte(t_map), rgb_performance[j % 6].R, rgb_performance[j % 6].G, rgb_performance[j % 6].B);
-                    colours.Add(c);
+                    tmaps.Add(t_map);
 
                     //detect if the performance is an extrema value
                     if(performas[i][j] == minValues[j] || performas[i][j] == maxValues[j])
@@ -1087,7 +1063,7 @@ namespace Biomorpher
                 }
 
                 //Create canvas
-                Canvas canvas = createPerformanceCanvas(colours, isExtrema);
+                Canvas canvas = createPerformanceCanvas(tmaps, isExtrema);
                 performanceCanvas.Add(canvas);
             }
 
@@ -1098,14 +1074,15 @@ namespace Biomorpher
         /// <summary>
         /// Create performas canvas with coloured circles for one representative design
         /// </summary>
-        /// <param name="colours"></param>
+        /// <param name="tmaps"></param>
         /// <param name="isExtrema"></param>
         /// <returns></returns>
-        private Canvas createPerformanceCanvas(List<Color> colours, List<bool> isExtrema)
+        private Canvas createPerformanceCanvas(List<double> tmaps, List<bool> isExtrema)
         {
-            int numCircles = colours.Count;
-            int dOuter = 16;
-            int dOffset = 3;
+            int numCircles = tmaps.Count;
+            int dOuter = 16; // the diameter of the extrema circle
+            int dInner = 12; // the diameter of the inner circle
+            int dGap = 3; // gap between each performance measure 
             int topOffset = 6;
 
             Canvas canvas = new Canvas();
@@ -1114,13 +1091,16 @@ namespace Biomorpher
             //Add circles
             for(int i=0; i<numCircles; i++)
             {
-                int distFromLeft = dOuter + ((dOuter + dOffset) * i);
+                int distFromLeft = 16 + ((dOuter + dGap) * i);
 
                 //Extrema circle
                 System.Windows.Shapes.Ellipse extremaCircle = new System.Windows.Shapes.Ellipse();
                 extremaCircle.Height = dOuter;
                 extremaCircle.Width = dOuter;
                 extremaCircle.StrokeThickness = 0.5;
+                extremaCircle.Stroke = Brushes.White;
+
+                /*
                 if (isExtrema[i])
                 {
                     extremaCircle.Stroke = Brushes.White;
@@ -1128,7 +1108,8 @@ namespace Biomorpher
                 else
                 {
                     extremaCircle.Stroke = Friends.RhinoGrey();
-                }                
+                }  
+                */
 
                 Canvas.SetLeft(extremaCircle, distFromLeft);
                 Canvas.SetTop(extremaCircle, topOffset);
@@ -1136,14 +1117,16 @@ namespace Biomorpher
 
                 //Performance circle
                 System.Windows.Shapes.Ellipse performanceCircle = new System.Windows.Shapes.Ellipse();
-                performanceCircle.Height = dOuter - (2*dOffset);
-                performanceCircle.Width = dOuter - (2*dOffset);
+                double performanceDiameter = dInner * tmaps[i];
+                performanceDiameter = (Math.Round(performanceDiameter *0.5)) *2; // even number for pixel orientation
+                performanceCircle.Height = performanceDiameter;
+                performanceCircle.Width = performanceDiameter;
                 SolidColorBrush brush = new SolidColorBrush();
-                brush.Color = colours[i];
+                brush.Color = rgb_performance[i];
                 performanceCircle.Fill = brush;
 
-                Canvas.SetLeft(performanceCircle, (distFromLeft+dOffset) );
-                Canvas.SetTop(performanceCircle, (topOffset + dOffset));
+                Canvas.SetLeft(performanceCircle, distFromLeft + (dOuter - performanceDiameter)*0.5 );
+                Canvas.SetTop(performanceCircle, topOffset + (dOuter - performanceDiameter) * 0.5);
                 canvas.Children.Add(performanceCircle);
 
             }
@@ -1371,23 +1354,22 @@ namespace Biomorpher
             for (int i = 0; i < yourBorders.Count; i++)
             {
 
-                if(!isHistory)
+                if (!isHistory)
                     yourBorders[i].Margin = new Thickness(margin_w + 5, 0, margin_w, 0);
                 else
+                {
                     yourBorders[i].Margin = new Thickness(0, 0, 0, 0);
-
+                }
                 // Try to catch if we just don't have the criteria info
                 string label_p;
 
                 // CAREFUL!!
                 try
                 {
-
                     double roundedPerf = Math.Round(performas[clusterID][i], 3);
-                    if (!isHistory)
-                        label_p = criteria[clusterID][i].ToString() + "   =   " + roundedPerf.ToString();
-                    else
-                        label_p = "  " + roundedPerf.ToString();
+
+                    if (!isHistory) label_p = criteria[clusterID][i].ToString() + "   =   " + roundedPerf.ToString();
+                    else label_p = "  " + roundedPerf.ToString();
 
                     // 6 colours MAX!
                     string tooltiptext = "(pop average = " + thisPop.Performance_Averages[i]+")";
@@ -1429,9 +1411,9 @@ namespace Biomorpher
             //Create filled circle
             if (isHistoryTab)
             {
-                diameter = 6;
-                topOffset = 6;
-                margin = 6;
+                diameter = 7;
+                topOffset = 9;
+                margin = 0;
                 fSize = 10;
             }
             else
@@ -1575,24 +1557,12 @@ namespace Biomorpher
                     StackPanel sp = new StackPanel();
                     sp.VerticalAlignment = System.Windows.VerticalAlignment.Top;
 
-                    Border border = new Border();
-                    border.BorderThickness = new Thickness(0);
-                    border.Padding = new Thickness(2);
-
-                    ViewportBasic vp4 = new ViewportBasic(thisDesign, this)
-                    {
-                        Background = Friends.RhinoGrey(),
-                        //if(thisDesign.isOptimal || !isOptimisationRun)
-                        BorderBrush = Brushes.Black,
-                        BorderThickness = new Thickness(1.0)
-                    };
-
-                    //else
-                    //vp4.BorderThickness = new Thickness(0.6);
+                    Border border = new Border {BorderThickness = new Thickness(0), Padding = new Thickness(2)};
+                    ViewportBasic vp4 = new ViewportBasic(thisDesign, this) {Background = Friends.RhinoGrey(), BorderThickness = new Thickness(1.0)};
 
                     if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.Red;}
-                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Yellow; }
-                    else {vp4.BorderBrush = Brushes.White;}
+                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.White; }
+                    else {vp4.BorderBrush = Brushes.Black; }
 
                     border.Child = vp4;
                     border.Height = 120;
@@ -2243,33 +2213,11 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Handle the event when the Go3 button is clicked (existing population)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (!GO)
-            {
-                RunInit(2);
-
-                //Disable sliders in tab 1
-                Slider s_popSize = (Slider)controls["s_tab1_popSize"];
-                s_popSize.IsEnabled = false;
-
-            }
-
-            GO = true;
-        }
-
-
-        /// <summary>
         /// Handle the event when the Go2 button is clicked (existing population)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab1_Go3_Click(object sender, RoutedEventArgs e)
+        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
         {
 
             if (!GO)
@@ -2284,6 +2232,7 @@ namespace Biomorpher
 
             GO = true;
         }
+
 
         /// <summary>
         /// Reinstates an old population and makes a new biobranch

@@ -45,6 +45,23 @@ namespace Biomorpher.IGA
             return new SolidColorBrush(Color.FromArgb(255, 157, 163, 170));
         }
 
+        /// <summary>
+        /// The performance criteria colours
+        /// </summary>
+        /// <returns></returns>
+        public static Color[] PerformanceColours()
+        {
+            return new Color[6] 
+            {
+                Color.FromArgb(255, 120, 0, 120),
+                Color.FromArgb(255, 120, 120, 0),
+                Color.FromArgb(255, 0, 120, 120),
+                Color.FromArgb(255, 120, 120, 120),
+                Color.FromArgb(255, 0, 0, 120),
+                Color.FromArgb(255, 120, 0, 0),
+            };
+        }
+
 
         /// <summary>
         /// Master random number generator

@@ -80,48 +80,6 @@ namespace Biomorpher.IGA
                     break;
 
                 case 1:
-                    bool isExisting = false;
-
-                    GH_Structure<GH_Number> tree = owner.existingPopTree;
-
-                    if (tree != null && tree.Branches.Count == popSize)
-                    {
-                        if (tree.Branches[0].Count == chromosomes[0].GetGenes().Length)
-                        {
-                            isExisting = true;
-                        }
-                        owner.AddWarning("Current popuation size, wrong gene size");
-                    }
-
-
-                    if (isExisting)
-                    {
-                        for (int i = 0; i < tree.Branches.Count; i++)
-                        {
-                            // Set up a feature vector of doubles
-                            List<double> featureVector = new List<double>();
-
-                            for (int j = 0; j < tree.get_Branch(i).Count; j++)
-                            {
-                                double myDouble;
-                                GH_Convert.ToDouble(tree.get_Branch(i)[j], out myDouble, GH_Conversion.Primary);
-                                featureVector.Add(myDouble);
-                            }
-
-                            chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
-                            chromosomes[i].GenerateExistingGenes(featureVector);
-                        }
-
-                    }
-                    else
-                    {
-                        GenerateCurrentPop();
-                        JigglePop(0.001);
-                        owner.AddWarning("existing population data must be same structure as population and gene count; Current parameter state substituted.");
-                    }
-                    break;
-
-                case 2:
                     GenerateCurrentPop();
                     JigglePop(0.001);
                     break;
