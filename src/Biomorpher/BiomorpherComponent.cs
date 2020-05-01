@@ -26,7 +26,11 @@ namespace Biomorpher
         public bool GO = false;
         private IGH_DataAccess deej;
         public int solveinstanceCounter;
+
+        // For the outputs
         private GH_Structure<GH_Number> clusterNumbers, historicNumbers, populationNumbers;
+        private GH_Structure<GH_Guid> genoGuids;
+
         private static readonly object syncLock = new object();
         private BiomorpherDataParam myParam;
 
@@ -55,7 +59,7 @@ namespace Biomorpher
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
             pm.AddMeshParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
             pm.AddNumberParameter("Performance", "Performance", "(Optional) List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
-
+            
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
@@ -86,12 +90,12 @@ namespace Biomorpher
                 deej = DA;
             }
 
+
             // Output info
             if (populationNumbers != null)  myOutputData.SetPopulationData(populationNumbers);
             if (historicNumbers != null)    myOutputData.SetHistoricData(historicNumbers);
             if (clusterNumbers!=null)       myOutputData.SetClusterData(clusterNumbers);
-            if (cSliders!=null)             myOutputData.SetSliderData(cSliders);
-            if (cGenePools!=null)           myOutputData.SetGenePoolData(cGenePools);
+            if (genoGuids != null)          myOutputData.SetGenoGuids(genoGuids);
 
             DA.SetData(0, new BiomorpherGoo(myOutputData));
 
@@ -367,6 +371,29 @@ namespace Biomorpher
             }
 
 
+            // Get the Guids for the sliders and genepools to pass on
+            genoGuids = new GH_Structure<GH_Guid>();
+
+            List<GH_Guid> mySliderList = new List<GH_Guid>();
+            List<GH_Guid> myGenepoolList = new List<GH_Guid>();
+
+            // Add the sliders
+            for (int i = 0; i < cSliders.Count; i++)
+            {
+                GH_Guid myGuid = new GH_Guid(cSliders[i].InstanceGuid);
+                mySliderList.Add(myGuid);
+            }
+
+            // Add the genepools
+            for (int i = 0; i < cGenePools.Count; i++)
+            {
+                GH_Guid myGuid = new GH_Guid(cGenePools[i].InstanceGuid);
+                myGenepoolList.Add(myGuid);
+            }
+
+            // Add to the GH_Structure
+            genoGuids.AppendRange(mySliderList, new GH_Path(0));
+            genoGuids.AppendRange(myGenepoolList, new GH_Path(1));
 
 
             this.ExpireSolution(true);
@@ -418,10 +445,10 @@ namespace Biomorpher
         protected override void AppendAdditionalComponentMenuItems(System.Windows.Forms.ToolStripDropDown menu)
         {
             base.AppendAdditionalComponentMenuItems(menu);
-            Menu_AppendItem(menu, @"All Sliders", AddAllSliders);
-            Menu_AppendItem(menu, @"Selected Sliders", AddSelectedSliders);
-            Menu_AppendItem(menu, @"No Sliders", RemoveAllSliders);
-            Menu_AppendItem(menu, @"Github source", GotoGithub);
+            Menu_AppendItem(menu, @"Connect all sliders", AddAllSliders);
+            Menu_AppendItem(menu, @"Connect selected sliders", AddSelectedSliders);
+            Menu_AppendItem(menu, @"Remove all sliders", RemoveAllSliders);
+            Menu_AppendItem(menu, @"Link to github src", GotoGithub);
         }
 
         /// <summary>

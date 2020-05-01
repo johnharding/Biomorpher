@@ -30,8 +30,12 @@ namespace Biomorpher
         //private List<GH_NumberSlider> sliders = new List<GH_NumberSlider>();
         //private List<GalapagosGeneListObject> genepools = new List<GalapagosGeneListObject>();
 
-        private GH_Integer designID;
-        private GH_Path historicPath;
+        private int branch;
+        private int generation;
+        private int design;
+
+        private BiomorpherDataParam myParam;
+        private BiomorpherData solutionData;
 
         /// <summary>
         /// Main constructor
@@ -50,10 +54,11 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-
-            pm.AddTextParameter("GenoGuids", "GenoGuids", "GUIDs of the sliders and genepools to be manipulated", GH_ParamAccess.list);
-            pm.AddNumberParameter("Population", "Population", "Last biomorpher population", GH_ParamAccess.tree);
-            pm.AddIntegerParameter("DesignID", "DesignID", "Design ID from the population", GH_ParamAccess.item, 0);
+            myParam = new BiomorpherDataParam();
+            pm.AddParameter(myParam, "Solution", "Solution", "Biomorpher Solution Data for use in reader", GH_ParamAccess.item);
+            pm.AddIntegerParameter("Branch", "Branch", "Generation branch (usually zero unless you conducted multiple runs)", GH_ParamAccess.item, 0);
+            pm.AddIntegerParameter("Generation", "Generation", "Generation (epoch)", GH_ParamAccess.item, 0);
+            pm.AddIntegerParameter("Design", "Design", "Design ID from the population", GH_ParamAccess.item);
         }
         
         /// <summary>
@@ -63,6 +68,7 @@ namespace Biomorpher
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
             //pm[1].Simplify = true;
+            pm.AddGenericParameter("out", "out", "out", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -71,36 +77,46 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            List<string> genoGuids = new List<string>();
-            GH_Structure<GH_Number> populationData;
+            
+            // Get Solution
+            BiomorpherGoo temp = new BiomorpherGoo();
+            if (!DA.GetData("Solution", ref temp)) { return; }
+            solutionData = temp.Value;
 
-            if (!DA.GetDataList<string>("GenoGuids", genoGuids)) { return; }
-            if (!DA.GetDataTree("Population", out populationData))
+            DA.SetDataList(0, solutionData.genoGuids);
 
-            if (populationData == null)
+            /*
+            // Set a list of slider and genotype ids from the data
+            List<System.Guid> genoGuids = solutionData.GetGenoGUIDs(); 
+
+            // Check to see if we have anything
+            if (solutionData.populationData == null)
             {
                 this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "No population data!");
                 return;
             }
             else
             {
-                Message = "Popcount = " + populationData.Branches.Count;
+                Message = "Popcount = " + solutionData.populationData.Branches.Count;
             }
 
-            if (!DA.GetData<GH_Integer>("DesignID", ref designID)) { return; };
-
+            // Now for the design we actually want to display
+            if (!DA.GetData<int>("Branch", ref branch)) { return; };
+            if (!DA.GetData<int>("Generation", ref design)) { return; };
+            if (!DA.GetData<int>("Design", ref design)) { return; };
 
             // Horrible workaround for genepools. I'm completely lost finding a better way to be honest.
-            // Maybe only trigger this bit IF the input data has changed in some way? That might solve the Embryo problem.
+            // Maybe only trigger this bit IF the input data has changed in some way? 
 
             if (isActive)
             {
                 //GH_Path 
                 List<double> genes = new List<double>();
-                for (int i = 0; i < populationData.get_Branch(i).Count; i++)
+
+                for(int i=0; i< solutionData.populationData.get_Branch(design).Count; i++)
                 {
                     double myDouble;
-                    GH_Convert.ToDouble(populationData.get_Branch(designID.Value)[i], out myDouble, GH_Conversion.Primary);
+                    GH_Convert.ToDouble(solutionData.populationData.get_Branch(design)[i], out myDouble, GH_Conversion.Primary);
                     genes.Add(myDouble);
                 }
 
@@ -110,14 +126,13 @@ namespace Biomorpher
                 bool flag = false;
                 int counter = 0;
 
-                foreach (string myGuid in genoGuids)
+                foreach (System.Guid myGuid in genoGuids)
                 {
                     try
                     {
-                        System.Guid me = new Guid(myGuid);
 
                         // Try for a slider
-                        GH_NumberSlider slidy = OnPingDocument().FindObject<GH_NumberSlider>(me, true);
+                        GH_NumberSlider slidy = OnPingDocument().FindObject<GH_NumberSlider>(myGuid, true);
                         if (slidy != null)
                         {
                             theSliders.Add(slidy);
@@ -125,7 +140,7 @@ namespace Biomorpher
                         }
 
                         // Try for a genepool
-                        GalapagosGeneListObject pooly = OnPingDocument().FindObject<GalapagosGeneListObject>(me, true);
+                        GalapagosGeneListObject pooly = OnPingDocument().FindObject<GalapagosGeneListObject>(myGuid, true);
                         if (pooly != null)
                         {
                             theGenePools.Add(pooly);
@@ -164,7 +179,7 @@ namespace Biomorpher
                 // Turn the thing back on without setting all the sliders etc.
                 isActive = true;
             }
-
+            */
         }
 
 

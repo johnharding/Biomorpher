@@ -10,43 +10,73 @@ using System.Threading.Tasks;
 
 namespace Biomorpher.IGA
 {
+    /// <summary>
+    /// A datatype used to store information about a Biomorpher solution
+    /// </summary>
     public class BiomorpherData
     {
+        /// <summary>
+        /// Population genes
+        /// </summary>
         public GH_Structure<GH_Number> populationData;
+
+        /// <summary>
+        /// Historic population genes
+        /// </summary>
         public GH_Structure<GH_Number> historicData;
+
+        /// <summary>
+        /// K-means clusters
+        /// </summary>
         public GH_Structure<GH_Number> clusterData;
-        public List<GH_NumberSlider> sliderData;
-        public List<GalapagosGeneListObject> genepoolData;
-        public int fish;
-        
-        public BiomorpherData(){}
 
-        public void SetPopulationData(GH_Structure<GH_Number> incoming){ populationData = new GH_Structure<GH_Number>(incoming, false);}
-        public void SetHistoricData(GH_Structure<GH_Number> incoming){ historicData = new GH_Structure<GH_Number>(incoming, false);}
-        public void SetClusterData(GH_Structure<GH_Number> incoming){ clusterData = new GH_Structure<GH_Number>(incoming, false);}
-        public void SetSliderData(List<GH_NumberSlider> incoming) { sliderData = new List<GH_NumberSlider>(incoming); }
-        public void SetGenePoolData(List<GalapagosGeneListObject> incoming){ genepoolData = new List<GalapagosGeneListObject>(incoming);}
-
-        public GH_Structure<GH_Number> GetPopulationData() { return populationData; }
-        public GH_Structure<GH_Number> GetHistoricData() { return historicData; }
-        public GH_Structure<GH_Number> GetClusterData() { return clusterData; }
-        public List<GH_NumberSlider> GetSliders() { return sliderData; }
-        public List<GalapagosGeneListObject> GetGenePools() { return genepoolData; }
-
-        public List<Guid> GetGenoGUIDs()
+        /// <summary>
+        /// Slider and genepool guids
+        /// </summary>
+        public GH_Structure<GH_Guid> genoGuids;
+      
+        /// <summary>
+        /// Standard constructor
+        /// </summary>
+        public BiomorpherData()
         {
-            List<Guid> myList = new List<Guid>();
-            for (int i = 0; i < sliderData.Count; i++)
-            {
-                myList.Add(sliderData[i].InstanceGuid);
-            }
-
-            for (int i = 0; i < genepoolData.Count; i++)
-            {
-                myList.Add(genepoolData[i].InstanceGuid);
-            }
-
-            return myList;
         }
+
+        /// <summary>
+        /// Sets the popualation data
+        /// </summary>
+        /// <param name="incoming"></param>
+        public void SetPopulationData(GH_Structure<GH_Number> incoming)
+        {
+            populationData = new GH_Structure<GH_Number>(incoming, false);
+        }
+
+        /// <summary>
+        /// Sets the historic popopulation data
+        /// </summary>
+        /// <param name="incoming"></param>
+        public void SetHistoricData(GH_Structure<GH_Number> incoming)
+        {
+            historicData = new GH_Structure<GH_Number>(incoming, false);
+        }
+
+        /// <summary>
+        /// Sets the K-means clusters data
+        /// </summary>
+        /// <param name="incoming"></param>
+        public void SetClusterData(GH_Structure<GH_Number> incoming)
+        {
+            clusterData = new GH_Structure<GH_Number>(incoming, false);
+        }
+
+        /// <summary>
+        /// Sets the guids for the sliders and genepools used
+        /// </summary>
+        /// <param name="incoming"></param>
+        public void SetGenoGuids(GH_Structure<GH_Guid> incoming)
+        {
+            genoGuids = new GH_Structure<GH_Guid>(incoming, false);
+        }
+
     }
 }

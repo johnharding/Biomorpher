@@ -13,8 +13,9 @@ namespace Biomorpher.IGA
     {
         
         public BiomorpherDataParam() :
-            base(new GH_InstanceDescription("BiomorpherData", "BiomorpherData", "BiomorpherData", "Params", "Util"))
+            base(new GH_InstanceDescription("BiomorpherSolution", "BiomorpherSolution", "Biomorpher solution to use in Reader component", "Params", "Util"))
         {
+            this.IconDisplayMode = GH_IconDisplayMode.icon;
         }
 
         public override System.Guid ComponentGuid
@@ -24,12 +25,10 @@ namespace Biomorpher.IGA
 
         public override GH_Exposure Exposure
         {
-
             get
             {
                 return GH_Exposure.senary;
             }
-
         }
 
         protected override Bitmap Icon
@@ -40,7 +39,6 @@ namespace Biomorpher.IGA
             }
         }
 
-
         protected override GH_GetterResult Prompt_Singular(ref BiomorpherGoo value)
         {
             return GH_GetterResult.success;
@@ -50,7 +48,6 @@ namespace Biomorpher.IGA
         {
             return GH_GetterResult.success;
         }
-
         
     }
 }
