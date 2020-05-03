@@ -78,11 +78,8 @@ namespace Biomorpher.IGA
             
             if (Value != null)
             {
-                Value.populationData.Write(writer.CreateChunk("populationData"));
                 Value.historicData.Write(writer.CreateChunk("historicData"));
-                Value.clusterData.Write(writer.CreateChunk("clusterData"));
                 Value.genoGuids.Write(writer.CreateChunk("genoData"));
-
             }
             
 
@@ -96,30 +93,14 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public override bool Read(GH_IO.Serialization.GH_IReader reader)
         {
-            var popChunk = reader.FindChunk("populationData");
             var hisChunk = reader.FindChunk("historicData");
-            var cluChunk = reader.FindChunk("clusterData");
             var genChunk = reader.FindChunk("genoData");
-
-            if (popChunk != null)
-            {
-                var data = new GH_Structure<GH_Number>();
-                data.Read(popChunk);
-                Value.populationData = new GH_Structure<GH_Number>(data, true);
-            }
 
             if (hisChunk != null)
             {
                 var data = new GH_Structure<GH_Number>();
                 data.Read(hisChunk);
                 Value.historicData = new GH_Structure<GH_Number>(data, true);
-            }
-
-            if (cluChunk != null)
-            {
-                var data = new GH_Structure<GH_Number>();
-                data.Read(cluChunk);
-                Value.clusterData = new GH_Structure<GH_Number>(data, true);
             }
 
             if (genChunk != null)

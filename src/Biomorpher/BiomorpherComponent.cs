@@ -28,7 +28,7 @@ namespace Biomorpher
         public int solveinstanceCounter;
 
         // For the outputs
-        private GH_Structure<GH_Number> clusterNumbers, historicNumbers, populationNumbers;
+        private GH_Structure<GH_Number> historicNumbers;
         private GH_Structure<GH_Guid> genoGuids;
 
         private static readonly object syncLock = new object();
@@ -57,8 +57,8 @@ namespace Biomorpher
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
-            pm.AddMeshParameter("Mesh(es)", "Mesh(es)", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
-            pm.AddNumberParameter("Performance", "Performance", "(Optional) List of performance measures for the design. One per output parameter only", GH_ParamAccess.tree);
+            pm.AddMeshParameter("Meshes", "Meshes", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Perform", "Perform", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
             
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
@@ -90,11 +90,8 @@ namespace Biomorpher
                 deej = DA;
             }
 
-
             // Output info
-            if (populationNumbers != null)  myOutputData.SetPopulationData(populationNumbers);
             if (historicNumbers != null)    myOutputData.SetHistoricData(historicNumbers);
-            if (clusterNumbers!=null)       myOutputData.SetClusterData(clusterNumbers);
             if (genoGuids != null)          myOutputData.SetGenoGuids(genoGuids);
 
             DA.SetData(0, new BiomorpherGoo(myOutputData));
@@ -210,7 +207,7 @@ namespace Biomorpher
                     Mesh myLocalMesh = new Mesh();
                     GH_Convert.ToMesh(myGHMesh, ref myLocalMesh, GH_Conversion.Primary);
                     myLocalMesh.Faces.ConvertQuadsToTriangles();
-                    //Mesh joinedMesh = new Mesh(); yes this is commented out and no I am not a software engineer. Deal with it.
+                    //Mesh joinedMesh = new Mesh(); yes this is commented out and no I am not a software engineer.
                     //joinedMesh.Append(myLocalMesh);
                     allGeometry.Add(myLocalMesh);
                 }
@@ -258,107 +255,30 @@ namespace Biomorpher
             return performas.Count;
         }
 
-        /*
-         * Get choice method to be implemented later.
-         * 
         /// <summary>
-        /// Gets
+        /// Updates the GH_Structure component out values ready to go
         /// </summary>
-        /// <returns></returns>
-        public List<int> GetGhoice()
+        /// <param name="pop"></param>
+        /// <param name="BioBranches"></param>
+        /// <param name="performanceCount"></param>
+        /// <param name="bioBranchID"></param>
+        public void SetComponentOut(Population pop, List<BioBranch> BioBranches, int performanceCount, int bioBranchID)
         {
-            // Collect the object at the current instance
-            List<int> choices = new List<int>();
-            
-            // Thank you Dimitrie :)
-            foreach (IGH_Param param in Params.Input[4].Sources)
-            {
-                foreach (Object myObj in param.VolatileData.AllData(true)) // AllData flattens the tree
-                {
-                    if (myObj is Grasshopper.Kernel.Types.GH_Number)
-                    {
-                        GH_Number thisChoice = (GH_Number)myObj;
-                        int x = (int)thisChoice.Value;
-                        if(x>=0 && x<=11)
-                        {
-                            choices.Add(x);
-                        }            
-                    }
-                }
-            }
-
-            return choices;
-        }
-        */
-
-        /// <summary>
-        /// Population cluster data for the component output. Outputs normalised genes values.
-        /// </summary>
-        /// <param name="pop">Uses the given population to set the cluster output data</param>
-        public void SetComponentOut(Population pop, List<BioBranch> BioBranches)
-        {
-
-            // Curent pop
-            populationNumbers = new GH_Structure<GH_Number>();
-            
-            for (int i = 0; i < pop.chromosomes.Length; i++)
-            {
-                GH_Path myPath = new GH_Path(i);
-
-                List<GH_Number> myList = new List<GH_Number>();
-                for (int k = 0; k < pop.chromosomes[i].GetGenes().Length; k++)
-                {
-                    GH_Number myGHNumber = new GH_Number(pop.chromosomes[i].GetGenes()[k]);
-                    myList.Add(myGHNumber);
-                }
-
-                populationNumbers.AppendRange(myList, myPath);
-            }
-
-
-            // Cluster data
-            clusterNumbers = new GH_Structure<GH_Number>();
-
-            for (int i = 0; i < 12; i++)
-            {
-                GH_Path myPath = new GH_Path(i);
-                int localCounter = 0;
-
-                // Go through all the chromosomes. If cluster ID of it equals 'i', then stick it in the branch.
-                for (int j = 0; j < pop.chromosomes.Length; j++)
-                {
-                    List<GH_Number> myList = new List<GH_Number>();
-                    
-                    if (pop.chromosomes[j].clusterId == i)
-                    {
-                        for (int k = 0; k < pop.chromosomes[j].GetGenes().Length; k++)
-                        {
-                            GH_Number myGHNumber = new GH_Number(pop.chromosomes[j].GetGenes()[k]);
-                            myList.Add(myGHNumber);
-                        }
-
-                        clusterNumbers.AppendRange(myList, myPath.AppendElement(localCounter));
-                        localCounter++;
-                    }   
-
-                }
-            }
-
 
             // Historic pop
             historicNumbers = new GH_Structure<GH_Number>();
 
             for (int i = 0; i < BioBranches.Count; i++)
             {
-                for (int j = 0; j < BioBranches[i].Twigs.Count; j++)
+                for (int j = 0; j < BioBranches[i].PopTwigs.Count; j++)
                 {
-                    for (int k = 0; k < BioBranches[i].Twigs[j].chromosomes.Length; k++)
+                    for (int k = 0; k < BioBranches[i].PopTwigs[j].chromosomes.Length; k++)
                     {
 
                         List<GH_Number> myList = new List<GH_Number>();
                         for (int c = 0; c < pop.chromosomes[k].GetGenes().Length; c++)
                         {
-                            GH_Number myGHNumber = new GH_Number(BioBranches[i].Twigs[j].chromosomes[k].GetGenes()[c]);
+                            GH_Number myGHNumber = new GH_Number(BioBranches[i].PopTwigs[j].chromosomes[k].GetGenes()[c]);
                             myList.Add(myGHNumber);
                         }
 
@@ -369,6 +289,25 @@ namespace Biomorpher
 
                 }
             }
+
+            // Find the current number of population twigs in the latest biobranch
+            int lastBranchTwigCount = BioBranches[bioBranchID].PopTwigs.Count;
+
+            // Now add the current population to the output, using the latest biobranch ID.
+            // This is going to be really hard to understand in a month's time.
+            for (int k = 0; k < pop.chromosomes.Length; k++)
+            {
+                List<GH_Number> myList = new List<GH_Number>();
+                for (int c = 0; c < pop.chromosomes[k].GetGenes().Length; c++)
+                {
+                    GH_Number myGHNumber = new GH_Number(pop.chromosomes[k].GetGenes()[c]);
+                    myList.Add(myGHNumber);
+                }
+
+                GH_Path myPath = new GH_Path(bioBranchID, lastBranchTwigCount, k);
+                historicNumbers.AppendRange(myList, myPath);
+            }
+
 
 
             // Get the Guids for the sliders and genepools to pass on

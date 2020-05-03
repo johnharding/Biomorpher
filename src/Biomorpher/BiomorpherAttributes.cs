@@ -80,18 +80,18 @@ namespace Biomorpher
         /// <param name="channel"></param>
         protected override void Render(GH_Canvas canvas, Graphics graphics, GH_CanvasChannel channel)
         {
-            if (channel == GH_CanvasChannel.Wires)
-            {
-                base.Render(canvas, graphics, channel);
-            }
+
+            Grasshopper.GUI.Canvas.GH_PaletteStyle styleStandard = null;
 
             if (channel == GH_CanvasChannel.Objects)
             {
 
-                SolidBrush johnBrush = new SolidBrush(Color.FromArgb(255, 50, 50, 50));
-              
-                Pen myPen = new Pen(johnBrush, 1);
-                
+                // Cache the current styles.
+                styleStandard = GH_Skin.palette_normal_standard;
+                GH_Skin.palette_normal_standard = new GH_PaletteStyle(Color.FromArgb(255,13,138), Color.Black, Color.Black);
+
+                Pen myPen = new Pen(Brushes.Black, 1);
+
                 GraphicsPath path = RoundedRectangle.Create((int)(Bounds.Location.X), (int)Bounds.Y - 13, (int)Bounds.Width, 24, 3);
                 graphics.DrawPath(myPen, path);
 
@@ -101,12 +101,21 @@ namespace Biomorpher
                 format.Alignment = StringAlignment.Center;
                 format.LineAlignment = StringAlignment.Center;
                 format.Trimming = StringTrimming.EllipsisCharacter;
-                ;
-                graphics.DrawString("doubleclick icon to launch window", myFont, johnBrush, (int)(Bounds.Location.X+(Bounds.Width/2)), (int)Bounds.Location.Y-6, format);
+                
+                graphics.DrawString("doubleclick icon to launch window", myFont, Brushes.Black, (int)(Bounds.Location.X + (Bounds.Width / 2)), (int)Bounds.Location.Y - 6, format);
 
                 format.Dispose();
 
-                base.Render(canvas, graphics, channel);
+            }
+
+            base.Render(canvas, graphics, channel);
+
+            if (channel == GH_CanvasChannel.Objects)
+            {
+
+                // Restore the cached styles.
+                GH_Skin.palette_normal_standard = styleStandard;
+
 
             }
         }

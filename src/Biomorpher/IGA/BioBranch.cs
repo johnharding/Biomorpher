@@ -32,7 +32,7 @@ namespace Biomorpher.IGA
         /// <summary>
         /// List of populations in this branch
         /// </summary>
-        public List<Population> Twigs { get; set; }
+        public List<Population> PopTwigs { get; set; }
 
         /// <summary>
         /// The BSpline curve drawn back to the parent
@@ -63,7 +63,7 @@ namespace Biomorpher.IGA
         /// <param name="startY">Location of starting y coordinate on the history canvas</param>
         public BioBranch(int parentBranchIndex, int parentTwigIndex, int startY)
         {
-            Twigs = new List<Population>();
+            PopTwigs = new List<Population>();
             this.ParentBranchIndex = parentBranchIndex;
             this.ParentTwigIndex = parentTwigIndex;
             StartY = startY; // used for the history bit
@@ -76,7 +76,7 @@ namespace Biomorpher.IGA
         /// <param name="pop">Population that will be copied and stored</param>
         public void AddTwig(Population pop, int pCount)
         {
-            Twigs.Add(new Population(pop)); // copy of the current pop
+            PopTwigs.Add(new Population(pop)); // copy of the current pop
             performanceCount = pCount;
             PerformAnalytics();
         }
@@ -91,8 +91,8 @@ namespace Biomorpher.IGA
         {
             OriginCurve = new Path();
 
-            System.Windows.Point outNode = allBranches[ParentBranchIndex].Twigs[ParentTwigIndex].HistoryNodeOUT;
-            System.Windows.Point inNode = this.Twigs[0].HistoryNodeIN;
+            System.Windows.Point outNode = allBranches[ParentBranchIndex].PopTwigs[ParentTwigIndex].HistoryNodeOUT;
+            System.Windows.Point inNode = this.PopTwigs[0].HistoryNodeIN;
 
             int offset = (int)((inNode.X - outNode.X)/2);
 
@@ -107,8 +107,6 @@ namespace Biomorpher.IGA
             OriginCurve.Data = Friends.MakeBezierGeometry(P1, P2, P3, P4);
             OriginCurve.Stroke = Brushes.White;
             OriginCurve.StrokeThickness = 0.6;
-            //Canvas.SetLeft(OriginCurve, 0);
-            //Canvas.SetTop(OriginCurve, 0);
             Canvas.SetZIndex(OriginCurve, -1);
             canvas.Children.Add(OriginCurve);
 
@@ -156,11 +154,11 @@ namespace Biomorpher.IGA
             }
 
 
-            for(int j=0; j<Twigs.Count; j++)
+            for(int j=0; j<PopTwigs.Count; j++)
             {
-                for(int k=0; k<Twigs[j].chromosomes.Length; k++)
+                for(int k=0; k<PopTwigs[j].chromosomes.Length; k++)
                 {
-                   Chromosome thisDesign = Twigs[j].chromosomes[k];
+                   Chromosome thisDesign = PopTwigs[j].chromosomes[k];
                    if(thisDesign.isRepresentative)
                    {
                        for(int p=0; p<thisDesign.GetPerformas().Count; p++)

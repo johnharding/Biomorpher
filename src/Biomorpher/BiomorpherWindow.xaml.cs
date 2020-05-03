@@ -247,7 +247,8 @@ namespace Biomorpher
         public void RunInit(int runType)
         {
 
-            // 1. Initialise population history
+            // 1. Initialise population history. Biobranches are only used for the history and plot bits.
+            // Note that we won't actually add a population here yet, but we initialise it at the start.
             BioBranches = new List<BioBranch>();
             biobranchID = 0;
             BioBranches.Add(new BioBranch(-1, 0, 0));
@@ -276,10 +277,8 @@ namespace Biomorpher
             tab3_secondary_settings();
             tab3b_secondary_settings();
 
-            //tab3a_plotcanvas();
-
             // 7. Set component outputs
-            owner.SetComponentOut(population, BioBranches);
+            owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
         }
 
 
@@ -330,7 +329,7 @@ namespace Biomorpher
             // 5. Now get the average performance values. Cluster reps only bool here
             population.SetAveragePerformanceValues(performanceCount, true);
             
-            // 6. Update display of K-Means and representative meshes
+            // 6. Update display of K-Means, representative meshes history and plot canvas
             tab1_primary_update();
 
             tab2_primary_update();
@@ -341,7 +340,7 @@ namespace Biomorpher
             tab3a_plotcanvas();
 
             // 7. Set component outputs
-            owner.SetComponentOut(population, BioBranches);
+            owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
 
             // 8. Finally, if performance based
             // Set the current grasshopper instance to the best fitness.
@@ -1523,12 +1522,12 @@ namespace Biomorpher
             xCount++;
 
             // Now to populate the selected designs for this generation
-            for (int k = 0; k < BioBranches[biobranchID].Twigs[j].chromosomes.Length; k++)
+            for (int k = 0; k < BioBranches[biobranchID].PopTwigs[j].chromosomes.Length; k++)
             {
                 bool flag = false;
 
-                Population thisPop = BioBranches[biobranchID].Twigs[j];
-                Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
+                Population thisPop = BioBranches[biobranchID].PopTwigs[j];
+                Chromosome thisDesign = BioBranches[biobranchID].PopTwigs[j].chromosomes[k];
 
                 TagExtrema(thisPop);
 
@@ -1607,8 +1606,8 @@ namespace Biomorpher
 
             // Now set some node points
             // TODO: Why is this StartY used in the X coordinate?
-            BioBranches[biobranchID].Twigs[j].HistoryNodeIN = new System.Windows.Point(BioBranches[biobranchID].StartY + vportWidth -10, 20 + yLocation + vportHeight / 2);
-            BioBranches[biobranchID].Twigs[j].HistoryNodeOUT = new System.Windows.Point(BioBranches[biobranchID].StartY + myGrid.Width + 10, 20 + yLocation + vportHeight / 2);
+            BioBranches[biobranchID].PopTwigs[j].HistoryNodeIN = new System.Windows.Point(BioBranches[biobranchID].StartY + vportWidth -10, 20 + yLocation + vportHeight / 2);
+            BioBranches[biobranchID].PopTwigs[j].HistoryNodeOUT = new System.Windows.Point(BioBranches[biobranchID].StartY + myGrid.Width + 10, 20 + yLocation + vportHeight / 2);
 
             // Set the pngHeight to the maximum so far
             int soupdragon = yLocation + gridHeight;
@@ -1736,7 +1735,7 @@ namespace Biomorpher
         {
             PlotCanvas.Children.Clear();
             
-            int totalGenerations = BioBranches[biobranchID].Twigs.Count;
+            int totalGenerations = BioBranches[biobranchID].PopTwigs.Count;
 
             // Could be an array, but potentially more risky in case of early events.
             List<System.Windows.Shapes.Polyline> myPoly = new List<System.Windows.Shapes.Polyline>();
@@ -1751,15 +1750,15 @@ namespace Biomorpher
             }
 
             // j indicates generation
-            for (int j = 0; j < BioBranches[biobranchID].Twigs.Count; j++)
+            for (int j = 0; j < BioBranches[biobranchID].PopTwigs.Count; j++)
             {
 
                 double xPos = (Convert.ToDouble(j) / totalGenerations) * PlotCanvas.Width + 5;
 
                 // k indicates chromosome (design)
-                for (int k = 0; k < BioBranches[biobranchID].Twigs[j].chromosomes.Length; k++)
+                for (int k = 0; k < BioBranches[biobranchID].PopTwigs[j].chromosomes.Length; k++)
                 {
-                    Chromosome thisDesign = BioBranches[biobranchID].Twigs[j].chromosomes[k];
+                    Chromosome thisDesign = BioBranches[biobranchID].PopTwigs[j].chromosomes[k];
 
                     if (thisDesign.isRepresentative)
                     {
@@ -1798,7 +1797,7 @@ namespace Biomorpher
                     {
                         double minP = BioBranches[biobranchID].minPerformanceValues[p];
                         double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
-                        double yPos = PlotCanvas.Height - ((BioBranches[biobranchID].Twigs[j].Performance_Averages[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
+                        double yPos = PlotCanvas.Height - ((BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
 
                         myPoly[p].Points.Add(new System.Windows.Point(xPos, yPos));
 
@@ -1807,7 +1806,7 @@ namespace Biomorpher
                         myCircle.StrokeThickness = 1.5;
                         myCircle.Stroke = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
                         myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 4, 4);
-                        myCircle.ToolTip = "pop average = " + BioBranches[biobranchID].Twigs[j].Performance_Averages[p];
+                        myCircle.ToolTip = "pop average = " + BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p];
                         PlotCanvas.Children.Add(myCircle);
 
                     }
@@ -2251,7 +2250,7 @@ namespace Biomorpher
             biobranchID++;
 
             // Clone the population
-            population = new Population(BioBranches[branch].Twigs[twig]);
+            population = new Population(BioBranches[branch].PopTwigs[twig]);
 
             // Clone carries of fitnesses, so it needs to be reset for a new run.
             population.ResetAllFitness();
