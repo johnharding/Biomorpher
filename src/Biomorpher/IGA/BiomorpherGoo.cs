@@ -80,6 +80,7 @@ namespace Biomorpher.IGA
             {
                 Value.historicData.Write(writer.CreateChunk("historicData"));
                 Value.genoGuids.Write(writer.CreateChunk("genoData"));
+                writer.SetInt32("popCount", Value.PopCount);
             }
             
 
@@ -109,6 +110,9 @@ namespace Biomorpher.IGA
                 data.Read(genChunk);
                 Value.genoGuids = new GH_Structure<GH_Guid>(data, true);
             }
+
+            if (reader.ItemExists("popCount"))
+                Value.PopCount = reader.GetInt32("popCount");
 
             return true;
 

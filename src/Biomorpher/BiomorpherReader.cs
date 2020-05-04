@@ -25,8 +25,6 @@ namespace Biomorpher
         public Grasshopper.GUI.Canvas.GH_Canvas canvas;
         private static readonly object syncLock = new object();
 
-        bool isActive { get; set; }
-
         //private List<GH_NumberSlider> sliders = new List<GH_NumberSlider>();
         //private List<GalapagosGeneListObject> genepools = new List<GalapagosGeneListObject>();
 
@@ -34,18 +32,30 @@ namespace Biomorpher
         private int generation;
         private int design;
 
+        private int localBranch;
+        private int localGeneration;
+        private int localDesign;
+
+        private bool active;
+
         private BiomorpherDataParam myParam;
-        private BiomorpherData solutionData;
+        private BiomorpherData solutionData; // What we get from the input
+        private BiomorpherData localSolutionData; // Monitor if it has changed
 
         /// <summary>
         /// Main constructor
         /// </summary>
         public BiomorpherReader()
             : base("BiomorpherReader", "BiomorpherReader", "Uses Biomorpher data to display paramter states", "Params", "Util")
-        {    
+        {
             canvas = Instances.ActiveCanvas;
             this.IconDisplayMode = GH_IconDisplayMode.icon;
-            isActive = true;
+
+            active = false;
+            localBranch = -1;
+            localGeneration = -1;
+            localDesign = -1;
+            localSolutionData = null;
         }
 
         /// <summary>
@@ -68,7 +78,7 @@ namespace Biomorpher
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pm)
         {
             //pm[1].Simplify = true;
-            pm.AddGenericParameter("out", "out", "out", GH_ParamAccess.tree);
+            //pm.AddGenericParameter("out", "out", "out", GH_ParamAccess.tree);
         }
 
         /// <summary>
@@ -77,7 +87,7 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            
+
             // Get Solution and data
             BiomorpherGoo temp = new BiomorpherGoo();
             if (!DA.GetData("Solution", ref temp)) { return; }
@@ -87,90 +97,105 @@ namespace Biomorpher
             if (!DA.GetData<int>("Generation", ref generation)) { return; };
             if (!DA.GetData<int>("Design", ref design)) { return; };
 
-            // Output (to be deleted)
-            // int lastGeneration = solutionData.historicData.get_Branch(new GH_Path(branch, generation, design)).Count;
-            // DA.SetData(0, lastGeneration);
-
             // Check to see if we have anything at all (population is the lowest possible thing in the hierarchy)
             if (solutionData.historicData == null)
             {
-               this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "No histric gene data in the solution!");
+               AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "Empty biomorpher solution!");
                return;
             }
 
-            // Display the number of designs in a typical population
+            // If we have then display the number of designs in a typical population
             else
             {
-                // Needs updating
-               Message = "Population size = " + solutionData.historicData.Branches.Count;
+                Message = "Population size = " + solutionData.PopCount;
             }
 
-            if (isActive && solutionData.historicData.get_Branch(new GH_Path(branch, generation, design)) != null)
+            // Only if things have changed do we actually want to change the sliders and expire the solution
+            if(branch != localBranch || localGeneration != generation || localDesign != design || !localSolutionData.Equals(solutionData))
             {
-
-                //We need a list of genes for the selected design
-                List<double> genes = new List<double>();
-
-
-                for (int i = 0; i < solutionData.historicData.get_Branch(new GH_Path(branch, generation, design)).Count; i++)
-                {
-                    double myDouble;
-                    GH_Convert.ToDouble(solutionData.historicData.get_Branch(new GH_Path(branch, generation, design))[i], out myDouble, GH_Conversion.Primary);
-                    genes.Add(myDouble);
-                }
-
-                // Set up some local sliders and genepools
-                List<GH_NumberSlider> theSliders = new List<GH_NumberSlider>();
-                List<GalapagosGeneListObject> theGenePools = new List<GalapagosGeneListObject>();
-
-                bool flag = false;
-
-                // Note that the sliders and genepools are stored in two branches of a GH_Structure
-                try
-                {
-                    // Get sliders
-                    List<GH_Guid> sliderList = new List<GH_Guid>();
-
-                    foreach (GH_Guid x in solutionData.genoGuids.get_Branch(0))
-                    {
-                        GH_NumberSlider slidy = OnPingDocument().FindObject<GH_NumberSlider>(x.Value, true);
-                        if(slidy!=null) theSliders.Add(slidy);
-                    }
-
-                    // Get genepools
-                    foreach (GH_Guid x in solutionData.genoGuids.get_Branch(1))
-                    {
-                        GalapagosGeneListObject pooly = OnPingDocument().FindObject<GalapagosGeneListObject>(x.Value, true);
-                        if (pooly != null) theGenePools.Add(pooly);
-                    }
-                }
-                catch
-                {
-                    flag = true;
-                }
-
-
-                if (flag)
-                {
-                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Getting sliders and/or genepools from the canvas was unsuccesful. Have they been modified?");
-                    return;
-                }
-
-
-                canvas.Document.Enabled = false;
-                SetSliders(genes, theSliders, theGenePools);
-                canvas.Document.Enabled = true;
-
-                if(theGenePools.Count > 0) isActive = false;
+                localBranch = branch;
+                localGeneration = generation;
+                localDesign = design;
+                localSolutionData = solutionData;
+                active = true;
             }
+
+            else
+            {
+                active = false;
+            }
+
+            // Only do things if there is a design at the location
+            if (solutionData.historicData.get_Branch(new GH_Path(branch, generation, design)) != null)
+            {
+                if (active)
+                {
+                    //We need a list of genes for the selected design
+                    List<double> genes = new List<double>();
+
+                    // g
+                    for (int i = 0; i < solutionData.historicData.get_Branch(new GH_Path(branch, generation, design)).Count; i++)
+                    {
+                        double myDouble;
+                        GH_Convert.ToDouble(solutionData.historicData.get_Branch(new GH_Path(branch, generation, design))[i], out myDouble, GH_Conversion.Primary);
+                        genes.Add(myDouble);
+                    }
+
+                    // Set up some local sliders and genepools
+                    List<GH_NumberSlider> theSliders = new List<GH_NumberSlider>();
+                    List<GalapagosGeneListObject> theGenePools = new List<GalapagosGeneListObject>();
+
+                    bool flag = false;
+
+                    // Note that the sliders and genepools are stored in two branches of a GH_Structure
+                    try
+                    {
+                        // Get sliders
+                        List<GH_Guid> sliderList = new List<GH_Guid>();
+
+                        foreach (GH_Guid x in solutionData.genoGuids.get_Branch(0))
+                        {
+                            GH_NumberSlider slidy = OnPingDocument().FindObject<GH_NumberSlider>(x.Value, true);
+                            if (slidy != null) theSliders.Add(slidy);
+                        }
+
+                        // Get genepools
+                        foreach (GH_Guid x in solutionData.genoGuids.get_Branch(1))
+                        {
+                            GalapagosGeneListObject pooly = OnPingDocument().FindObject<GalapagosGeneListObject>(x.Value, true);
+                            if (pooly != null) theGenePools.Add(pooly);
+                        }
+                    }
+                    catch
+                    {
+                        flag = true;
+                    }
+
+
+                    if (flag)
+                    {
+                        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Getting sliders and/or genepools from the canvas was unsuccesful. Have they been modified?");
+                        return;
+                    }
+
+                    canvas.Document.Enabled = false;
+                    //this.Locked = true;
+
+                    SetSliders(genes, theSliders, theGenePools);
+
+                    canvas.Document.Enabled = true;
+                    canvas.Document.ExpireSolution();
+
+                }
+
+            }
+
 
             else
             {
                 // Turn the thing back on without setting all the sliders etc.
-                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "No historic design found at this reference");
-                isActive = true;
+                AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, "No historic design found at this reference");
             }
-            
         }
 
 

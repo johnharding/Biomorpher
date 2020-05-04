@@ -8,6 +8,7 @@ using Grasshopper.Kernel.Attributes;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using Biomorpher.IGA;
 
 namespace Biomorpher
 {
@@ -102,7 +103,7 @@ namespace Biomorpher
                 format.LineAlignment = StringAlignment.Center;
                 format.Trimming = StringTrimming.EllipsisCharacter;
                 
-                graphics.DrawString("doubleclick icon to launch window", myFont, Brushes.Black, (int)(Bounds.Location.X + (Bounds.Width / 2)), (int)Bounds.Location.Y - 6, format);
+                graphics.DrawString("doubleclick icon to launch (v"+ Friends.VerionInfo() +")", myFont, Brushes.Black, (int)(Bounds.Location.X + (Bounds.Width / 2)), (int)Bounds.Location.Y - 6, format);
 
                 format.Dispose();
 

@@ -15,10 +15,6 @@ namespace Biomorpher.IGA
     /// </summary>
     public class BiomorpherData
     {
-        /// <summary>
-        /// Population genes
-        /// </summary>
-        public GH_Structure<GH_Number> populationData;
 
         /// <summary>
         /// Historic population genes
@@ -26,9 +22,9 @@ namespace Biomorpher.IGA
         public GH_Structure<GH_Number> historicData;
 
         /// <summary>
-        /// K-means clusters
+        /// Population number
         /// </summary>
-        public GH_Structure<GH_Number> clusterData;
+        public int PopCount { get; set; }
 
         /// <summary>
         /// Slider and genepool guids
@@ -43,30 +39,12 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
-        /// Sets the popualation data
-        /// </summary>
-        /// <param name="incoming"></param>
-        public void SetPopulationData(GH_Structure<GH_Number> incoming)
-        {
-            populationData = new GH_Structure<GH_Number>(incoming, false);
-        }
-
-        /// <summary>
         /// Sets the historic popopulation data
         /// </summary>
         /// <param name="incoming"></param>
         public void SetHistoricData(GH_Structure<GH_Number> incoming)
         {
             historicData = new GH_Structure<GH_Number>(incoming, false);
-        }
-
-        /// <summary>
-        /// Sets the K-means clusters data
-        /// </summary>
-        /// <param name="incoming"></param>
-        public void SetClusterData(GH_Structure<GH_Number> incoming)
-        {
-            clusterData = new GH_Structure<GH_Number>(incoming, false);
         }
 
         /// <summary>

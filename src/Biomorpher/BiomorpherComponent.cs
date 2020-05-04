@@ -30,6 +30,7 @@ namespace Biomorpher
         // For the outputs
         private GH_Structure<GH_Number> historicNumbers;
         private GH_Structure<GH_Guid> genoGuids;
+        private int popCount = 0;
 
         private static readonly object syncLock = new object();
         private BiomorpherDataParam myParam;
@@ -91,6 +92,7 @@ namespace Biomorpher
             }
 
             // Output info
+                                            myOutputData.PopCount = popCount;
             if (historicNumbers != null)    myOutputData.SetHistoricData(historicNumbers);
             if (genoGuids != null)          myOutputData.SetGenoGuids(genoGuids);
 
@@ -264,6 +266,8 @@ namespace Biomorpher
         /// <param name="bioBranchID"></param>
         public void SetComponentOut(Population pop, List<BioBranch> BioBranches, int performanceCount, int bioBranchID)
         {
+
+            popCount = pop.chromosomes.Length;
 
             // Historic pop
             historicNumbers = new GH_Structure<GH_Number>();
