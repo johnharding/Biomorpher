@@ -173,8 +173,6 @@ namespace Biomorpher
             }
         }
 
-
-
         #endregion
 
         #region CONSTRUCTOR
@@ -1117,7 +1115,7 @@ namespace Biomorpher
                 performanceCircle.Height = performanceDiameter;
                 performanceCircle.Width = performanceDiameter;
                 SolidColorBrush brush = new SolidColorBrush();
-                brush.Color = rgb_performance[i];
+                brush.Color = rgb_performance[i % 6];
                 performanceCircle.Fill = brush;
 
                 Canvas.SetLeft(performanceCircle, distFromLeft + (dOuter - performanceDiameter)*0.5 );
@@ -1176,34 +1174,45 @@ namespace Biomorpher
 
             //Evolve button
             Button button_evo = createButton("b_tab2_Evolve", "Evolve", 125, new RoutedEventHandler(Tab2_Evolve_Click));
+            button_evo.ToolTip = "Advance to next generation(s)";
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);
 
+            // Bit of a space
             Border spacer = new Border();
             spacer.Width = 4;
             dp_buttons.Children.Add(spacer);
 
-            NumericUpDown myNumericUpDown = new NumericUpDown();
-            myNumericUpDown.Width = 125;
-            myNumericUpDown.ToolTip = "Increases the number of generations calculated (performance based only).";
-            myNumericUpDown.UpDownButtonsWidth = 16;
-            myNumericUpDown.Value = 1;
-            myNumericUpDown.Minimum = 1;
-            myNumericUpDown.Maximum = 49;
-            myNumericUpDown.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
-            //myNumericUpDown.IsReadOnly = true;
-            //myNumericUpDown.Margin = new Thickness(4);
-            myNumericUpDown.BorderBrush = Brushes.Black;
-            //myNumericUpDown.BorderThickness = new Thickness(1);
+            Label label_numeric = new Label();
+            label_numeric.Content = "Iterations:";
+            label_numeric.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
+            //DockPanel.SetDock(label_numeric, Dock.Left);
+            dp_buttons.Children.Add(label_numeric);
+
+            //Numeric upDown
+            NumericUpDown myNumericUpDown = new NumericUpDown
+            {
+                Width = 62,
+                ToolTip = "Increases the number of generations calculated (performance based only).",
+                UpDownButtonsWidth = 16,
+                Value = 1,
+                Minimum = 1,
+                Maximum = 49,
+                Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)),
+                BorderBrush = Brushes.Black,
+            };
+
             controls.Add("myNumericUpDown", myNumericUpDown);
+            DockPanel.SetDock(myNumericUpDown, Dock.Right);
             dp_buttons.Children.Add(myNumericUpDown);
 
+            // Final events
             border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
 
             //Header 2
             Border border_data = new Border();
-            border_data.Margin = new Thickness(margin_w, 40, margin_w, 0);
+            border_data.Margin = new Thickness(margin_w, 24, margin_w, 0);
             Label label_data = new Label();
             label_data.FontSize = fontsize;
             label_data.Content = "Performance Optimisation";
@@ -1277,7 +1286,7 @@ namespace Biomorpher
                 radButtonPanel.Children.Add(radButtonMin);
                 radButtonPanel.Children.Add(radButtonMax);
 
-                radButtonPanel.Height = 24;
+                radButtonPanel.Height = 26;
 
                 soupdragon2.Children.Add(radButtonPanel);
             }
@@ -1311,7 +1320,7 @@ namespace Biomorpher
         {
             //Design info
             Border border_clus = (Border) controls["CLUSTER"];
-            border_clus.Margin = new Thickness(margin_w, 30, margin_w, 10);
+            border_clus.Margin = new Thickness(margin_w, 20, margin_w, 10);
             
             Label label_gen = new Label();
             label_gen.Content = "Design " + HighlightedCluster +":";
@@ -1777,6 +1786,10 @@ namespace Biomorpher
 
                                 double minP = BioBranches[biobranchID].minPerformanceValues[p];
                                 double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
+
+                                // Avoid division by zero
+                                if (minP == maxP) maxP++;
+
                                 double yPos = PlotCanvas.Height - ((myPerforms[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
 
                                 myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
@@ -1797,6 +1810,10 @@ namespace Biomorpher
                     {
                         double minP = BioBranches[biobranchID].minPerformanceValues[p];
                         double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
+
+                        // Avoid division by zero
+                        if (minP == maxP) maxP++;
+
                         double yPos = PlotCanvas.Height - ((BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
 
                         myPoly[p].Points.Add(new System.Windows.Point(xPos, yPos));

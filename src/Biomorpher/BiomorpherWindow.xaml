@@ -16,7 +16,7 @@
         WindowStartupLocation="CenterScreen"
                       >
 
-    <Grid Background="#9DA3AA">
+    <Grid Background="#a7adb4">
         <Border Background="#9DA3AA" BorderThickness="0" Width="300" HorizontalAlignment="Right" VerticalAlignment="Top"/>
         <TabControl x:Name="tabControl">
             <TabItem Header="Population" x:Name="Tab1" Margin="21,0,-21,0">

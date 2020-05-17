@@ -221,6 +221,7 @@ namespace Biomorpher
 
             // Cap at eight criteria max.
             int pCount = 0;
+            int repeatCounter = 1;
 
             foreach (IGH_Param param in Params.Input[2].Sources)
             {
@@ -228,24 +229,40 @@ namespace Biomorpher
                 {
                     if (myObj is GH_Number && pCount < 8)
                     {
-                        if(!criteria.Contains(param.NickName))
+                        GH_Number temp = (GH_Number)myObj;
+                        performas.Add(temp.Value);
+
+                        if (!criteria.Contains(param.NickName))
                         {
-                            GH_Number temp = (GH_Number)myObj;
-                            performas.Add(temp.Value);
                             criteria.Add(param.NickName);
-                            pCount++;
                         }
+
+                        else
+                        {
+                            criteria.Add(param.NickName + " (" + repeatCounter + ")");
+                            repeatCounter++;
+                        }
+
+                        pCount++;
                     }
 
                     else if (myObj is GH_Integer && pCount < 8)
                     {
+                        GH_Integer temp = (GH_Integer)myObj;
+                        performas.Add((double)temp.Value);
+
                         if (!criteria.Contains(param.NickName))
                         {
-                            GH_Integer temp = (GH_Integer)myObj;
-                            performas.Add((double)temp.Value);
                             criteria.Add(param.NickName);
-                            pCount++;
                         }
+
+                        else
+                        {
+                            criteria.Add(param.NickName + " (" + repeatCounter + ")");
+                            repeatCounter++;
+                        }
+
+                        pCount++;
                     }
                 }
             }
