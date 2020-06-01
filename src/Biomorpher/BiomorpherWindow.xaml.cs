@@ -225,11 +225,11 @@ namespace Biomorpher
             tab1_primary_initial();
             tab1_secondary_settings();
 
-            //Make sure that tab 3 graphics are clipped to bounds
+            //Make sure that tab 3 history graphics are clipped to bounds
             Tab3_primary.ClipToBounds = true;
 
             // Show biomorpher info
-            Tab4_primary_permanent();
+            Tab6_primary_permanent();
             
         }
 
@@ -273,7 +273,7 @@ namespace Biomorpher
             tab2_secondary_settings();
 
             tab3_secondary_settings();
-            tab3b_secondary_settings();
+            tab4_secondary_settings();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
@@ -335,7 +335,7 @@ namespace Biomorpher
 
             tab3_primary_update(isPerformanceCriteriaBased);
 
-            tab3a_plotcanvas();
+            tab4_plotcanvas();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
@@ -375,7 +375,7 @@ namespace Biomorpher
             tab2_primary_update();
             tab2_updatePerforms();
 
-            tab3a_plotcanvas();
+            tab4_plotcanvas();
 
         }
 
@@ -804,12 +804,12 @@ namespace Biomorpher
             DockPanel dp_showall12 = new DockPanel();
             Label label_showall12 = new Label();
             label_showall12.HorizontalContentAlignment = HorizontalAlignment.Left;
-            label_showall12.Content = "Show all 12 cluster centres in history?";
+            label_showall12.Content = "Show all 12 cluster centroids in history?";
             DockPanel.SetDock(label_showall12, Dock.Left);
             dp_showall12.Children.Add(label_showall12);
             CheckBox cb_showall12 = new CheckBox();
             cb_showall12.Name = "cb_showall12";
-            cb_showall12.IsChecked = true;
+            cb_showall12.IsChecked = false;
             cb_showall12.Background = Friends.RhinoGrey();
             controls.Add(cb_showall12.Name, cb_showall12);
             cb_showall12.HorizontalAlignment = HorizontalAlignment.Right;
@@ -1735,15 +1735,16 @@ namespace Biomorpher
 
         #endregion
 
-        #region UI TAB 3a (PLOT)
+        #region UI TAB 4 & 5 (PLOTS)
 
         /// <summary>
         /// Plot graph
         /// </summary>
-        public void tab3a_plotcanvas()
+        public void tab4_plotcanvas()
         {
             PlotCanvas.Children.Clear();
-            
+            PlotCanvas2.Children.Clear();
+
             int totalGenerations = BioBranches[biobranchID].PopTwigs.Count;
 
             // Could be an array, but potentially more risky in case of early events.
@@ -1769,9 +1770,11 @@ namespace Biomorpher
                 {
                     Chromosome thisDesign = BioBranches[biobranchID].PopTwigs[j].chromosomes[k];
 
-                    if (thisDesign.isRepresentative)
+                    List<double> myPerforms = thisDesign.GetPerformas();
+
+                    // Note that manual selection does not run performance measures for all population, so we have to avoid this
+                    if (myPerforms != null)
                     {
-                        List<double> myPerforms = thisDesign.GetPerformas();
 
                         for (int p = 0; p < myPerforms.Count; p++)
                         {
@@ -1792,7 +1795,11 @@ namespace Biomorpher
 
                                 double yPos = PlotCanvas.Height - ((myPerforms[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
 
-                                myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
+                                // Smaller radius if not a cluster centroid
+                                double radius = 1.5;
+                                if (thisDesign.isRepresentative) radius = 3;
+
+                                myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), radius, radius);
 
                                 PlotCanvas.Children.Add(myCircle);
 
@@ -1862,16 +1869,13 @@ namespace Biomorpher
             }
         }
 
-
-
-
         /// <summary>
-        /// Create settings panel for Tab 3
+        /// Create settings panel for Tab 4
         /// </summary>
-        public void tab3b_secondary_settings()
+        public void tab4_secondary_settings()
         {
-            StackPanel sp3b = new StackPanel();
-            controls.Add("SP3b", sp3b);
+            StackPanel sp4 = new StackPanel();
+            controls.Add("SP4", sp4);
 
             //Header
             Border border_head = new Border();
@@ -1880,7 +1884,7 @@ namespace Biomorpher
             label_head.FontSize = fontsize;
             label_head.Content = "Performance History";
             border_head.Child = label_head;
-            sp3b.Children.Add(border_head);
+            sp4.Children.Add(border_head);
 
             // History description
             Border border = new Border();
@@ -1892,7 +1896,7 @@ namespace Biomorpher
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
-            sp3b.Children.Add(border);
+            sp4.Children.Add(border);
 
 
             // Now for the soupdragons...
@@ -1929,19 +1933,19 @@ namespace Biomorpher
 
             // Bring the soupdragons together and add to the overall stackpanel
             soupdragon.Orientation = Orientation.Vertical;
-            sp3b.Children.Add(soupdragon);
+            sp4.Children.Add(soupdragon);
 
 
             //Add the stackpanels to the secondary area of Tab 3
-            Tab3b_secondary.Child = sp3b;
+            Tab4_secondary.Child = sp4;
 
         }
 
         #endregion
 
-        #region UI TAB 4 (ABOUT)
+        #region UI TAB 6 (ABOUT)
 
-        void Tab4_primary_permanent()
+        void Tab6_primary_permanent()
         {
             StackPanel sp = new StackPanel();
             Border border_dcl = new Border();
@@ -1972,10 +1976,10 @@ namespace Biomorpher
 
             TextBlock txt_dcl2 = new TextBlock();
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
-            txt_dcl2.FontSize = 14;
-            txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed.");
-            txt_dcl2.Inlines.Add("\n\nThis work is sponsored by the 2016/17 UWE VC Early Career Researcher Development Award and was initially inspired by Richard Dawkins' Biomorphs from his 1986 book, The Blind Watchmaker: Why the Evidence of Evolution Reveals a Universe without Design.");
-            txt_dcl2.Inlines.Add("\n\n\nDevelopment:\tJohn Harding & Cecilie Brandt Olsen");
+            txt_dcl2.FontSize = 12;
+            txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
+            txt_dcl2.Inlines.Add("Inspired by Richard Dawkins' Biomorphs from 1986.");
+            txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
             txt_dcl2.Inlines.Add("\nCopyright:\t2020 John Harding");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
             txt_dcl2.Inlines.Add("\nLicence:\t\tMIT");
@@ -1983,9 +1987,19 @@ namespace Biomorpher
             txt_dcl2.Inlines.Add("\nGHgroup:\thttp://www.grasshopper3d.com/group/biomorpher");
             txt_dcl2.Inlines.Add("\n\nDependencies:\tHelixToolkit: https://github.com/helix-toolkit");
             txt_dcl2.Inlines.Add("\n\t\tMahapps.metro: http://mahapps.com/");
-            sp.Children.Add(txt_dcl2);
+            txt_dcl2.Inlines.Add("\n\nBiomorpher is completely free, but if you would like to make a small donation and leave a message you can do so here (launches browser):");
+            txt_dcl2.Inlines.Add("\n ");
 
-            Tab4_primary.Child = sp;
+            // Donate button
+            Button donate = createButton("donate", "donate", 75, new RoutedEventHandler(ClickDonate));
+            donate.BorderThickness = new Thickness(0);
+            donate.Background = Brushes.LightGray;
+            //DockPanel.SetDock(dock_go, Dock.Left);
+
+            sp.Children.Add(txt_dcl2);
+            sp.Children.Add(donate);
+
+            Tab6_primary.Child = sp;
         }
 
         # endregion
@@ -2142,30 +2156,11 @@ namespace Biomorpher
 
         #region EVENT HANDLERS
 
-        /*
-        System.Windows.Point last;
-        void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        // Donation weblink
+        private void ClickDonate(Object sender, EventArgs e)
         {
-            HistoryCanvas.ReleaseMouseCapture();
+            System.Diagnostics.Process.Start(@"https://ko-fi.com/ab8jeh");
         }
-
-        void MyCanvas_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (!HistoryCanvas.IsMouseCaptured)
-                return;
-            var t = (TranslateTransform)((TransformGroup)HistoryCanvas.RenderTransform).Children.First(tr => tr is TranslateTransform);
-            Vector v = last - e.GetPosition(HistoryCanvas);
-            t.X -= v.X;
-            t.Y -= v.Y;
-            last = e.GetPosition(HistoryCanvas);
-        }
-        void MyCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            last = e.GetPosition(HistoryCanvas);
-            HistoryCanvas.CaptureMouse();
-        }
-        */
-
 
         //Tab 1 Popsize event handler
         private void tab1_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -2198,7 +2193,7 @@ namespace Biomorpher
         /// <param name="e"></param>
         public void replot(object sender, RoutedEventArgs e)
         {
-            tab3a_plotcanvas();
+            tab4_plotcanvas();
         }
 
         /// <summary>
@@ -2478,7 +2473,7 @@ namespace Biomorpher
 
             // Only if evolution has started do we do this bit.
             if(GO)
-                tab3a_plotcanvas();
+                tab4_plotcanvas();
         }
 
         #endregion

@@ -45,10 +45,10 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Performance" x:Name="Tab3b" Margin="36,0,-36,0" >
+            <TabItem Header="Plot 1" x:Name="Tab4" Margin="36,0,-36,0" >
                 <DockPanel LastChildFill="True">
-                    <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3b_secondary" Margin="0,10,0,0"/>
-                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3b_primary" >
+                    <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab4_secondary" Margin="0,10,0,0"/>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab4_primary" >
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="14"/>
@@ -85,9 +85,49 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="About" x:Name="Tab4" Margin="41,0,-41,0">
+
+            <TabItem Header="Plot 2" x:Name="Tab5" Margin="41,0,-41,0" >
                 <DockPanel LastChildFill="True">
-                    <Border BorderThickness="0" Padding ="100" Width="Auto" Height="Auto" x:Name="Tab4_primary"/>
+                    <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab5_secondary" Margin="0,10,0,0"/>
+                    <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab5_primary" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="14"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="40"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid x:Name="chartGrid2" SizeChanged="chartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
+                                <Border BorderThickness="1" BorderBrush="Black">
+                                    <Canvas x:Name="PlotCanvas2" ClipToBounds="True"/>
+                                </Border>
+                            </Grid>
+
+                            <Border Grid.Column="0" Grid.Row="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel x:Name="MaxGraphLabels2" Grid.Row="0"></StackPanel>
+                                    <StackPanel x:Name="MinGraphLabels2" Grid.Row="1" VerticalAlignment="Bottom"></StackPanel>
+                                </Grid>
+                            </Border>
+
+                        </Grid>
+                    </Border>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="About" x:Name="Tab6" Margin="0,0,-46,0" HorizontalAlignment="Right" Width="85">
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="0" Padding ="50" Width="Auto" Height="Auto" x:Name="Tab6_primary"/>
                 </DockPanel>
             </TabItem>
 
