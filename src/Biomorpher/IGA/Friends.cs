@@ -42,7 +42,6 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public static Brush RhinoGrey()
         {
-            // Default: 255, 157, 163, 170
             return new SolidColorBrush(Color.FromArgb(255, 167, 173, 180));
         }
 

@@ -68,7 +68,7 @@ namespace Biomorpher.IGA
 
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i] = new Chromosome(popSliders, popGenePools, i);
+                chromosomes[i] = new Chromosome(popSliders, popGenePools);
             }
 
             
@@ -146,7 +146,7 @@ namespace Biomorpher.IGA
             double fitSum;
             double totalFitness = 0.0;
 
-            // Set up a fresh population.
+            // Set up a fresh new population (no clone).
             Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools, owner, -1);
 
             // find the total fitness
@@ -164,17 +164,35 @@ namespace Biomorpher.IGA
                 for (int j = 0; j < chromosomes.Length; j++)
                 {
                     fitSum += chromosomes[j].GetFitness();
+
+                    // Stop when we get to the right design
+                    // higher fitnesses will result in a greater jump in fitsum, and therefore more likely to be above the random number.
                     if (fitSum > weightedRandom)
                     {
-                        // Clone the chromosomes, but make sure to reset if the design is a cluster representative
+                        // Clone the chromosomes, reset all the representatives and elites
                         newPop.chromosomes[i] = chromosomes[j].Clone();
                         newPop.chromosomes[i].isRepresentative = false;
+                        newPop.chromosomes[i].isElite = false;
                         break;
                     }
                 }
             }
 
-            // Replace the current popultion of chromosomes with the newPop
+            // New Elitism
+            // Basically take the best one from the last generation and copy to indices 0 and 1. 
+            // Replaces the above
+            
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                if(chromosomes[i].GetFitness() == 1.0)
+                {
+                    newPop.chromosomes[0] = chromosomes[i].Clone();
+                    newPop.chromosomes[0].isElite = true;
+                }
+            }
+            
+
+            // Finally, Replace the current popultion of chromosomes with the newPop
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 chromosomes[i] = newPop.chromosomes[i].Clone();
@@ -338,7 +356,10 @@ namespace Biomorpher.IGA
         {
             for (int i = 0; i < chromosomes.Length; i++)
             {
-                chromosomes[i].Mutate(probability);
+                //if (!chromosomes[i].isElite)
+                //{
+                    chromosomes[i].Mutate(probability);
+                //}
             }
         }
 
@@ -353,6 +374,7 @@ namespace Biomorpher.IGA
             {
                 int size = chromosomes[0].GetGenes().Length;
 
+                // Avoid the first two 'elites'
                 for (int i = 0; i < chromosomes.Length; i += 2)
                 {
 

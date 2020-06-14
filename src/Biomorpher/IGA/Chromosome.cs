@@ -58,6 +58,11 @@ namespace Biomorpher.IGA
         public bool isRepresentative;
 
         /// <summary>
+        /// Describes if the member is an elite candidate and preserved for the next generation
+        /// </summary>
+        public bool isElite;
+
+        /// <summary>
         /// A design that has min or max fitness for the population. May be more than one depending on objective count.
         /// </summary>
         public bool isOptimal;
@@ -88,16 +93,11 @@ namespace Biomorpher.IGA
         public bool isChecked;
 
         /// <summary>
-        /// Unique chromosome ID
-        /// </summary>
-        public int ID;
-
-        /// <summary>
         /// Main chromosome constructor
         /// </summary>
         /// <param name="sliders">Grasshopper sliders used to formulate the chromosome</param>
         /// <param name="genePools">Grasshopper genepools used to formulate the chromosome</param>
-        public Chromosome(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools, int id)
+        public Chromosome(List<GH_NumberSlider> sliders, List<GalapagosGeneListObject> genePools)
         {
             chromoSliders = new List<GH_NumberSlider>(sliders);
             chromoGenePools = new List<GalapagosGeneListObject>(genePools);
@@ -112,6 +112,7 @@ namespace Biomorpher.IGA
             fitness = 0.0;
 
             isRepresentative = false;
+            isElite = false;
             isChecked = false;
             isOptimal = false;
             isMinimum = false;
@@ -119,7 +120,6 @@ namespace Biomorpher.IGA
 
             clusterId = -1;
             distToRepresentative = -1.0;
-            ID = id;
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Biomorpher.IGA
         public Chromosome Clone()
         {
             // Clone sliders and genepools associated with this chromosome
-            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools, this.ID);
+            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools);
 
             // Clone gene array
             Array.Copy(this.genes, clone.genes, this.genes.Length);
@@ -202,6 +202,7 @@ namespace Biomorpher.IGA
             clone.fitness = this.fitness;
             clone.clusterId = this.clusterId;
             clone.isRepresentative = this.isRepresentative;
+            clone.isElite = this.isElite;
             clone.distToRepresentative = this.distToRepresentative;
             clone.isChecked = this.isChecked;
             clone.isOptimal = this.isOptimal;
@@ -246,10 +247,6 @@ namespace Biomorpher.IGA
                 }
             }
         }
-
-
-
-
 
         /// <summary>
         /// Returns the genes for this chromosome

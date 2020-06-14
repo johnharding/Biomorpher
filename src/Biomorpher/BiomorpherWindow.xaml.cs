@@ -274,6 +274,7 @@ namespace Biomorpher
 
             tab3_secondary_settings();
             tab4_secondary_settings();
+            tab5_secondary_settings();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
@@ -624,7 +625,7 @@ namespace Biomorpher
                 System.Windows.Shapes.Ellipse circle = new System.Windows.Shapes.Ellipse();
                 circle.Height = diameter;
                 circle.Width = diameter;
-                circle.Fill = Brushes.White;
+                circle.Fill = Brushes.DarkSlateGray;
 
                 //Calculate angle
                 double angle = (2 * Math.PI * i) / distancesMapped.Count;
@@ -634,7 +635,7 @@ namespace Biomorpher
                 //Lines
                 System.Windows.Shapes.Line ln = new System.Windows.Shapes.Line();
                 ln.StrokeThickness = 1;
-                ln.Stroke = Brushes.White;
+                ln.Stroke = Brushes.DarkSlateGray;
                 ln.X1 = width / 2.0 + 0;
                 ln.Y1 = (width / 2.0) -12;
                 ln.X2 = (width / 2.0) + xCoord + 0;
@@ -652,7 +653,7 @@ namespace Biomorpher
             circle2.Height = diameter;
             circle2.Width = diameter;
             circle2.Fill = Friends.RhinoGrey();
-            circle2.Stroke = Brushes.White;
+            circle2.Stroke = Brushes.DarkSlateGray;
             circle2.StrokeThickness = 1;
             Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0)+0);
             Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0) -12);
@@ -807,6 +808,7 @@ namespace Biomorpher
             label_showall12.Content = "Show all 12 cluster centroids in history?";
             DockPanel.SetDock(label_showall12, Dock.Left);
             dp_showall12.Children.Add(label_showall12);
+
             CheckBox cb_showall12 = new CheckBox();
             cb_showall12.Name = "cb_showall12";
             cb_showall12.IsChecked = false;
@@ -1091,7 +1093,7 @@ namespace Biomorpher
                 extremaCircle.Height = dOuter;
                 extremaCircle.Width = dOuter;
                 extremaCircle.StrokeThickness = 0.5;
-                extremaCircle.Stroke = Brushes.White;
+                extremaCircle.Stroke = Brushes.Black;
 
                 /*
                 if (isExtrema[i])
@@ -1498,7 +1500,7 @@ namespace Biomorpher
             string name = biobranchID + "." + j;
             txt.Inlines.Add(name);
             if (isOptimisationRun)
-                txt.Foreground = Brushes.Red;
+                txt.Foreground = Brushes.White;
             dp.Children.Add(txt);
             
             Button myButton = new Button();
@@ -1511,7 +1513,7 @@ namespace Biomorpher
             myTag[0] = biobranchID;
             myTag[1] = j;
             myButton.Tag = myTag;
-
+            myButton.BorderBrush = Brushes.Black;
             myButton.Content = "Reinstate";
             myButton.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             myButton.Click += new RoutedEventHandler(ReinstatePopClick);
@@ -1564,8 +1566,8 @@ namespace Biomorpher
                     Border border = new Border {BorderThickness = new Thickness(0), Padding = new Thickness(2)};
                     ViewportBasic vp4 = new ViewportBasic(thisDesign, this) {Background = Friends.RhinoGrey(), BorderThickness = new Thickness(1.0)};
 
-                    if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.Red;}
-                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.White; }
+                    if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.White;}
+                    else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Black; }
                     else {vp4.BorderBrush = Brushes.Black; }
 
                     border.Child = vp4;
@@ -1708,7 +1710,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.Inlines.Add("Recorded history of designs. Double click a design to diplay the instance in the Rhino viewport");
+            txt.Inlines.Add("Recorded history of selected designs, with results of a 'performance optimisation' run shown in white. \n\nDouble click a design to diplay the instance in the Rhino viewport.");
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
@@ -1738,7 +1740,7 @@ namespace Biomorpher
         #region UI TAB 4 & 5 (PLOTS)
 
         /// <summary>
-        /// Plot graph
+        /// Plot graph for 4 and 5
         /// </summary>
         public void tab4_plotcanvas()
         {
@@ -1747,16 +1749,39 @@ namespace Biomorpher
 
             int totalGenerations = BioBranches[biobranchID].PopTwigs.Count;
 
+            // Set up IDs for performance count
+            ComboBox myComboX = (ComboBox)controls["MYCOMBOX"];
+            ComboBox myComboY = (ComboBox)controls["MYCOMBOY"];
+
+            int ParetoXID = myComboX.SelectedIndex;
+            int ParetoYID = myComboY.SelectedIndex;
+
+            // Generate the graph labels for the scatterplot
+            if(performanceCount >= 2 && myComboX.SelectedIndex!=-1 && myComboY.SelectedIndex != -1)
+            {
+                this.Plot2XName.Text = myComboX.SelectedItem.ToString();
+                this.Plot2YName.Text = myComboY.SelectedItem.ToString();
+
+                // Check there is anything in there. If this is generation 0 there will not be anything.
+                if (BioBranches[biobranchID].PopTwigs.Count > 0)
+                {
+                    this.MinXName.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[ParetoXID]);
+                    this.MaxXName.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[ParetoXID]);
+
+                    this.MinYName.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[ParetoYID]);
+                    this.MaxYName.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[ParetoYID]);
+                }
+            }
+
             // Could be an array, but potentially more risky in case of early events.
+            // Set up points for a polyline for each performance measure
             List<System.Windows.Shapes.Polyline> myPoly = new List<System.Windows.Shapes.Polyline>();
             for (int p = 0; p < performanceCount; p++)
             {
-
                     myPoly.Add(new System.Windows.Shapes.Polyline());
                     myPoly[p].StrokeThickness = 1.5;
                     myPoly[p].Stroke = new SolidColorBrush(rgb_performance[p % 6]);
                     PlotCanvas.Children.Add(myPoly[p]);
-
             }
 
             // j indicates generation
@@ -1772,43 +1797,88 @@ namespace Biomorpher
 
                     List<double> myPerforms = thisDesign.GetPerformas();
 
-                    // Note that manual selection does not run performance measures for all population, so we have to avoid this
-                    if (myPerforms != null)
-                    {
-
-                        for (int p = 0; p < myPerforms.Count; p++)
+                    // Let's keep this for the time being
+                    //if (thisDesign.isRepresentative)
+                    //{
+                        // Note that manual selection does not run performance measures for all population, so we have to avoid this
+                        if (myPerforms != null)
                         {
-
-                            CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
-                            if ((bool)checkBox.IsChecked)
+                            for (int p = 0; p < myPerforms.Count; p++)
                             {
 
-                                System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
+                                CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
+                                if ((bool)checkBox.IsChecked)
+                                {
+                                    // Get min and max values for this performance criteria
+                                    double minP = BioBranches[biobranchID].minPerformanceValues[p];
+                                    double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
 
-                                myCircle.Fill = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
+                                    // Avoid division by zero
+                                    if (minP == maxP) maxP++;
 
-                                double minP = BioBranches[biobranchID].minPerformanceValues[p];
-                                double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
+                                    // Includes some margins
+                                    double yPos = PlotCanvas.Height - ((myPerforms[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
 
-                                // Avoid division by zero
-                                if (minP == maxP) maxP++;
+                                    // Draw the circle
+                                    System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
+                                    myCircle.Fill = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
+                                    myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
+                                    PlotCanvas.Children.Add(myCircle);
 
-                                double yPos = PlotCanvas.Height - ((myPerforms[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
-
-                                // Smaller radius if not a cluster centroid
-                                double radius = 1.5;
-                                if (thisDesign.isRepresentative) radius = 3;
-
-                                myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), radius, radius);
-
-                                PlotCanvas.Children.Add(myCircle);
+                                }
 
                             }
+
+                            // Now for the Pareto graph, which has to have minimum 2 performance values to work
+                            // If index is -1, then combobox has not been selected yet
+                            if (myPerforms.Count > 1 && ParetoXID !=-1 && ParetoYID !=-1)
+                            {
+
+                                double minXP = BioBranches[biobranchID].minPerformanceValues[ParetoXID];
+                                double maxXP = BioBranches[biobranchID].maxPerformanceValues[ParetoXID];
+                                double minYP = BioBranches[biobranchID].minPerformanceValues[ParetoYID];
+                                double maxYP = BioBranches[biobranchID].maxPerformanceValues[ParetoYID];
+
+                                // Avoid division by zero
+                                if (minXP == maxXP) maxXP++;
+                                if (minYP == maxYP) maxYP++;
+
+                                // Includes margin
+                                double paretoX = (myPerforms[ParetoXID] - minXP) * Math.Abs(PlotCanvas2.Width-10) / (maxXP - minXP) +5;
+                                double paretoY = PlotCanvas2.Height - ((myPerforms[ParetoYID] - minYP) * Math.Abs((PlotCanvas2.Height - 10)) / (maxYP - minYP) + 5);
+
+                                // Draw the circle
+                                System.Windows.Shapes.Path myCircle2 = new System.Windows.Shapes.Path();
+                                double alpha = (double)(j + 1) / BioBranches[biobranchID].PopTwigs.Count;
+
+                                double radius = 0;
+
+                                if (j == BioBranches[biobranchID].PopTwigs.Count - 1)
+                                {
+                                    radius = 4;
+                                    myCircle2.StrokeThickness = 1;
+                                    myCircle2.Stroke = Brushes.White;
+                                    myCircle2.Fill = Brushes.Black;
+                                    myCircle2.ToolTip = thisDesign.clusterId;
+                                }
+
+                                else
+                                {
+                                    myCircle2.Fill = new SolidColorBrush(Color.FromArgb((byte)(int)(255 * alpha), 0, 0, 0));
+                                    radius = 3;
+                                }
+                                
+                                myCircle2.Data = new EllipseGeometry(new System.Windows.Point(paretoX, paretoY), radius, radius);
+                                myCircle2.MouseDown += new MouseButtonEventHandler(scatterCircleClick);
+                                //Owner.SetInstance(thisDesign);
+                                PlotCanvas2.Children.Add(myCircle2);
+                            }
+
                         }
-                    }
+                    //}
                 }
 
-                //Polylines
+                // Average Polylines
                 for (int p = 0; p < performanceCount; p++)
                 {
                     
@@ -1864,9 +1934,14 @@ namespace Biomorpher
                         MinGraphLabels.Children.Add(myTextBlock2);
                     }
                 }
-                
-                
+
+
             }
+        }
+
+        private void MyCircle2_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -1892,18 +1967,15 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.Inlines.Add("Recorded history of (quantitative) performance.");
+            txt.Inlines.Add("A history of quantitative performance (if applicable) on this evolutionary branch. \n\nShows data for the 12 cluster representatives, with an average given for the whole population.");
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
             sp4.Children.Add(border);
 
-
             // Now for the soupdragons...
             StackPanel soupdragon = new StackPanel();
             string[][] criteria = getRepresentativeCriteria(population);
-
-            // 
 
             for (int i = 0; i < performanceCount; i++)
             {
@@ -1917,7 +1989,6 @@ namespace Biomorpher
                 DockPanel.SetDock(dp_p, Dock.Left);
                 myPanel.Children.Add(dp_p);
 
-                
                 CheckBox myCheck = new CheckBox();
                 myCheck.IsChecked = true;
                 myCheck.Background = Friends.RhinoGrey();
@@ -1935,10 +2006,75 @@ namespace Biomorpher
             soupdragon.Orientation = Orientation.Vertical;
             sp4.Children.Add(soupdragon);
 
-
             //Add the stackpanels to the secondary area of Tab 3
             Tab4_secondary.Child = sp4;
 
+        }
+
+        /// <summary>
+        /// Create settings panel for Tab 5
+        /// </summary>
+        public void tab5_secondary_settings()
+        {
+            StackPanel sp5 = new StackPanel();
+            //controls.Add("SP4", sp4);
+
+            //Header
+            Border border_head = new Border();
+            border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
+            Label label_head = new Label();
+            label_head.FontSize = fontsize;
+            label_head.Content = "Scatter Plot";
+            border_head.Child = label_head;
+            sp5.Children.Add(border_head);
+
+            // History description
+            Border border = new Border();
+            border.Margin = new Thickness(margin_w, 0, margin_w, 12);
+            TextBlock txt = new TextBlock();
+            txt.TextWrapping = TextWrapping.Wrap;
+            txt.FontSize = fontsize2;
+            txt.Inlines.Add("Plots two performance criteria against each other on a scatter graph. \n\nAll generations for the current evolutionary branch are displayed, with those in the past the faded the most and the latest generation outlined.");
+            Label label = new Label();
+            label.Content = txt;
+            border.Child = label;
+            sp5.Children.Add(border);
+
+            // Dropdowns
+            string[][] criteria = getRepresentativeCriteria(population);
+
+            Border menuBorder = new Border();
+            menuBorder.Margin = new Thickness(margin_w, 0, margin_w, 12);
+            Border menuBorder2 = new Border();
+            menuBorder2.Margin = new Thickness(margin_w, 0, margin_w, 12);
+
+            ComboBox myComboX = new ComboBox();
+            ComboBox myComboY = new ComboBox();
+
+            controls.Add("MYCOMBOX", myComboX);
+            controls.Add("MYCOMBOY", myComboY);
+
+            myComboX.Background = Friends.RhinoGrey();
+            myComboY.Background = Friends.RhinoGrey();
+
+            for (int i = 0; i < performanceCount; i++)
+            {
+                myComboX.Items.Add(criteria[0][i].ToString());
+                myComboY.Items.Add(criteria[0][i].ToString());
+            }
+
+
+            myComboX.SelectionChanged += new SelectionChangedEventHandler(replot);
+            myComboY.SelectionChanged += new SelectionChangedEventHandler(replot);
+
+            menuBorder.Child = myComboX;
+            menuBorder2.Child = myComboY;
+
+            sp5.Children.Add(menuBorder);
+            sp5.Children.Add(menuBorder2);
+
+            //Add the stackpanels to the secondary area of Tab 3
+            Tab5_secondary.Child = sp5;
         }
 
         #endregion
@@ -2239,6 +2375,10 @@ namespace Biomorpher
             GO = true;
         }
 
+        public void scatterCircleClick(object sender, RoutedEventArgs e)
+        {
+            System.Console.Beep(10000, 50);
+        }
 
         /// <summary>
         /// Reinstates an old population and makes a new biobranch
@@ -2331,28 +2471,10 @@ namespace Biomorpher
             Button b_clicked = (Button)sender;
             bool isPerformanceCriteriaBased = isRadioMinMaxButtonChecked();
 
-            // Try and get data from the choice input (for next release??)
-            // Currently adds too much clutter to the biomorpher component.
-            /*
-            List<int> choice = owner.GetGhoice();
-
-            for (int i = 0; i < choice.Count; i++ )
-            {
-                string cb_name = "cb_tab2_" + choice[i];
-                CheckBox cb = (CheckBox)controls[cb_name];
-
-                if (cb.IsChecked == false)
-                {
-                    cb.IsChecked = true;
-                    parentCount++;
-                }
-            }
-            */
-
             //Test if minimum one parent is selected
             if (ParentCount < 1 && !isPerformanceCriteriaBased)
             {
-                MessageBoxResult message = MessageBox.Show(this, "Manually select designs or performance criteria to optimise.");
+                MessageBoxResult message = MessageBox.Show(this, "Manually select designs and/or performance criteria to evolve.");
             }
 
             else
@@ -2471,8 +2593,11 @@ namespace Biomorpher
             PlotCanvas.Width = chartGrid.ActualWidth;
             PlotCanvas.Height = chartGrid.ActualHeight;
 
+            PlotCanvas2.Width = chartGrid2.ActualWidth;
+            PlotCanvas2.Height = chartGrid2.ActualHeight;
+
             // Only if evolution has started do we do this bit.
-            if(GO)
+            if (GO)
                 tab4_plotcanvas();
         }
 
