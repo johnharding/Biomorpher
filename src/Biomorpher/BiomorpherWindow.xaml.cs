@@ -1,31 +1,19 @@
-﻿using HelixToolkit.Wpf;
-using Rhino.Geometry;
+﻿using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Biomorpher.IGA;
-using Biomorpher;
 using Grasshopper.Kernel;
 using MahApps.Metro.Controls;
-using System.Windows.Controls.Primitives;
 using System.ComponentModel;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
-using Grasshopper.Kernel.Data;
-using Grasshopper;
-using System.IO;
-using System.Windows.Interop;
-using Rhino;
 
 namespace Biomorpher
 {
@@ -769,7 +757,6 @@ namespace Biomorpher
             dock_go2.Children.Add(label_go2);
             DockPanel.SetDock(dock_go2, Dock.Left);
             dp_buttons.Children.Add(dock_go2);
-
 
             Border border_buttons = new Border();
             border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -1591,7 +1578,7 @@ namespace Biomorpher
 
                     if (thisDesign.isOptimal) {vp4.BorderBrush = Brushes.White;}
                     else if (thisDesign.isChecked) {vp4.BorderBrush = Brushes.Black; }
-                    else {vp4.BorderBrush = Brushes.Black; }
+                    else {vp4.BorderBrush = Brushes.SlateGray; }
 
                     border.Child = vp4;
                     border.Height = 120;

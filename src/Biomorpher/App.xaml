@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Biomorpher"
              StartupUri="BiomorpherWindow.xaml">
     <Application.Resources>
-         
+        
     </Application.Resources>
 </Application>

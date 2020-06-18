@@ -37,8 +37,8 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
-                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="False">
-                            <Canvas x:Name="HistoryCanvas">
+                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="True">
+                            <Canvas x:Name="HistoryCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
                             </Canvas>
                         </ScrollViewer>
                     </Border>
@@ -223,6 +223,19 @@
                     <SolidColorBrush x:Key="IdealForegroundDisabledBrush" Opacity="0.4" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
                     <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
 
+                    <!--
+                    <Style TargetType="Label">
+                        <Setter Property="FontFamily" Value="Candara"/>
+                    </Style>
+
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontFamily" Value="Candara"/>
+                    </Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="FontFamily" Value="Candara"/>
+                    </Style>
+                    -->
+                    
                 </ResourceDictionary>
 
 
@@ -230,6 +243,7 @@
 
 
         </ResourceDictionary>
+
 
 
     </controls:MetroWindow.Resources>
