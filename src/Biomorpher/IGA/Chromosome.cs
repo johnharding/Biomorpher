@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Grasshopper.Kernel;
 using Rhino.Geometry;
-using Biomorpher.IGA;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
-
 
 namespace Biomorpher.IGA
 {
@@ -40,12 +34,12 @@ namespace Biomorpher.IGA
         /// <summary>
         /// List of associated sliders to this chromosome
         /// </summary>
-        private List<Grasshopper.Kernel.Special.GH_NumberSlider> chromoSliders;
+        private List<GH_NumberSlider> chromoSliders;
 
         /// <summary>
         /// List of associated genepools to this chromosome
         /// </summary>
-        private List<GalapagosComponents.GalapagosGeneListObject> chromoGenePools;
+        private List<GalapagosGeneListObject> chromoGenePools;
 
         /// <summary>
         /// Fitness from 0.0 to 1.0 used for elitism selection
@@ -131,7 +125,8 @@ namespace Biomorpher.IGA
             this.chromoSliders = cloner.chromoSliders; // is this copying by reference!?
             this.chromoGenePools = cloner.chromoGenePools; // is this copying by reference!?
 
-            Array.Copy(cloner.genes, this.genes, cloner.genes.Length); // by value
+            this.genes = new double[cloner.genes.Length];
+            Array.Copy(cloner.genes, this.genes, cloner.genes.Length);
 
             this.fitness = cloner.fitness;
             this.clusterId = cloner.clusterId;
@@ -144,25 +139,23 @@ namespace Biomorpher.IGA
             this.isMaximum = cloner.isMaximum;
 
             // Clone phenotype mesh
-            if (this.phenotype != null)
+            if (cloner.phenotype != null)
             {
                 this.phenotype = new List<Mesh>(cloner.phenotype);
             }
 
             // Clone performance values
-            if (this.performance != null)
+            if (cloner.performance != null)
             {
                 this.performance = new List<double>(cloner.performance);
             }
 
             // Clone crieria
-            if (this.criteria != null)
+            if (cloner.criteria != null)
             {
                 this.criteria = new List<string>(cloner.criteria);
             }
         }
-
-
 
         /// <summary>
         /// Generates a random set of genes for this chromosome
@@ -226,52 +219,6 @@ namespace Biomorpher.IGA
         public double GetFitness()
         {
             return fitness;
-        }
-
-        /// <summary>
-        /// Clones the chromosome including k-means data, geometry phenotype and performance data
-        /// </summary>
-        /// <returns></returns>
-        public Chromosome Clone()
-        {
-            // Clone sliders and genepools associated with this chromosome
-            Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools);
-
-            // Clone gene array
-            // These are value types, so all good here
-            Array.Copy(this.genes, clone.genes, this.genes.Length);
-            
-            // Clone fitness and K-means data
-            clone.fitness = this.fitness;
-            clone.clusterId = this.clusterId;
-            clone.isRepresentative = this.isRepresentative;
-            clone.isElite = this.isElite;
-            clone.distToRepresentative = this.distToRepresentative;
-            clone.isChecked = this.isChecked;
-            clone.isOptimal = this.isOptimal;
-            clone.isMinimum = this.isMinimum;
-            clone.isMaximum = this.isMaximum;
-
-            // Clone phenotype mesh
-            if (this.phenotype != null)
-            {
-                clone.phenotype = new List<Mesh>(this.phenotype);
-            }
-
-            // Clone performance values
-            if (this.performance != null)
-            {
-                clone.performance = new List<double>(this.performance);
-            }
-
-            // Clone crieria
-            if (this.criteria != null)
-            {
-                clone.criteria = new List<string>(this.criteria);
-            }
-            
-            // Return new chromosome
-            return clone;
         }
 
         /// <summary>

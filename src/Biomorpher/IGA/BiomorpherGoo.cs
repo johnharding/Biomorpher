@@ -1,13 +1,5 @@
-﻿using Grasshopper.Kernel;
-using Grasshopper.Kernel.Data;
+﻿using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
-using Rhino.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Grasshopper.Kernel.Special;
 
 namespace Biomorpher.IGA
 {
@@ -83,7 +75,6 @@ namespace Biomorpher.IGA
                 writer.SetInt32("popCount", Value.PopCount);
             }
             
-
             return true;
         }
 
@@ -117,7 +108,6 @@ namespace Biomorpher.IGA
             return true;
 
         }
-
 
     }
 }

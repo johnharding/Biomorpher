@@ -110,7 +110,6 @@ namespace Biomorpher.IGA
             Canvas.SetZIndex(OriginCurve, -1);
             canvas.Children.Add(OriginCurve);
 
-
             //Add outline circle
             double s = 6;
             System.Windows.Shapes.Ellipse nodule = new System.Windows.Shapes.Ellipse();
@@ -129,8 +128,6 @@ namespace Biomorpher.IGA
             Canvas.SetLeft(nodule2, P4.X-s/2);
             Canvas.SetTop(nodule2, P4.Y-s/2);
             canvas.Children.Add(nodule2);
-
-            
         }
 
         /// <summary>
@@ -138,21 +135,16 @@ namespace Biomorpher.IGA
         /// </summary>
         public void PerformAnalytics()
         {
-
-            // Calculate min and max for the entire set.
-            
-            
+            // min max for this entire branch
+            // Only looks at representatives, as data might be null for the others
             minPerformanceValues = new double[performanceCount];
             maxPerformanceValues = new double[performanceCount];
-
-            
 
             for(int p=0; p<minPerformanceValues.Length; p++)
             {
                 minPerformanceValues[p] = 9999999999d;
                 maxPerformanceValues[p] = -9999999999d;
             }
-
 
             for(int j=0; j<PopTwigs.Count; j++)
             {
@@ -174,16 +166,8 @@ namespace Biomorpher.IGA
                            }
                        }
                    }
-
                 }
-
             }
-
-
-            //Cluster size?
-
-
         }
-
     }
 }

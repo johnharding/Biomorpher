@@ -313,7 +313,7 @@ namespace Biomorpher
 
             // 2. Crossover and Mutate population using user preferences
             population.CrossoverPop(crossoverProbability);
-            population.MutatePop(mutateProbability);
+            population.MutatePop(controls, mutateProbability);
 
             // Now to display the new population...
             // 2a. Jiggle the population a little to avoid repeats (don't tell anyone)
@@ -841,6 +841,29 @@ namespace Biomorpher
             dp_disablepreview.Children.Add(cb_disablepreview);
             border_disablepreview.Child = dp_disablepreview;
             sp.Children.Add(border_disablepreview);
+
+
+            // Now for the mutate elites checkbox
+            Border border_mutateElites = new Border();
+            border_mutateElites.Padding = new Thickness(0);
+            border_mutateElites.BorderThickness = new Thickness(margin_w, 0, margin_w, 0);
+            DockPanel dp_mutateElites = new DockPanel();
+            Label label_mutateElites = new Label();
+            label_mutateElites.HorizontalContentAlignment = HorizontalAlignment.Left;
+            label_mutateElites.Content = "Mutate elite (fittest) designs";
+            DockPanel.SetDock(label_mutateElites, Dock.Left);
+            dp_mutateElites.Children.Add(label_mutateElites);
+
+            CheckBox cb_mutateElites = new CheckBox();
+            cb_mutateElites.Name = "cb_mutateElites";
+            cb_mutateElites.IsChecked = false;
+            cb_mutateElites.Background = Friends.RhinoGrey();
+            controls.Add(cb_mutateElites.Name, cb_mutateElites);
+            cb_mutateElites.HorizontalAlignment = HorizontalAlignment.Right;
+            DockPanel.SetDock(cb_mutateElites, Dock.Right);
+            dp_mutateElites.Children.Add(cb_mutateElites);
+            border_mutateElites.Child = dp_mutateElites;
+            sp.Children.Add(border_mutateElites);
 
             //Add the stackpanel to the secondary area of Tab 0
             Tab1_secondary.Child = sp;

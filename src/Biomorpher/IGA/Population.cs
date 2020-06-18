@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
-using Grasshopper.Kernel.Data;
 using System.Windows.Controls;
 using System.Windows;
-using Grasshopper.Kernel.Types;
-using Grasshopper.Kernel;
 
 namespace Biomorpher.IGA
 {
@@ -150,22 +145,25 @@ namespace Biomorpher.IGA
             // Set up a fresh new population (no clone).
             Population newPop = new Population(this.chromosomes.Length, popSliders, popGenePools, owner, -1);
 
-            // Copy the elites and get the total fitness
+            
+            // Copy the elites
             for (int i = 0; i < chromosomes.Length; i++)
             {
                 if (chromosomes[i].GetFitness() == 1.0)
                 {
                     newPop.chromosomes[counter] = new Chromosome(chromosomes[i]);
+                    newPop.chromosomes[counter].isRepresentative = false;
                     newPop.chromosomes[counter].isElite = true;
                     counter++;
-
                 }
+            }
 
+            // Now for the roulette wheel selection for the new population
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
                 totalFitness += chromosomes[i].GetFitness();
             }
 
-
-            // Now for the roulette wheel selection for the new population
             // Run from the counter above
             for (int i = counter; i < newPop.chromosomes.Length; i++)
             {
@@ -184,16 +182,8 @@ namespace Biomorpher.IGA
                         // Fitness is cloned at this stage
                         newPop.chromosomes[i] = new Chromosome(chromosomes[j]);
                         newPop.chromosomes[i].isRepresentative = false;
+                        newPop.chromosomes[i].isElite = false;
 
-                        // Elitism tag even for those selected here by roulette
-                        if (newPop.chromosomes[i].GetFitness() == 1.0)
-                        {
-                            newPop.chromosomes[i].isElite = true;
-                        }
-                        else
-                        {
-                            newPop.chromosomes[i].isElite = false;
-                        }
                         break;
                     }
                 }
@@ -205,11 +195,10 @@ namespace Biomorpher.IGA
                 chromosomes[i] = new Chromosome(newPop.chromosomes[i]);
             }
             
-
         }
 
         /// <summary>
-        /// Gets the fittest design there is (or at least one of them).
+        /// Gets the fittest design there is (or at least one of them if there are several the same).
         /// </summary>
         /// <returns></returns>
         public Chromosome GetFittest()
@@ -294,10 +283,22 @@ namespace Biomorpher.IGA
                     // Find the normalised value for each chromosome
                     for (int j = 0; j < chromosomes.Length; j++)
                     {
+                        double value = 0.0;
+
                         // Get the normalised value, and flip value for minimising criteria
-                        double value = (chromosomes[j].GetPerformas()[p] - minValues[p]) / range;
-                        if (radButtonMin[p].IsChecked == true)
-                            value = 1 - value;
+                        // Catch division by zero. This may occur if all the performances are identical.
+                        if (range != 0)
+                        {
+                            value = (chromosomes[j].GetPerformas()[p] - minValues[p]) / range;
+
+                            if (radButtonMin[p].IsChecked == true)
+                                value = 1 - value;
+                        }
+                        
+                        else
+                        {
+                            value = 1.0;
+                        }
 
                         // Adjust depending on number of performance measures to be optimised
                         value /= (double)toBeOptimisedCount;
@@ -354,16 +355,25 @@ namespace Biomorpher.IGA
             }
         }
 
-
         /// <summary>
         /// Mutates a gene according to a probability
         /// </summary>
+        /// <param name="controls"></param>
         /// <param name="probability"></param>
-        public void MutatePop(double probability)
+        public void MutatePop(Dictionary<string, FrameworkElement> controls, double probability)
         {
+
+            CheckBox checkBox = (CheckBox)controls["cb_mutateElites"];
+
             for (int i = 0; i < chromosomes.Length; i++)
             {
+
                 if (!chromosomes[i].isElite)
+                {
+                    chromosomes[i].Mutate(probability);
+                }
+
+                else if ((bool)checkBox.IsChecked)
                 {
                     chromosomes[i].Mutate(probability);
                 }
@@ -381,29 +391,30 @@ namespace Biomorpher.IGA
             {
                 int size = chromosomes[0].GetGenes().Length;
 
-                // Avoid the first two elites
-                for (int i = 2; i < chromosomes.Length; i += 2)
+                for (int i = 0; i < chromosomes.Length; i += 2)
                 {
 
                     if (Friends.GetRandomDouble() < probability)
                     {
-
-                        int splice = Friends.GetRandomInt(0, size);
-
-                        double[] limbo1 = new double[size];
-                        double[] limbo2 = new double[size];
-
-                        chromosomes[i].GetGenes().CopyTo(limbo1, 0);
-                        chromosomes[i + 1].GetGenes().CopyTo(limbo2, 0);
-
-                        for (int s = splice; s < size; s++)
+                        if (!chromosomes[i].isElite && !chromosomes[i + 1].isElite)
                         {
-                            limbo1[s] = chromosomes[i + 1].GetGenes()[s];
-                            limbo2[s] = chromosomes[i].GetGenes()[s];
-                        }
+                            int splice = Friends.GetRandomInt(0, size);
 
-                        chromosomes[i].SetGenes(limbo1);
-                        chromosomes[i + 1].SetGenes(limbo2);
+                            double[] limbo1 = new double[size];
+                            double[] limbo2 = new double[size];
+
+                            chromosomes[i].GetGenes().CopyTo(limbo1, 0);
+                            chromosomes[i + 1].GetGenes().CopyTo(limbo2, 0);
+
+                            for (int s = splice; s < size; s++)
+                            {
+                                limbo1[s] = chromosomes[i + 1].GetGenes()[s];
+                                limbo2[s] = chromosomes[i].GetGenes()[s];
+                            }
+
+                            chromosomes[i].SetGenes(limbo1);
+                            chromosomes[i + 1].SetGenes(limbo2);
+                        }
                     }
                 }
             }
@@ -801,9 +812,6 @@ namespace Biomorpher.IGA
 
             return clusterCounts;
         }
-
-
-
 
     }
 }
