@@ -123,6 +123,48 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
+        /// Cloning constructor
+        /// </summary>
+        /// <param name="cloner"></param>
+        public Chromosome(Chromosome cloner)
+        {
+            this.chromoSliders = cloner.chromoSliders; // is this copying by reference!?
+            this.chromoGenePools = cloner.chromoGenePools; // is this copying by reference!?
+
+            Array.Copy(cloner.genes, this.genes, cloner.genes.Length); // by value
+
+            this.fitness = cloner.fitness;
+            this.clusterId = cloner.clusterId;
+            this.isRepresentative = cloner.isRepresentative;
+            this.isElite = cloner.isElite;
+            this.distToRepresentative = cloner.distToRepresentative;
+            this.isChecked = cloner.isChecked;
+            this.isOptimal = cloner.isOptimal;
+            this.isMinimum = cloner.isMinimum;
+            this.isMaximum = cloner.isMaximum;
+
+            // Clone phenotype mesh
+            if (this.phenotype != null)
+            {
+                this.phenotype = new List<Mesh>(cloner.phenotype);
+            }
+
+            // Clone performance values
+            if (this.performance != null)
+            {
+                this.performance = new List<double>(cloner.performance);
+            }
+
+            // Clone crieria
+            if (this.criteria != null)
+            {
+                this.criteria = new List<string>(cloner.criteria);
+            }
+        }
+
+
+
+        /// <summary>
         /// Generates a random set of genes for this chromosome
         /// </summary>
         public void GenerateRandomGenes()
@@ -196,6 +238,7 @@ namespace Biomorpher.IGA
             Chromosome clone = new Chromosome(this.chromoSliders, this.chromoGenePools);
 
             // Clone gene array
+            // These are value types, so all good here
             Array.Copy(this.genes, clone.genes, this.genes.Length);
             
             // Clone fitness and K-means data

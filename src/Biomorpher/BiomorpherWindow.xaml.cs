@@ -307,7 +307,7 @@ namespace Biomorpher
 
             // 1. Create a new population using fitness values (also resets fitnesses)
             Generation++;
-            population.RoulettePop();
+            population.SelectPop();
             //
             population.ResetAllFitness();
 
@@ -2377,7 +2377,7 @@ namespace Biomorpher
 
         public void scatterCircleClick(object sender, RoutedEventArgs e)
         {
-            System.Console.Beep(10000, 50);
+            // TODO
         }
 
         /// <summary>
