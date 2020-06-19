@@ -1127,7 +1127,7 @@ namespace Biomorpher
                 performanceCircle.Height = performanceDiameter;
                 performanceCircle.Width = performanceDiameter;
                 SolidColorBrush brush = new SolidColorBrush();
-                brush.Color = rgb_performance[i % 6];
+                brush.Color = rgb_performance[i % 8];
                 performanceCircle.Fill = brush;
 
                 Canvas.SetLeft(performanceCircle, distFromLeft + (dOuter - performanceDiameter)*0.5 );
@@ -1389,7 +1389,7 @@ namespace Biomorpher
 
                     // 6 colours MAX!
                     string tooltiptext = "(pop average = " + thisPop.Performance_Averages[i]+")";
-                    DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 6], isHistory, i);
+                    DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 8], isHistory, i);
                 
                     yourBorders[i].Child = dp_p;
                 }
@@ -1790,7 +1790,7 @@ namespace Biomorpher
             {
                     myPoly.Add(new System.Windows.Shapes.Polyline());
                     myPoly[p].StrokeThickness = 1.5;
-                    myPoly[p].Stroke = new SolidColorBrush(rgb_performance[p % 6]);
+                    myPoly[p].Stroke = new SolidColorBrush(rgb_performance[p % 8]);
                     PlotCanvas.Children.Add(myPoly[p]);
             }
 
@@ -1831,7 +1831,7 @@ namespace Biomorpher
 
                                     // Draw the circle
                                     System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
-                                    myCircle.Fill = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
+                                    myCircle.Fill = new SolidColorBrush(rgb_performance[p % 8]);// 8 colours max
                                     myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
                                     PlotCanvas.Children.Add(myCircle);
 
@@ -1908,7 +1908,7 @@ namespace Biomorpher
                         System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
                         myCircle.Fill = Brushes.White;
                         myCircle.StrokeThickness = 1.5;
-                        myCircle.Stroke = new SolidColorBrush(rgb_performance[p % 6]);// 6 colours max
+                        myCircle.Stroke = new SolidColorBrush(rgb_performance[p % 8]);// 8 colours max
                         myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 4, 4);
                         myCircle.ToolTip = "pop average = " + BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p];
                         PlotCanvas.Children.Add(myCircle);
@@ -1930,14 +1930,14 @@ namespace Biomorpher
                     {
 
                         TextBlock myTextBlock = new TextBlock();
-                        myTextBlock.Foreground = new SolidColorBrush(rgb_performance[p % 6]);
+                        myTextBlock.Foreground = new SolidColorBrush(rgb_performance[p % 8]);
                         myTextBlock.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[p]);
                         myTextBlock.UseLayoutRounding = true;
                         myTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
                         MaxGraphLabels.Children.Add(myTextBlock);
 
                         TextBlock myTextBlock2 = new TextBlock();
-                        myTextBlock2.Foreground = new SolidColorBrush(rgb_performance[p % 6]);
+                        myTextBlock2.Foreground = new SolidColorBrush(rgb_performance[p % 8]);
                         myTextBlock2.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[p]);
                         myTextBlock2.UseLayoutRounding = true;
                         myTextBlock2.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
@@ -1995,7 +1995,7 @@ namespace Biomorpher
                 
                 DockPanel myPanel = new DockPanel();
                 myPanel.LastChildFill = false;
-                DockPanel dp_p = createColourCodedLabel(criteria[0][i].ToString(), "none", rgb_performance[i % 6], false, i);
+                DockPanel dp_p = createColourCodedLabel(criteria[0][i].ToString(), "none", rgb_performance[i % 8], false, i);
                 DockPanel.SetDock(dp_p, Dock.Left);
                 myPanel.Children.Add(dp_p);
 

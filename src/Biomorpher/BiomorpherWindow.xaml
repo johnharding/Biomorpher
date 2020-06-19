@@ -37,7 +37,7 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
-                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="True">
+                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="True" Margin="0,30,0,0">
                             <Canvas x:Name="HistoryCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
                             </Canvas>
                         </ScrollViewer>
@@ -74,8 +74,14 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <StackPanel x:Name="MaxGraphLabels" Grid.Row="0"></StackPanel>
-                                    <StackPanel x:Name="MinGraphLabels" Grid.Row="1" VerticalAlignment="Bottom"></StackPanel>
+                                    
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="5" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel x:Name="MaxGraphLabels" Grid.Row="0" Grid.Column="0"></StackPanel>
+                                    <StackPanel x:Name="MinGraphLabels" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom"></StackPanel>
                                 </Grid>
                             </Border>
 
@@ -99,65 +105,80 @@
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70"/>
-                                <ColumnDefinition Width="27*"/>
-                                <ColumnDefinition Width="31*"/>
                                 <ColumnDefinition Width="806*"/>
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
 
-                            <Grid x:Name="chartGrid2" SizeChanged="chartGrid_SizeChanged" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3">
+                            <Grid x:Name="chartGrid2" SizeChanged="chartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
                                 <Border BorderThickness="1" BorderBrush="Black">
                                     <Canvas x:Name="PlotCanvas2" ClipToBounds="True"/>
                                 </Border>
                             </Grid>
 
-                            <TextBlock x:Name="Plot2YName" Grid.Column="0" Grid.Row="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="-20,84,-64,86" Height="26" Width="154" TextAlignment="Center" RenderTransformOrigin="0.5,0.5">
-                                <TextBlock.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform/>
-                                        <SkewTransform/>
-                                        <RotateTransform Angle="-90"/>
-                                        <TranslateTransform/>
-                                    </TransformGroup>
-                                </TextBlock.RenderTransform>
-                                Criteria 2
-                            </TextBlock>
 
-                            <TextBlock x:Name="MinYName" Grid.Column="0" Grid.Row="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="-20,496,800,66" Height="26" Width="154" TextAlignment="Left" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="4">
-                                <TextBlock.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform/>
-                                        <SkewTransform/>
-                                        <RotateTransform Angle="-90"/>
-                                        <TranslateTransform/>
-                                    </TransformGroup>
-                                </TextBlock.RenderTransform>
-                                Min Y
-                            </TextBlock>
+                            <Grid Grid.Column="1" Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock x:Name="MaxYName" Grid.Column="0" Grid.Row="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="-20,68,800,494" Height="26" Width="154" TextAlignment="Right" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="4">
-                                <TextBlock.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform/>
-                                        <SkewTransform/>
-                                        <RotateTransform Angle="-90"/>
-                                        <TranslateTransform/>
-                                    </TransformGroup>
-                                </TextBlock.RenderTransform>
-                                Max Y
-                            </TextBlock>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
 
-                            <TextBlock x:Name="Plot2XName" FontSize="12" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="192,7,251,8" Height="25" Width="363" TextAlignment="Center">
+                                <TextBlock x:Name="Plot2XName" FontSize="12"  Grid.Column="1" Grid.Row ="1" VerticalAlignment="Top" HorizontalAlignment="Center"  TextAlignment="Center">
                                 Criteria 1
-                            </TextBlock>
+                                </TextBlock>
 
-                            <TextBlock x:Name="MinXName" FontSize="12" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,7,708,8" Height="25" Width="156" TextAlignment="Left" Grid.ColumnSpan="3">
+                                <TextBlock x:Name="MinXName" FontSize="12" Grid.Column="0" Grid.Row ="1" VerticalAlignment="Top" HorizontalAlignment="Left" TextAlignment="Left">
                                 Min X
-                            </TextBlock>
+                                </TextBlock>
 
-                            <TextBlock x:Name="MaxXName" FontSize="12" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="640,7,0,8" Height="25" Width="166" TextAlignment="Right">
+                                <TextBlock x:Name="MaxXName" FontSize="12"  Grid.Column="2" Grid.Row ="1" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right">
                                 Max X
-                            </TextBlock>
+                                </TextBlock>
+
+                            </Grid>
+
+
+                            <Grid Grid.Column="0" Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+
+                                <TextBlock x:Name="Plot2YName" Grid.Column="0" Grid.Row="1" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Center">
+
+                                    <TextBlock.LayoutTransform>
+                                        <TransformGroup>
+                                            <RotateTransform Angle="-90"/>
+                                        </TransformGroup>
+                                    </TextBlock.LayoutTransform>
+                                    
+                                Criteria 2
+                                </TextBlock>
+
+                                <TextBlock x:Name="MinYName" Grid.Column="0" Grid.Row="2" FontSize="12" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right">
+
+                                Min Y
+                                </TextBlock>
+
+
+                                <TextBlock x:Name="MaxYName" Grid.Column="0" Grid.Row="0" FontSize="12" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right">
+                                    
+                                Max Y
+                                </TextBlock>
+                            </Grid>
+
                         </Grid>
                     </Border>
                 </DockPanel>
@@ -235,7 +256,7 @@
                         <Setter Property="FontFamily" Value="Candara"/>
                     </Style>
                     -->
-                    
+
                 </ResourceDictionary>
 
 
