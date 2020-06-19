@@ -53,7 +53,7 @@ namespace Biomorpher.IGA
         {
             return new Color[8] 
             {
-                Color.FromArgb(255, 0, 0, 0),
+                Color.FromArgb(255, 60, 60, 60),
                 Color.FromArgb(255, 120, 0, 0),
                 Color.FromArgb(255, 0, 120, 0),
                 Color.FromArgb(255, 0, 0, 120),

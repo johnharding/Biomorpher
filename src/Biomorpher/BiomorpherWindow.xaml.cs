@@ -843,7 +843,7 @@ namespace Biomorpher
 
             CheckBox cb_mutateElites = new CheckBox();
             cb_mutateElites.Name = "cb_mutateElites";
-            cb_mutateElites.IsChecked = false;
+            cb_mutateElites.IsChecked = true;
             cb_mutateElites.Background = Friends.RhinoGrey();
             controls.Add(cb_mutateElites.Name, cb_mutateElites);
             cb_mutateElites.HorizontalAlignment = HorizontalAlignment.Right;
