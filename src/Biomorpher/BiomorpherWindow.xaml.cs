@@ -1808,8 +1808,8 @@ namespace Biomorpher
                     List<double> myPerforms = thisDesign.GetPerformas();
 
                     // Let's keep this for the time being
-                    //if (thisDesign.isRepresentative)
-                    //{
+                    if (thisDesign.isRepresentative || thisDesign.isMinimum || thisDesign.isMaximum || thisDesign.isOptimal)
+                    {
                         // Note that manual selection does not run performance measures for all population, so we have to avoid this
                         if (myPerforms != null)
                         {
@@ -1833,6 +1833,13 @@ namespace Biomorpher
                                     System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
                                     myCircle.Fill = new SolidColorBrush(rgb_performance[p % 8]);// 8 colours max
                                     myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
+
+                                    if (thisDesign.isOptimal)
+                                    {
+                                        myCircle.StrokeThickness = 1.0;
+                                        myCircle.Stroke = Brushes.White;
+                                    }
+
                                     PlotCanvas.Children.Add(myCircle);
 
                                 }
@@ -1885,7 +1892,7 @@ namespace Biomorpher
                             }
 
                         }
-                    //}
+                    }
                 }
 
                 // Average Polylines
@@ -1977,7 +1984,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.Inlines.Add("A history of quantitative performance (if applicable) on this evolutionary branch. \n\nShows data for the 12 cluster representatives, with an average given for the whole population.");
+            txt.Inlines.Add("A history of quantitative performance (if applicable) on this evolutionary branch. \n\nShows data for the 12 cluster representatives and performance optimals, with an average shown for the whole population.");
             Label label = new Label();
             label.Content = txt;
             border.Child = label;
@@ -2124,7 +2131,7 @@ namespace Biomorpher
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
             txt_dcl2.FontSize = 12;
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
-            txt_dcl2.Inlines.Add("Inspired by Richard Dawkins' Biomorphs from 1986.");
+            txt_dcl2.Inlines.Add("Inspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris.");
             txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
             txt_dcl2.Inlines.Add("\nCopyright:\t2020 John Harding");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
