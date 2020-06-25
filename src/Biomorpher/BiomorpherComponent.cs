@@ -58,8 +58,8 @@ namespace Biomorpher
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
-            pm.AddMeshParameter("Meshes", "Meshes", "(phenotype) Connect geometry here: currently meshes only please. Use mesh pipe for lines", GH_ParamAccess.tree);
-            pm.AddNumberParameter("Perform", "Perform", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
+            pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here. Surfaces, Meshes, Curves.", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Performs", "Performs", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
             
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
@@ -196,8 +196,9 @@ namespace Biomorpher
                 }
             }
 
-            // TODO: The allGeometry should not be of type Mesh.
-            List<Mesh> allGeometry = new List<Mesh>();
+            // Gets lists of different geometry
+            List<Mesh> meshGeometry = new List<Mesh>();
+            List<PolylineCurve> polyGeometry = new List<PolylineCurve>();
 
             // Get only mesh geometry from the object list
             for (int i = 0; i < localObjs.Count; i++)
@@ -211,8 +212,17 @@ namespace Biomorpher
                     myLocalMesh.Faces.ConvertQuadsToTriangles();
                     //Mesh joinedMesh = new Mesh();
                     //joinedMesh.Append(myLocalMesh);
-                    allGeometry.Add(myLocalMesh);
+                    meshGeometry.Add(myLocalMesh);
                 }
+
+                if (localObjs[i] is GH_Curve)
+                {
+                    GH_Curve myGHCurve = (GH_Curve)localObjs[i];
+                    PolylineCurve myPoly = myGHCurve.Value.ToPolyline(0, 0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, true);
+                    polyGeometry.Add(myPoly);
+
+                }
+
             }
 
             // Get performance data
@@ -268,7 +278,7 @@ namespace Biomorpher
             }
 
             // Set the phenotype within the chromosome class
-            chromo.SetPhenotype(allGeometry, performas, criteria);
+            chromo.SetPhenotype(meshGeometry, polyGeometry, performas, criteria);
 
             // Return the number of performance criteria
             return performas.Count;

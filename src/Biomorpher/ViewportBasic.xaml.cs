@@ -44,7 +44,7 @@ namespace Biomorpher
 
             myViewport = new Viewport3D();
 
-            List<Mesh> rMesh = thisDesign.phenotype;
+            List<Mesh> rMesh = thisDesign.phenoMesh;
             List<ModelVisual3D> vis = new List<ModelVisual3D>();
 
             Model3DGroup boundsGroup = new Model3DGroup();

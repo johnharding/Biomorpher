@@ -14,7 +14,12 @@ namespace Biomorpher.IGA
         /// <summary>
         /// Geometry phenotype. Currently only meshes
         /// </summary>
-        public List<Mesh> phenotype;
+        public List<Mesh> phenoMesh;
+
+        /// <summary>
+        /// Geometry phenotype. Currently only meshes
+        /// </summary>
+        public List<PolylineCurve> phenoPoly;
 
         /// <summary>
         /// Optional list of performance values
@@ -138,10 +143,16 @@ namespace Biomorpher.IGA
             this.isMinimum = cloner.isMinimum;
             this.isMaximum = cloner.isMaximum;
 
-            // Clone phenotype mesh
-            if (cloner.phenotype != null)
+            // Clone phenotype meshes
+            if (cloner.phenoMesh != null)
             {
-                this.phenotype = new List<Mesh>(cloner.phenotype);
+                this.phenoMesh = new List<Mesh>(cloner.phenoMesh);
+            }
+
+            // Clone phenotype polys
+            if (cloner.phenoPoly != null)
+            {
+                this.phenoPoly = new List<PolylineCurve>(cloner.phenoPoly);
             }
 
             // Clone performance values
@@ -280,9 +291,13 @@ namespace Biomorpher.IGA
         /// Sets the phenotype for this chromosome (geometry and performance criteria)
         /// </summary>
         /// <param name="meshes"></param>
-        public void SetPhenotype(List<Mesh> meshes, List<double> performas, List<string> crit)
+        /// <param name="polys"></param>
+        /// <param name="performas"></param>
+        /// <param name="crit"></param>
+        public void SetPhenotype(List<Mesh> meshes, List<PolylineCurve> polys, List<double> performas, List<string> crit)
         {
-            phenotype = new List<Mesh>(meshes);
+            phenoMesh = new List<Mesh>(meshes);
+            phenoPoly = new List<PolylineCurve>(polys);
             performance = new List<double>(performas);
             criteria = new List<string>(crit);
         }

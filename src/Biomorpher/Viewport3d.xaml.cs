@@ -28,15 +28,24 @@ namespace Biomorpher
         private BiomorpherWindow W;
         private HelixViewport3D hVp3D;
         //HelixToolkit.Wpf.SharpDX.Viewport3DX hVp3D;
-        public Viewport3d(List<Mesh> meshes, int id, BiomorpherWindow w, bool hasViewcube)
+
+        /// <summary>
+        /// Our own Viewport3d class here
+        /// </summary>
+        /// <param name="meshes"></param>
+        /// <param name="polys"></param>
+        /// <param name="id"></param>
+        /// <param name="w"></param>
+        /// <param name="hasViewcube"></param>
+        public Viewport3d(List<Mesh> meshes, List<PolylineCurve> polys, int id, BiomorpherWindow w, bool hasViewcube)
         {
             ID = id;
             W = w;
             InitializeComponent();
-            create3DViewPort(meshes, hasViewcube);
+            create3DViewPort(meshes, polys, hasViewcube);
         }
 
-        private void create3DViewPort(List<Mesh> rMesh, bool hasViewcube)
+        private void create3DViewPort(List<Mesh> meshes, List<PolylineCurve> polys, bool hasViewcube)
         {
             hVp3D = new HelixViewport3D();
             //hVp3D = new HelixToolkit.Wpf.SharpDX.Viewport3DX();
@@ -60,23 +69,37 @@ namespace Biomorpher
 
             List<ModelVisual3D> vis = new List<ModelVisual3D>();
 
-            for (int i = 0; i < rMesh.Count; i++)
+            for (int i = 0; i < meshes.Count; i++)
             {
-                if(rMesh[i] != null)
+                if(meshes[i] != null)
                 {
                     MeshGeometry3D wMesh = new MeshGeometry3D();
                     DiffuseMaterial material = new DiffuseMaterial();
-                    Friends.ConvertRhinotoWpfMesh(rMesh[i], wMesh, material);
+                    Friends.ConvertRhinotoWpfMesh(meshes[i], wMesh, material);
                     GeometryModel3D model = new GeometryModel3D(wMesh, material);
 
                     model.BackMaterial = material;
                     ModelVisual3D v = new ModelVisual3D();
                     v.Content = model;
-                    
+
                     vis.Add(v);
                 }
             }
 
+            for (int i = 0; i < polys.Count; i++)
+            {
+                if (polys[i] != null)
+                {
+                    LinesVisual3D line = new LinesVisual3D();
+                    line.Color = Colors.White;
+                    line.Thickness = 1;
+                    line.Points.Add(new Point3D(polys[i].PointAtStart.X, polys[i].PointAtStart.Y, polys[i].PointAtStart.Z));
+                    line.Points.Add(new Point3D(polys[i].PointAtEnd.X, polys[i].PointAtEnd.Y, polys[i].PointAtEnd.Z));
+                    vis.Add(line);
+
+                }
+            }
+                    
 
             for (int i = 0; i < vis.Count; i++)
             {

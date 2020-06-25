@@ -467,7 +467,7 @@ namespace Biomorpher
 
 
         //Gets representative meshes
-        private List<Mesh>[] getRepresentativePhenotypes()
+        private List<Mesh>[] getRepresentativeMeshes()
         {
             // EXACTLY 12 SOUPDRAGONS
             List<Mesh>[] soupdragon = new List<Mesh>[12];
@@ -476,7 +476,7 @@ namespace Biomorpher
             {
                 if (population.chromosomes[i].isRepresentative)
                 {
-                    soupdragon[population.chromosomes[i].clusterId] = population.chromosomes[i].phenotype;
+                    soupdragon[population.chromosomes[i].clusterId] = population.chromosomes[i].phenoMesh;
                 }
                     
             }
@@ -484,6 +484,27 @@ namespace Biomorpher
             // List is now ordered according to cluster IDs
             return soupdragon;
         }
+
+
+        //Gets representative polys
+        private List<PolylineCurve>[] getRepresentativePolys()
+        {
+            // EXACTLY 12 SOUPDRAGONS
+            List<PolylineCurve>[] soupdragon = new List<PolylineCurve>[12];
+
+            for (int i = 0; i < population.chromosomes.Length; i++)
+            {
+                if (population.chromosomes[i].isRepresentative)
+                {
+                    soupdragon[population.chromosomes[i].clusterId] = population.chromosomes[i].phenoPoly;
+                }
+
+            }
+
+            // List is now ordered according to cluster IDs
+            return soupdragon;
+        }
+
 
 
         //Gets *representative* performance values
@@ -955,7 +976,8 @@ namespace Biomorpher
         //Updates the display of the representative meshes and their performance values
         public void tab2_primary_update()
         {
-            List<Mesh>[] meshes = getRepresentativePhenotypes();
+            List<Mesh>[] meshes = getRepresentativeMeshes();
+            List<PolylineCurve>[] polys = getRepresentativePolys();
             List<Canvas> performanceCanvas = createPerformanceCanvasAll();
 
             //Run through the design windows and add a viewport3d control and performance display to each
@@ -975,7 +997,7 @@ namespace Biomorpher
                     dp.Children.RemoveAt(dp.Children.Count - 1);
                 }
 
-                Viewport3d vp3d = new Viewport3d(meshes[i], i, this, true);
+                Viewport3d vp3d = new Viewport3d(meshes[i], polys[i], i, this, true);
                 dp.Children.Add(vp3d);
 
                 //Performance display update
