@@ -209,7 +209,7 @@ namespace Biomorpher
                     Mesh myLocalMesh = new Mesh();
                     GH_Convert.ToMesh(myGHMesh, ref myLocalMesh, GH_Conversion.Primary);
                     myLocalMesh.Faces.ConvertQuadsToTriangles();
-                    //Mesh joinedMesh = new Mesh(); yes this is commented out and no I am not a software engineer.
+                    //Mesh joinedMesh = new Mesh();
                     //joinedMesh.Append(myLocalMesh);
                     allGeometry.Add(myLocalMesh);
                 }

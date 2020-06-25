@@ -246,7 +246,7 @@ namespace Biomorpher
             population.KMeansClustering(12);
 
             // 4. Get geometry and performance for each chromosome
-            GetPhenotypes(true);
+            GetPhenotypes(true, true);
 
             // 5. Now get the average performance values (cluster reps only)
             population.SetAveragePerformanceValues(performanceCount, true);
@@ -279,7 +279,7 @@ namespace Biomorpher
             // We put these before adding to history, to ensure performance display is correct.
             if (isPerformanceCriteriaBased)
             {
-                GetPhenotypes(false); // We have to do this to make sure we have performance for the whole population.
+                GetPhenotypes(false, false); // We have to do this to make sure we have performance for the whole population.
                 population.SetPerformanceBasedFitness(controls, performanceCount);
             }
             else
@@ -311,7 +311,7 @@ namespace Biomorpher
             population.KMeansClustering(12);
 
             // 4. Get geometry for cluster reps only for the display period
-            GetPhenotypes(true);
+            GetPhenotypes(true, false);
 
             // 5. Now get the average performance values. Cluster reps only bool here
             population.SetAveragePerformanceValues(performanceCount, true);
@@ -353,7 +353,7 @@ namespace Biomorpher
             //population.KMeansClustering(12);
 
             // Get geometry for each chromosome
-            GetPhenotypes(true);
+            GetPhenotypes(true, true);
 
             // 5. Now get the average performance values (cluster reps only)
             population.SetAveragePerformanceValues(performanceCount, true);
@@ -373,17 +373,17 @@ namespace Biomorpher
         /// <summary>
         /// Gets the phenotype information for the current cluster representatives
         /// </summary>
-        public void GetPhenotypes(bool clusterRepsOnly)
+        public void GetPhenotypes(bool clusterRepsOnly, bool firstTime)
         {
-            bool dsiablePreview;
+            bool disablePreview;
             CheckBox cb = (CheckBox) controls["cb_disablepreview"];
-            dsiablePreview = (bool) cb.IsChecked;
+            disablePreview = (bool) cb.IsChecked;
 
-            if (dsiablePreview)
+            if (disablePreview)
                 owner.OnPingDocument().PreviewMode = GH_PreviewMode.Disabled;
 
             // Get geometry for each chromosome in the initial population
-            // TODO: Don't repeat code like this!
+            // This is probably the bit that has claimed most of my life getting to work!
             if (clusterRepsOnly)
             {
                 for (int i = 0; i < population.chromosomes.Length; i++)
@@ -395,7 +395,10 @@ namespace Biomorpher
                         owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders using gene values
                         owner.canvas.Document.Enabled = true;                               // Enable the solver again
                         owner.ExpireSolution(true);                                         // Now expire the main component and recompute
-                        performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
+                        int pCount = owner.GetGeometry(population.chromosomes[i]);          // Get the new geometry for this particular chromosome
+                        if (firstTime)                                                      // If first generation, sets the performanceCount value
+                            if (pCount > performanceCount)
+                                performanceCount = pCount;
                     }
                 }
             }
@@ -408,14 +411,18 @@ namespace Biomorpher
                     owner.SetSliders(population.chromosomes[i], sliders, genePools);    // Change the sliders using gene values
                     owner.canvas.Document.Enabled = true;                               // Enable the solver again
                     owner.ExpireSolution(true);                                         // Now expire the main component and recompute
-                    performanceCount = owner.GetGeometry(population.chromosomes[i]);    // Get the new geometry for this particular chromosome
+                    int pCount = owner.GetGeometry(population.chromosomes[i]);          // Get the new geometry for this particular chromosome
+                    if(firstTime)                                                       // If first generation, sets the performanceCount value
+                        if (pCount > performanceCount)
+                            performanceCount = pCount;
                 }
             }
 
             // TODO: Fill up null performance values instead, because this way if you have a null performance value it kills all the others.
-            population.RepairPerforms();
+            population.RepairPerforms(performanceCount);
 
-            if (dsiablePreview)
+            // Turn the preview back on
+            if (disablePreview)
                 owner.OnPingDocument().PreviewMode = GH_PreviewMode.Shaded;
 
         }

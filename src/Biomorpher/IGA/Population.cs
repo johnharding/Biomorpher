@@ -455,28 +455,10 @@ namespace Biomorpher.IGA
 
 
         /// <summary>
-        /// Repairs performance values
+        /// Sets some dummy performance values in case performanceCount changes mid run
         /// </summary>
-        public void RepairPerforms()
+        public void RepairPerforms(int performanceCount)
         {
-
-            // Finds the maximum number of performance criteria for this population
-            int perfCount = 0;
-
-            for (int i = 0; i < chromosomes.Length; i++)
-            {
-                try
-                {
-                    int pc = chromosomes[i].GetPerformas().Count;
-                    if (pc > perfCount)
-                        perfCount = pc;
-                }
-                catch
-                {
-                    // just leave the perfCount as it is then
-                }
-            }
-             
 
             // Fills the null performances with zeros (TODO: A better way? What if we optimised to a minimum?
             for (int i = 0; i < chromosomes.Length; i++)
@@ -492,15 +474,15 @@ namespace Biomorpher.IGA
                     pc = 0;
                 }
 
-                if (pc < perfCount)
+                if (pc < performanceCount)
                 {
                     List<double> newPerforms = new List<double>();
                     List<string> newCrits = new List<string>();
 
-                    for (int j = 0; j < perfCount; j++)
+                    for (int j = 0; j < performanceCount; j++)
                     {
                         newPerforms.Add(0.0);
-                        newCrits.Add("NULL");
+                        newCrits.Add("pCount changed!");
                     }
 
                     chromosomes[i].SetPerformas(newPerforms, newCrits);
