@@ -91,12 +91,18 @@ namespace Biomorpher
                 if (polys[i] != null)
                 {
                     LinesVisual3D line = new LinesVisual3D();
-                    line.Color = Colors.White;
+                    line.Color = Colors.Black;
                     line.Thickness = 1;
-                    line.Points.Add(new Point3D(polys[i].PointAtStart.X, polys[i].PointAtStart.Y, polys[i].PointAtStart.Z));
-                    line.Points.Add(new Point3D(polys[i].PointAtEnd.X, polys[i].PointAtEnd.Y, polys[i].PointAtEnd.Z));
-                    vis.Add(line);
 
+                    Rhino.Geometry.Polyline result = new Rhino.Geometry.Polyline();
+                    polys[i].TryGetPolyline(out result);
+
+                    for (int j = 0; j < result.Count - 1; j++)
+                    {
+                        line.Points.Add(new Point3D(result[j].X, result[j].Y, result[j].Z));
+                        line.Points.Add(new Point3D(result[j+1].X, result[j+1].Y, result[j+1].Z));
+                    }
+                    vis.Add(line);
                 }
             }
                     

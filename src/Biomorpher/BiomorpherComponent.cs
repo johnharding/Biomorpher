@@ -218,9 +218,17 @@ namespace Biomorpher
                 if (localObjs[i] is GH_Curve)
                 {
                     GH_Curve myGHCurve = (GH_Curve)localObjs[i];
-                    PolylineCurve myPoly = myGHCurve.Value.ToPolyline(0, 0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, true);
+                    PolylineCurve myPoly = myGHCurve.Value.ToPolyline(0, 0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, true);
                     polyGeometry.Add(myPoly);
 
+                }
+
+                if (localObjs[i] is GH_Line)
+                {
+                    GH_Line myGHLine = (GH_Line)localObjs[i];
+                    List<Point3d> pts = new List<Point3d>{myGHLine.Value.From, myGHLine.Value.To};
+                    PolylineCurve myPoly = new PolylineCurve(pts);
+                    polyGeometry.Add(myPoly);
                 }
 
             }
