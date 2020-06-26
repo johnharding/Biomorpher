@@ -62,7 +62,7 @@ namespace Biomorpher
             hVp3D.ViewCubeHeight = 40;
             hVp3D.ViewCubeWidth = 40;
             hVp3D.ShowViewCube = hasViewcube;
-            var lights = new DefaultLights();
+            DefaultLights lights = new DefaultLights();
             hVp3D.Children.Add(lights);
             hVp3D.IsInertiaEnabled = true;
             hVp3D.ZoomExtentsWhenLoaded = true;

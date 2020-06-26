@@ -1,20 +1,11 @@
 ﻿using Biomorpher.IGA;
 using Rhino.Geometry;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using HelixToolkit.Wpf;
 
 namespace Biomorpher
 {
@@ -23,8 +14,9 @@ namespace Biomorpher
     /// </summary>
     public partial class ViewportBasic : UserControl
     {
-        
-        private Viewport3D myViewport;
+
+        //private Viewport3D myViewport;
+        private HelixViewport3D myViewport;
         private Rect3D bounds {get; set;}
         private Chromosome thisDesign;
         private BiomorpherWindow Owner;
@@ -42,12 +34,16 @@ namespace Biomorpher
             thisDesign = chromo;
             this.ToolTip = "double click to display in main viewport";
 
-            myViewport = new Viewport3D();
+            myViewport = new HelixViewport3D();
+            myViewport.ZoomExtentsWhenLoaded = true;
+            myViewport.ShowViewCube = false;
+            DefaultLights lights = new DefaultLights();
+            myViewport.Children.Add(lights);
 
             List<Mesh> rMesh = thisDesign.phenoMesh;
-            List<ModelVisual3D> vis = new List<ModelVisual3D>();
+            List<PolylineCurve> polys = thisDesign.phenoPoly;
 
-            Model3DGroup boundsGroup = new Model3DGroup();
+            List<ModelVisual3D> vis = new List<ModelVisual3D>();
 
             for (int i = 0; i < rMesh.Count; i++)
             {
@@ -61,70 +57,50 @@ namespace Biomorpher
 
                     model.BackMaterial = material;
 
-                    DirectionalLight myLight = new DirectionalLight(Colors.White, new Vector3D(-0.5, -1, -1));
+                    // DirectionalLight myLight = new DirectionalLight(Colors.White, new Vector3D(-0.5, -1, -1));
 
-                    // ModelGroup
                     Model3DGroup modelGroup = new Model3DGroup();
                     modelGroup.Children.Add(model);
-                    modelGroup.Children.Add(myLight);
+                    //modelGroup.Children.Add(myLight);
                     ModelVisual3D v = new ModelVisual3D();
                     v.Content = modelGroup;
                     vis.Add(v);
 
-                    boundsGroup.Children.Add(model);
-
                 }
             }
 
-            bounds = boundsGroup.Bounds;
+
+            for (int i = 0; i < polys.Count; i++)
+            {
+                if (polys[i] != null)
+                {
+                    LinesVisual3D line = new LinesVisual3D();
+                    line.Color = Colors.Black;
+                    line.Thickness = 1;
+
+                    Rhino.Geometry.Polyline result = new Rhino.Geometry.Polyline();
+                    polys[i].TryGetPolyline(out result);
+
+                    for (int j = 0; j < result.Count - 1; j++)
+                    {
+                        line.Points.Add(new Point3D(result[j].X, result[j].Y, result[j].Z));
+                        line.Points.Add(new Point3D(result[j + 1].X, result[j + 1].Y, result[j + 1].Z));
+                    }
+                    vis.Add(line);
+                }
+            }
 
             for (int i = 0; i < vis.Count; i++)
             {
                 myViewport.Children.Add(vis[i]);
             }
 
-            ZoomExtents();
+            myViewport.IsEnabled = false;
 
             //Add viewport to user control
             this.AddChild(myViewport);
 
         }
-
-        /// <summary>
-        /// Zoom to extent of mesh
-        /// </summary>
-        public void ZoomExtents()
-        {
-
-            // find centre and origin of bounding box
-            Point3d cen = new Point3d(bounds.X + bounds.SizeX / 2, bounds.Y + bounds.SizeY / 2, bounds.Z + bounds.SizeZ / 2);
-
-            // Find distances to corners of bounding box
-            double directrixX = cen.DistanceTo(new Point3d(bounds.X + bounds.SizeX, 0d, 0d));
-            double directrixY = cen.DistanceTo(new Point3d(0d, bounds.Y + bounds.SizeY, 0d));
-            double directrixZ = cen.DistanceTo(new Point3d(0d, 0d, bounds.Z + bounds.SizeZ));
-
-            // Find the radius of the camera sphere
-            double sphereRad = directrixX;
-            if (directrixY > sphereRad) sphereRad = directrixY;
-            if (directrixZ > sphereRad) sphereRad = directrixZ;
-
-            // Now set the camera based on this max view sphere rad
-            double camX = cen.X + sphereRad;
-            double camY = cen.Y + sphereRad;
-            double camZ = cen.Z + sphereRad;
-
-            // Find the orthowidth
-            double orthoWidth = bounds.SizeX;
-            if (bounds.SizeY > orthoWidth) orthoWidth = bounds.SizeY;
-            if (bounds.SizeZ > orthoWidth) orthoWidth = bounds.SizeZ;
-            orthoWidth *= 1.618; //phi?
-
-            //myViewport.Camera = new PerspectiveCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), 30);
-            myViewport.Camera = new OrthographicCamera(new Point3D(camX, camY, camZ), new Vector3D(cen.X - camX, cen.Y - camY, cen.Z - camZ), new Vector3D(0, 0, 1), orthoWidth);
-
-        }
-
 
         /// <summary>
         /// Double click to set the Grasshopper instance
