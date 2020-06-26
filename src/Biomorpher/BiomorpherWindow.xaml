@@ -37,7 +37,7 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
-                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="False" Margin="0,30,0,0">
+                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="True" Margin="0,30,0,0">
                             <Canvas x:Name="HistoryCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
                             </Canvas>
                         </ScrollViewer>
@@ -246,11 +246,16 @@
 
                     
                     <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="LightGray"/>
+                        <Setter Property="Background" Value="#f0f0f0"/>
                         <Setter Property="Foreground" Value="Red"/>
                         <Setter Property="BorderThickness" Value="0"/>
                     </Style>
 
+                    <!--
+                    <Style TargetType="controls:MetroThumb">
+                        <Setter Property="Foreground" Value="Red"/>
+                    </Style>
+-->
 
 
                     <!--
