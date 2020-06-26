@@ -1863,12 +1863,6 @@ namespace Biomorpher
                                     myCircle.Fill = new SolidColorBrush(rgb_performance[p % 8]);// 8 colours max
                                     myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
 
-                                    if (thisDesign.isOptimal)
-                                    {
-                                        myCircle.StrokeThickness = 1.0;
-                                        myCircle.Stroke = Brushes.White;
-                                    }
-
                                     PlotCanvas.Children.Add(myCircle);
 
                                 }
@@ -1951,9 +1945,6 @@ namespace Biomorpher
 
                     }
                 }
-
-                //bool flipflop = false;
-                //flipflop = !flipflop;
 
                 MinGraphLabels.Children.Clear();
                 MaxGraphLabels.Children.Clear();
@@ -2145,7 +2136,6 @@ namespace Biomorpher
             myImage.Height = 100;
             sp.Children.Add(myImage);
 
-
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             txt_dcl.FontSize = 24;
@@ -2160,7 +2150,7 @@ namespace Biomorpher
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
             txt_dcl2.FontSize = 12;
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
-            txt_dcl2.Inlines.Add("Inspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris.");
+            txt_dcl2.Inlines.Add("\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris.");
             txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
             txt_dcl2.Inlines.Add("\nCopyright:\t2020 John Harding");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");

@@ -203,6 +203,9 @@ namespace Biomorpher
             // Get only mesh geometry from the object list
             for (int i = 0; i < localObjs.Count; i++)
             {
+
+                // Need to replace with a Switch
+
                 if (localObjs[i] is GH_Mesh)
                 {
                     GH_Mesh myGHMesh = new GH_Mesh();
@@ -210,9 +213,51 @@ namespace Biomorpher
                     Mesh myLocalMesh = new Mesh();
                     GH_Convert.ToMesh(myGHMesh, ref myLocalMesh, GH_Conversion.Primary);
                     myLocalMesh.Faces.ConvertQuadsToTriangles();
+                    
+                    meshGeometry.Add(myLocalMesh);
+
                     //Mesh joinedMesh = new Mesh();
                     //joinedMesh.Append(myLocalMesh);
-                    meshGeometry.Add(myLocalMesh);
+                }
+
+                if (localObjs[i] is GH_Brep)
+                {
+                    GH_Brep myBrep = new GH_Brep();
+                    myBrep = (GH_Brep)localObjs[i];
+
+                    Mesh[] meshes = Mesh.CreateFromBrep(myBrep.Value, MeshingParameters.FastRenderMesh);
+                    
+                    Mesh mesh = new Mesh();
+                    mesh.Append(meshes);
+                    mesh.Faces.ConvertQuadsToTriangles();
+
+                    meshGeometry.Add(mesh);
+
+                }
+
+                if (localObjs[i] is GH_Box)
+                {
+                    GH_Box myBox = new GH_Box((GH_Box)localObjs[i]);
+                    Mesh[] meshes = Mesh.CreateFromBrep(myBox.Brep(), MeshingParameters.FastRenderMesh);
+
+                    Mesh mesh = new Mesh();
+                    mesh.Append(meshes);
+                    mesh.Faces.ConvertQuadsToTriangles();
+
+                    meshGeometry.Add(mesh);
+                }
+
+                if (localObjs[i] is GH_Surface)
+                {
+                    GH_Surface mySurface = (GH_Surface)localObjs[i];
+
+                    Mesh[] meshes = Mesh.CreateFromBrep(mySurface.Value, MeshingParameters.FastRenderMesh);
+
+                    Mesh mesh = new Mesh();
+                    mesh.Append(meshes);
+                    mesh.Faces.ConvertQuadsToTriangles();
+
+                    meshGeometry.Add(mesh);
                 }
 
                 if (localObjs[i] is GH_Curve)
@@ -220,7 +265,13 @@ namespace Biomorpher
                     GH_Curve myGHCurve = (GH_Curve)localObjs[i];
                     PolylineCurve myPoly = myGHCurve.Value.ToPolyline(0, 0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, true);
                     polyGeometry.Add(myPoly);
+                }
 
+                if (localObjs[i] is GH_Arc)
+                {
+                    GH_Arc myGHArc = (GH_Arc)localObjs[i];
+                    PolylineCurve myPoly = myGHArc.Value.ToNurbsCurve().ToPolyline(0, 0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, true);
+                    polyGeometry.Add(myPoly);
                 }
 
                 if (localObjs[i] is GH_Line)

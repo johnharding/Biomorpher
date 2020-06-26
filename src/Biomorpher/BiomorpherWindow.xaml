@@ -37,7 +37,7 @@
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
-                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="True" Margin="0,30,0,0">
+                        <ScrollViewer Height="Auto" Width="Auto" ScrollViewer.HorizontalScrollBarVisibility="Visible" OverridesDefaultStyle="False" Margin="0,30,0,0">
                             <Canvas x:Name="HistoryCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
                             </Canvas>
                         </ScrollViewer>
@@ -219,7 +219,7 @@
                     <!--  40%  -->
                     <Color x:Key="AccentColor3">#00ff41</Color>
                     <!--  20%  -->
-                    <Color x:Key="AccentColor4">#888888</Color>
+                    <Color x:Key="AccentColor4">#666666</Color>
 
                     <!--  re-set brushes too  -->
                     <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" options:Freeze="True" />
@@ -243,6 +243,15 @@
                     <SolidColorBrush x:Key="IdealForegroundColorBrush" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
                     <SolidColorBrush x:Key="IdealForegroundDisabledBrush" Opacity="0.4" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
                     <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
+
+                    
+                    <Style TargetType="ScrollBar">
+                        <Setter Property="Background" Value="LightGray"/>
+                        <Setter Property="Foreground" Value="Red"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+
+
 
                     <!--
                     <Style TargetType="Label">
