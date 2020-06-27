@@ -213,7 +213,7 @@ namespace Biomorpher
             tab1_primary_initial();
             tab1_secondary_settings();
 
-            //Make sure that tab 3 history graphics are clipped to bounds
+            // Make sure that tab 3 history graphics are clipped to bounds
             Tab3_primary.ClipToBounds = true;
 
             // Show biomorpher info
@@ -224,8 +224,7 @@ namespace Biomorpher
         #endregion
         
         #region MAIN METHODS
-
-        
+  
         /// <summary>
         /// Instantiate the population and intialise the window
         /// Runtype 0: Random, 1: Existing 2: Current
@@ -252,17 +251,17 @@ namespace Biomorpher
             population.SetAveragePerformanceValues(performanceCount, true);
 
             // 6. Setup tab layouts
-            tab12_primary_permanent(1); // 1 indicates tab 1
-            tab1_primary_update();
+            Tab12_primary_permanent(1); // 1 indicates tab 1
+            Tab1_primary_update();
 
-            tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
-            tab2_primary_update();
+            Tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
+            Tab2_primary_update();
 
-            tab2_secondary_settings();
+            Tab2_secondary_settings();
 
-            tab3_secondary_settings();
-            tab4_secondary_settings();
-            tab5_secondary_settings();
+            Tab3_secondary_settings();
+            Tab4_secondary_settings();
+            Tab5_secondary_settings();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
@@ -317,14 +316,14 @@ namespace Biomorpher
             population.SetAveragePerformanceValues(performanceCount, true);
             
             // 6. Update display of K-Means, representative meshes history and plot canvas
-            tab1_primary_update();
+            Tab1_primary_update();
 
-            tab2_primary_update();
-            tab2_updatePerforms();
+            Tab2_primary_update();
+            Tab2_updatePerforms();
 
-            tab3_primary_update(isPerformanceCriteriaBased);
+            Tab3_primary_update(isPerformanceCriteriaBased);
 
-            tab4_plotcanvas();
+            Tab4_plotcanvas();
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
@@ -341,6 +340,7 @@ namespace Biomorpher
 
         }
 
+
         /// <summary>
         /// Runs when a new biobranch is spawned.
         /// </summary>
@@ -349,9 +349,6 @@ namespace Biomorpher
             // Reset generation counter
             Generation = 0;
 
-            // Perform K-means clustering again?
-            //population.KMeansClustering(12);
-
             // Get geometry for each chromosome
             GetPhenotypes(true, true);
 
@@ -359,15 +356,14 @@ namespace Biomorpher
             population.SetAveragePerformanceValues(performanceCount, true);
 
             // Update display of K-Means and representative meshes
-            tab1_primary_update();
+            Tab1_primary_update();
 
-            tab2_primary_update();
-            tab2_updatePerforms();
+            Tab2_primary_update();
+            Tab2_updatePerforms();
 
-            tab4_plotcanvas();
+            Tab4_plotcanvas();
 
         }
-
 
 
         /// <summary>
@@ -441,9 +437,8 @@ namespace Biomorpher
             HighlightedCluster = chromo.clusterId;
 
             // Update performance tab
-            tab2_updatePerforms();
+            Tab2_updatePerforms();
         }
-
 
 
         /// <summary>
@@ -485,7 +480,6 @@ namespace Biomorpher
             return soupdragon;
         }
 
-
         //Gets representative polys
         private List<PolylineCurve>[] getRepresentativePolys()
         {
@@ -504,8 +498,6 @@ namespace Biomorpher
             // List is now ordered according to cluster IDs
             return soupdragon;
         }
-
-
 
         //Gets *representative* performance values
         private double[][] getRepresentativePerformas(Population thisPop)
@@ -563,7 +555,7 @@ namespace Biomorpher
         /// <summary>
         /// Update display of K-Means clustering
         /// </summary>
-        public void tab1_primary_update()
+        public void Tab1_primary_update()
         {
             //Run through the 12 designs
             for (int i = 0; i < 12; i++)
@@ -588,6 +580,7 @@ namespace Biomorpher
                 dp.ClipToBounds = true;
             }
         }
+
 
         /// <summary>
         /// Create canvas to visualise K-Means clustering for a specific ID
@@ -678,6 +671,7 @@ namespace Biomorpher
             return canvas;
         }
 
+
         /// <summary>
         /// An initial background for tab 1.
         /// </summary>
@@ -700,7 +694,10 @@ namespace Biomorpher
             Tab1_primary.Child = gp;
         }
 
-        //Create settings panel for Tab 1
+
+        /// <summary>
+        /// Create settings panel for Tab 1
+        /// </summary>
         public void tab1_secondary_settings()
         {
             //Container for all the controls
@@ -732,19 +729,19 @@ namespace Biomorpher
             // Create sliders with labels
             Border border_popSize = new Border();
             border_popSize.Margin = new Thickness(margin_w, 20, margin_w, 0);
-            DockPanel dp_popSize = createSlider("Population size", "s_tab1_popSize", 12, 200, PopSize, true, new RoutedPropertyChangedEventHandler<double>(tab1_popSize_ValueChanged));
+            DockPanel dp_popSize = CreateSlider("Population size", "s_tab1_popSize", 12, 200, PopSize, true, new RoutedPropertyChangedEventHandler<double>(Tab1_popSize_ValueChanged));
             border_popSize.Child = dp_popSize;
             sp.Children.Add(border_popSize);
 
             Border border_crossover = new Border();
             border_crossover.Margin = new Thickness(margin_w, 0, margin_w, 0);
-            DockPanel dp_crossover = createSlider("Crossover rate", "s_tab1_crossover", 0.00, 1.00, CrossoverProbability, false, new RoutedPropertyChangedEventHandler<double>(tab1_crossover_ValueChanged));
+            DockPanel dp_crossover = CreateSlider("Crossover rate", "s_tab1_crossover", 0.00, 1.00, CrossoverProbability, false, new RoutedPropertyChangedEventHandler<double>(Tab1_crossover_ValueChanged));
             border_crossover.Child = dp_crossover;
             sp.Children.Add(border_crossover);
 
             Border border_mutation = new Border();
             border_mutation.Margin = new Thickness(margin_w, 0, margin_w, 0);
-            DockPanel dp_mutation = createSlider("Mutation rate", "s_tab1_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(tab1_mutation_ValueChanged));
+            DockPanel dp_mutation = CreateSlider("Mutation rate", "s_tab1_mutation", 0.00, 1.00, MutateProbability, false, new RoutedPropertyChangedEventHandler<double>(Tab1_mutation_ValueChanged));
             border_mutation.Child = dp_mutation;
             sp.Children.Add(border_mutation);
 
@@ -754,7 +751,7 @@ namespace Biomorpher
 
             //GO button
             DockPanel dock_go = new DockPanel();
-            Button button_go = createButton("b_tab1_Go", "Go", 125, new RoutedEventHandler(tab1_Go_Click));
+            Button button_go = CreateButton("b_tab1_Go", "Go", 125, new RoutedEventHandler(Tab1_Go_Click));
             button_go.ToolTip = "Uses a random initial population";
             DockPanel.SetDock(button_go, Dock.Top);
             Label label_go = new Label();
@@ -774,7 +771,7 @@ namespace Biomorpher
 
             //GO2 button
             DockPanel dock_go2 = new DockPanel();
-            Button button_go2 = createButton("b_tab1_Go2", "Go", 125, new RoutedEventHandler(tab1_Go2_Click));
+            Button button_go2 = CreateButton("b_tab1_Go2", "Go", 125, new RoutedEventHandler(Tab1_Go2_Click));
             button_go2.ToolTip = "Creates an initial population from the current parameter state";
             DockPanel.SetDock(button_go2, Dock.Top);
             Label label_go2 = new Label();
@@ -791,7 +788,6 @@ namespace Biomorpher
             border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
 
-
             // K-means text
             Border border_kmeans = new Border();
             border_kmeans.Margin = new Thickness(margin_w, 20, margin_w, 0);
@@ -800,7 +796,6 @@ namespace Biomorpher
             label_kmeans.Content = "K-means Clusters";
             border_kmeans.Child = label_kmeans;
             sp.Children.Add(border_kmeans);
-            
             
             // K-means description
             Border border = new Border();
@@ -857,7 +852,6 @@ namespace Biomorpher
             border_disablepreview.Child = dp_disablepreview;
             sp.Children.Add(border_disablepreview);
 
-
             // Now for the mutate elites checkbox
             Border border_mutateElites = new Border();
             border_mutateElites.Padding = new Thickness(0);
@@ -892,38 +886,38 @@ namespace Biomorpher
         /// Create permanent grid layout for Tab 1 and Tab 2 (if Tab 2 is specified then checkboxes are added to the top right corners of the grid as well)
         /// </summary>
         /// <param name="tabIndex"></param>
-        public void tab12_primary_permanent(int tabIndex)
+        public void Tab12_primary_permanent(int tabIndex)
         {
-            //Create grid 3x4 layout
+            // Create grid 3x4 layout
             int rowCount = 3;
             int columnCount = 4;
             int gridCount = rowCount * columnCount;
-            Grid grid = createGrid(rowCount, columnCount, Tab2_primary.Width, Tab2_primary.Height);
+            Grid grid = CreateGrid(rowCount, columnCount, Tab2_primary.Width, Tab2_primary.Height);
             
-            //For each grid cell: create border with padding, a dock panel and add a checkbox
+            // For each grid cell: create border with padding, a dock panel and add a checkbox
             for (int i = 0; i < gridCount; i++)
             {
-                //Outer border
+                // Outer border
                 Border oBorder = new Border();
                 oBorder.Padding = new Thickness(4);
 
-                //Border
+                // Border
                 Border border = new Border();
                 border.BorderBrush = Brushes.Black;
                 border.BorderThickness = new Thickness(0.5);
                 border.Padding = new Thickness(2);
 
-                //Master Dock panel
+                // Master Dock panel
                 DockPanel dp = new DockPanel();
                 string dp_name = "dp_tab" + tabIndex + "_" + i;
                 dp.Name = dp_name;
 
-                //Sub Dock panel (this the top band that contains number, perfs & checkbox)
+                // Sub Dock panel (this the top band that contains number, perfs & checkbox)
                 DockPanel dp_sub = new DockPanel();
                 string dp_sub_name = "dp_sub_tab" + tabIndex + "_" + i;
                 dp_sub.Name = dp_sub_name;
 
-                //Label
+                // Label
                 Label l = new Label();
                 int index = i;
                 l.Content = " " + index.ToString();
@@ -935,9 +929,9 @@ namespace Biomorpher
 
                 if (tabIndex == 2)
                 {
-                    //Create checkbox with an event handler
+                    // Create checkbox with an event handler
                     string cb_name = "cb_tab2_" + i;
-                    CheckBox cb = createCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
+                    CheckBox cb = CreateCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
                     cb.Background = Friends.RhinoGrey();
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
                     DockPanel.SetDock(cb, Dock.Right);
@@ -947,14 +941,15 @@ namespace Biomorpher
                 DockPanel.SetDock(dp_sub, Dock.Top);
                 dp.Children.Add(dp_sub);
 
-                //Add dockpanel to controls dictionary in order to access and update content without recreating the entire grid with checkboxes
+                // Add dockpanel to controls dictionary in order to access and update content without recreating the entire grid with checkboxes
                 controls.Add(dp_name, dp);
                 controls.Add(dp_sub_name, dp_sub);
 
-                //Set the dockpanel as the child of the border element
+                // Set the dockpanel as the child of the border element
                 border.Child = dp;
                 oBorder.Child = border;
-                //Add the border to the grid
+
+                // Add the border to the grid
                 Grid.SetRow(oBorder, (int)(i / columnCount));
                 Grid.SetColumn(oBorder, i % columnCount);
                 grid.Children.Add(oBorder);
@@ -973,12 +968,14 @@ namespace Biomorpher
         }
 
 
-        //Updates the display of the representative meshes and their performance values
-        public void tab2_primary_update()
+        /// <summary>
+        /// Updates the display of the representative meshes and their performance values
+        /// </summary>
+        public void Tab2_primary_update()
         {
             List<Mesh>[] meshes = getRepresentativeMeshes();
             List<PolylineCurve>[] polys = getRepresentativePolys();
-            List<Canvas> performanceCanvas = createPerformanceCanvasAll();
+            List<Canvas> performanceCanvas = CreatePerformanceCanvasAll();
 
             //Run through the design windows and add a viewport3d control and performance display to each
             for (int i = 0; i < 12; i++)
@@ -1012,7 +1009,7 @@ namespace Biomorpher
 
 
             // Match the cameras
-            // TODO: Better way to do this???
+            // TODO: Is there a better way to do this?
             for (int i = 0; i < 12; i++)
             {
                 //The name of the control to add to
@@ -1026,8 +1023,11 @@ namespace Biomorpher
         }
 
 
-        //Create performance canvas for all representative designs
-        private List<Canvas> createPerformanceCanvasAll()
+        /// <summary>
+        /// Create performance canvas for all representative designs
+        /// </summary>
+        /// <returns></returns>
+        private List<Canvas> CreatePerformanceCanvasAll()
         {
             double alfaMin = 0.2;
             double alfaMax = 1.0;
@@ -1097,7 +1097,7 @@ namespace Biomorpher
                 }
 
                 //Create canvas
-                Canvas canvas = createPerformanceCanvas(tmaps, isExtrema);
+                Canvas canvas = CreatePerformanceCanvas(tmaps, isExtrema);
                 performanceCanvas.Add(canvas);
             }
 
@@ -1111,7 +1111,7 @@ namespace Biomorpher
         /// <param name="tmaps"></param>
         /// <param name="isExtrema"></param>
         /// <returns></returns>
-        private Canvas createPerformanceCanvas(List<double> tmaps, List<bool> isExtrema)
+        private Canvas CreatePerformanceCanvas(List<double> tmaps, List<bool> isExtrema)
         {
             int numCircles = tmaps.Count;
             int dOuter = 16; // the diameter of the extrema circle
@@ -1120,7 +1120,6 @@ namespace Biomorpher
             int topOffset = 6;
 
             Canvas canvas = new Canvas();
-            //canvas.Background = Friends.;
 
             //Add circles
             for(int i=0; i<numCircles; i++)
@@ -1133,17 +1132,6 @@ namespace Biomorpher
                 extremaCircle.Width = dOuter;
                 extremaCircle.StrokeThickness = 0.5;
                 extremaCircle.Stroke = Brushes.Black;
-
-                /*
-                if (isExtrema[i])
-                {
-                    extremaCircle.Stroke = Brushes.White;
-                }
-                else
-                {
-                    extremaCircle.Stroke = Friends.RhinoGrey();
-                }  
-                */
 
                 Canvas.SetLeft(extremaCircle, distFromLeft);
                 Canvas.SetTop(extremaCircle, topOffset);
@@ -1159,7 +1147,7 @@ namespace Biomorpher
                 brush.Color = rgb_performance[i % 8];
                 performanceCircle.Fill = brush;
 
-                Canvas.SetLeft(performanceCircle, distFromLeft + (dOuter - performanceDiameter)*0.5 );
+                Canvas.SetLeft(performanceCircle, distFromLeft + (dOuter - performanceDiameter)* 0.5);
                 Canvas.SetTop(performanceCircle, topOffset + (dOuter - performanceDiameter) * 0.5);
                 canvas.Children.Add(performanceCircle);
 
@@ -1172,7 +1160,7 @@ namespace Biomorpher
         /// <summary>
         /// Create settings panel for Tab 2
         /// </summary>
-        public void tab2_secondary_settings()
+        public void Tab2_secondary_settings()
         {
             StackPanel sp = new StackPanel();
             controls.Add("SP", sp);
@@ -1215,7 +1203,7 @@ namespace Biomorpher
 
 
             //Evolve button
-            Button button_evo = createButton("b_tab2_Evolve", "Evolve", 125, new RoutedEventHandler(Tab2_Evolve_Click));
+            Button button_evo = CreateButton("b_tab2_Evolve", "Evolve", 125, new RoutedEventHandler(Tab2_Evolve_Click));
             button_evo.ToolTip = "Advance to next generation(s)";
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);
@@ -1268,7 +1256,7 @@ namespace Biomorpher
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
             txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data below. ");
-            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for criteria using the whole population (artificial selection can also be used).");
+            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for criteria using the whole population (artificial selection can also be used concurrently).");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
@@ -1296,11 +1284,6 @@ namespace Biomorpher
                 controls.Add("PERFBORDER" + i, border_p);
                 soupdragon1.Children.Add(border_p);
             }
-
-            // Add the performance buttons to soupdragon 2
-            //Viewbox myBox = new Viewbox();
-            //myBox.Child = dummy;
-            //myBox.Height = 16;
  
             // Add the radiobuttons
             for (int i = 0; i < performanceCount; i++)
@@ -1335,7 +1318,6 @@ namespace Biomorpher
             }
 
             soupdragon1.Width = 214;
-            //soupdragon2.Width = 60;
             soupdragon1.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             soupdragon2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
 
@@ -1345,11 +1327,10 @@ namespace Biomorpher
             soupdragonMaster.Children.Add(soupdragon2);
             sp.Children.Add(soupdragonMaster);
 
-
             // Performance labels
-            tab2_updatePerforms();
+            Tab2_updatePerforms();
 
-            //Add the stackpanels to the secondary area of Tab 2
+            // Add the stackpanels to the secondary area of Tab 2
             Tab2_secondary.Child = sp;
 
         }
@@ -1359,9 +1340,9 @@ namespace Biomorpher
         /// Updates the list of performance 'borders' on the right hand side of the main window (tab 2)
         /// Called again when a design is double clicked
         /// </summary>
-        private void tab2_updatePerforms()
+        private void Tab2_updatePerforms()
         {
-            //Design info
+            // Design info
             Border border_clus = (Border)controls["CLUSTER"];
             border_clus.Margin = new Thickness(margin_w, 16, margin_w, 4);
 
@@ -1468,7 +1449,7 @@ namespace Biomorpher
 
                     // 6 colours MAX!
                     string tooltiptext = "(pop average = " + thisPop.Performance_Averages[i]+")";
-                    DockPanel dp_p = createColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 8], isHistory, i);
+                    DockPanel dp_p = CreateColourCodedLabel(label_p, tooltiptext, rgb_performance[i % 8], isHistory, i);
                 
                     yourBorders[i].Child = dp_p;
                 }
@@ -1491,11 +1472,12 @@ namespace Biomorpher
         /// Create colour-coded label for each performance values
         /// </summary>
         /// <param name="text"></param>
+        /// <param name="tooltiptext"></param>
         /// <param name="c"></param>
         /// <param name="isHistoryTab"></param>
         /// <param name="performanceID"></param>
         /// <returns></returns>
-        private DockPanel createColourCodedLabel(string text, string tooltiptext, Color c, bool isHistoryTab, int performanceID)
+        private DockPanel CreateColourCodedLabel(string text, string tooltiptext, Color c, bool isHistoryTab, int performanceID)
         {
             DockPanel dp = new DockPanel();
             int diameter;
@@ -1560,7 +1542,7 @@ namespace Biomorpher
         /// <summary>
         /// Updates history canvas
         /// </summary>
-        public void tab3_primary_update(bool isOptimisationRun)
+        public void Tab3_primary_update(bool isOptimisationRun)
         {
             // Set viewport size (TODO: variable?)
             int vportWidth = 120;
@@ -1645,7 +1627,6 @@ namespace Biomorpher
                     if (thisDesign.isRepresentative && thisDesign.isChecked) flag = true;
                 }
                 
-
                 // Now just show those representatives that are representatives.
                 if (flag)
                 {
@@ -1663,13 +1644,12 @@ namespace Biomorpher
                     border.Height = 120;
                     sp.Children.Add(border);
                     
-                    //Design info
+                    // Design info
                     Border border_clus = new Border();
                     border_clus.Margin = new Thickness(0, 0, 0, 0);
 
                     // Get the performance borders from the dictionary
                     // Note that these performance borders are for ONE design.
-                    
                     List<Border> myBorders = new List<Border>();
                     for (int i = 0; i < performanceCount; i++)
                     {
@@ -1680,7 +1660,6 @@ namespace Biomorpher
                     // A separate method is used due to the history tab also utilising this facility
                     AddPerformanceInfo(thisPop, myBorders, thisDesign.clusterId, true);
                     
-                    //myGrid.Children.Add(border);
                     myGrid.ColumnDefinitions.Add(new ColumnDefinition());
                     myGrid.Width = (xCount + 1) * vportWidth;
                     Grid.SetRow(border, 0);
@@ -1779,7 +1758,7 @@ namespace Biomorpher
         /// <summary>
         /// Create settings panel for Tab 3
         /// </summary>
-        public void tab3_secondary_settings()
+        public void Tab3_secondary_settings()
         {
             StackPanel sp3 = new StackPanel();
             controls.Add("SP3", sp3);
@@ -1812,7 +1791,7 @@ namespace Biomorpher
             Border border_buttons = new Border();
             border_buttons.Margin = new Thickness(margin_w, 20, margin_w, 0);
 
-            Button button_ExportPNG = createButton("b_tab3_ExportPNG", "save png", Tab3_secondary.Width * 0.3, new RoutedEventHandler(tab3_ExportPNG_Click));
+            Button button_ExportPNG = CreateButton("b_tab3_ExportPNG", "save png", Tab3_secondary.Width * 0.3, new RoutedEventHandler(Tab3_ExportPNG_Click));
             DockPanel.SetDock(button_ExportPNG, Dock.Left);
             dp_buttons.Children.Add(button_ExportPNG);
 
@@ -1831,7 +1810,7 @@ namespace Biomorpher
         /// <summary>
         /// Plot graph for 4 and 5
         /// </summary>
-        public void tab4_plotcanvas()
+        public void Tab4_plotcanvas()
         {
             PlotCanvas.Children.Clear();
             PlotCanvas2.Children.Clear();
@@ -1910,7 +1889,7 @@ namespace Biomorpher
 
                                     // Draw the circle
                                     System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
-                                    myCircle.Fill = new SolidColorBrush(rgb_performance[p % 8]);// 8 colours max
+                                    myCircle.Fill = new SolidColorBrush(rgb_performance[p % 8]); // 8 colours max
                                     myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
 
                                     PlotCanvas.Children.Add(myCircle);
@@ -1959,8 +1938,8 @@ namespace Biomorpher
                                 }
                                 
                                 myCircle2.Data = new EllipseGeometry(new System.Windows.Point(paretoX, paretoY), radius, radius);
-                                myCircle2.MouseDown += new MouseButtonEventHandler(scatterCircleClick);
-                                //Owner.SetInstance(thisDesign);
+                                myCircle2.MouseDown += new MouseButtonEventHandler(ScatterCircleClick);
+                                
                                 PlotCanvas2.Children.Add(myCircle2);
                             }
 
@@ -2026,15 +2005,11 @@ namespace Biomorpher
             }
         }
 
-        private void MyCircle2_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// Create settings panel for Tab 4
         /// </summary>
-        public void tab4_secondary_settings()
+        public void Tab4_secondary_settings()
         {
             StackPanel sp4 = new StackPanel();
             controls.Add("SP4", sp4);
@@ -2072,14 +2047,14 @@ namespace Biomorpher
                 
                 DockPanel myPanel = new DockPanel();
                 myPanel.LastChildFill = false;
-                DockPanel dp_p = createColourCodedLabel(criteria[0][i].ToString(), "none", rgb_performance[i % 8], false, i);
+                DockPanel dp_p = CreateColourCodedLabel(criteria[0][i].ToString(), "none", rgb_performance[i % 8], false, i);
                 DockPanel.SetDock(dp_p, Dock.Left);
                 myPanel.Children.Add(dp_p);
 
                 CheckBox myCheck = new CheckBox();
                 myCheck.IsChecked = true;
                 myCheck.Background = Friends.RhinoGrey();
-                myCheck.Click += new RoutedEventHandler(replot);
+                myCheck.Click += new RoutedEventHandler(Replot);
                 controls.Add("PLOTCHECKBOX" + i, myCheck);
 
                 DockPanel.SetDock(myCheck, Dock.Right);
@@ -2101,7 +2076,7 @@ namespace Biomorpher
         /// <summary>
         /// Create settings panel for Tab 5
         /// </summary>
-        public void tab5_secondary_settings()
+        public void Tab5_secondary_settings()
         {
             StackPanel sp5 = new StackPanel();
             //controls.Add("SP4", sp4);
@@ -2151,8 +2126,8 @@ namespace Biomorpher
             }
 
 
-            myComboX.SelectionChanged += new SelectionChangedEventHandler(replot);
-            myComboY.SelectionChanged += new SelectionChangedEventHandler(replot);
+            myComboX.SelectionChanged += new SelectionChangedEventHandler(Replot);
+            myComboY.SelectionChanged += new SelectionChangedEventHandler(Replot);
 
             menuBorder.Child = myComboX;
             menuBorder2.Child = myComboY;
@@ -2213,10 +2188,9 @@ namespace Biomorpher
             txt_dcl2.Inlines.Add("\n ");
 
             // Donate button
-            Button donate = createButton("donate", "donate", 75, new RoutedEventHandler(ClickDonate));
+            Button donate = CreateButton("donate", "donate", 75, new RoutedEventHandler(ClickDonate));
             donate.BorderThickness = new Thickness(0);
             donate.Background = Brushes.LightGray;
-            //DockPanel.SetDock(dock_go, Dock.Left);
 
             sp.Children.Add(txt_dcl2);
             sp.Children.Add(donate);
@@ -2228,8 +2202,15 @@ namespace Biomorpher
 
         #region CONTROL HELPERS
 
-        //Create Grid control
-        public Grid createGrid(int rowCount, int columnCount, double width, double height)
+        /// <summary>
+        /// Shortcut to create grid control
+        /// </summary>
+        /// <param name="rowCount"></param>
+        /// <param name="columnCount"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public Grid CreateGrid(int rowCount, int columnCount, double width, double height)
         {
             Grid grid = new Grid();
             grid.Width = width;
@@ -2256,7 +2237,7 @@ namespace Biomorpher
         /// <param name="handler"></param>
         /// <param name="chromoID"></param>
         /// <returns></returns>
-        public CheckBox createCheckBox(string name, RoutedEventHandler handler, int chromoID)
+        public CheckBox CreateCheckBox(string name, RoutedEventHandler handler, int chromoID)
         {
             CheckBox cb = new CheckBox();
             cb.Name = name;
@@ -2270,8 +2251,15 @@ namespace Biomorpher
         }
 
 
-        //Create button control
-        public Button createButton(string name, string content, double width, RoutedEventHandler handler)
+        /// <summary>
+        /// Create button control
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        /// <param name="width"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public Button CreateButton(string name, string content, double width, RoutedEventHandler handler)
         {
             Button b = new Button();
             b.Name = name;
@@ -2288,8 +2276,17 @@ namespace Biomorpher
         }
 
 
-        //Create slider with label WITHOUT eventhandler (useful to display e.g. performance values)
-        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider)
+        /// <summary>
+        /// Create slider with label WITHOUT eventhandler (useful to display e.g. performance values)
+        /// </summary>
+        /// <param name="labelName"></param>
+        /// <param name="controlName"></param>
+        /// <param name="minVal"></param>
+        /// <param name="maxVal"></param>
+        /// <param name="val"></param>
+        /// <param name="isIntSlider"></param>
+        /// <returns></returns>
+        public DockPanel CreateSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider)
         {
             //Container for slider + label
             DockPanel dp = new DockPanel();
@@ -2338,10 +2335,20 @@ namespace Biomorpher
         }
 
 
-        //Create slider with label WITH eventhandler (allows user to e.g. control popSize and mutation rate)
-        public DockPanel createSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider, RoutedPropertyChangedEventHandler<double> handler)
+        /// <summary>
+        /// Create slider with label WITH eventhandler (allows user to e.g. control popSize and mutation rate)
+        /// </summary>
+        /// <param name="labelName"></param>
+        /// <param name="controlName"></param>
+        /// <param name="minVal"></param>
+        /// <param name="maxVal"></param>
+        /// <param name="val"></param>
+        /// <param name="isIntSlider"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public DockPanel CreateSlider(string labelName, string controlName, double minVal, double maxVal, double val, bool isIntSlider, RoutedPropertyChangedEventHandler<double> handler)
         {
-            DockPanel dp = createSlider(labelName, controlName, minVal, maxVal, val, isIntSlider);
+            DockPanel dp = CreateSlider(labelName, controlName, minVal, maxVal, val, isIntSlider);
             
             Slider slider = (Slider)controls[controlName];
             slider.ValueChanged += handler;
@@ -2350,8 +2357,15 @@ namespace Biomorpher
         }
 
 
-        //Create combobox (dropdown menu)
-        public DockPanel createComboBox(string label, string name, List<string> items, SelectionChangedEventHandler handler)
+        /// <summary>
+        /// Create combobox (dropdown menu)
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="name"></param>
+        /// <param name="items"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public DockPanel CreateComboBox(string label, string name, List<string> items, SelectionChangedEventHandler handler)
         {
             DockPanel dp = new DockPanel();
 
@@ -2385,7 +2399,7 @@ namespace Biomorpher
         }
 
         //Tab 1 Popsize event handler
-        private void tab1_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void Tab1_popSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Slider s = (Slider)sender;
             int val = (int)s.Value;
@@ -2393,7 +2407,7 @@ namespace Biomorpher
         }
 
         //Tab 1 CrossoverProbability event handler
-        private void tab1_crossover_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void Tab1_crossover_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Slider s = (Slider)sender;
             double val = s.Value;
@@ -2401,7 +2415,7 @@ namespace Biomorpher
         }
 
         //Tab 1 MutateProbability event handler
-        private void tab1_mutation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void Tab1_mutation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Slider s = (Slider)sender;
             double val = s.Value;
@@ -2413,9 +2427,9 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void replot(object sender, RoutedEventArgs e)
+        public void Replot(object sender, RoutedEventArgs e)
         {
-            tab4_plotcanvas();
+            Tab4_plotcanvas();
         }
 
         /// <summary>
@@ -2423,7 +2437,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab1_Go_Click(object sender, RoutedEventArgs e)
+        public void Tab1_Go_Click(object sender, RoutedEventArgs e)
         {
 
             if (!GO)
@@ -2445,7 +2459,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab1_Go2_Click(object sender, RoutedEventArgs e)
+        public void Tab1_Go2_Click(object sender, RoutedEventArgs e)
         {
 
             if (!GO)
@@ -2461,10 +2475,18 @@ namespace Biomorpher
             GO = true;
         }
 
-        public void scatterCircleClick(object sender, RoutedEventArgs e)
+
+        /// <summary>
+        /// When a circle is clicked on the scatter plot
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void ScatterCircleClick(object sender, RoutedEventArgs e)
         {
             // TODO
+            // Owner.SetInstance(thisDesign);
         }
+
 
         /// <summary>
         /// Reinstates an old population and makes a new biobranch
@@ -2495,6 +2517,7 @@ namespace Biomorpher
 
             RunNewBranch();
         }
+
 
         /// <summary>
         /// Event handler for all checkboxes in tab 2
@@ -2555,7 +2578,7 @@ namespace Biomorpher
         public void Tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button)sender;
-            bool isPerformanceCriteriaBased = isRadioMinMaxButtonChecked();
+            bool isPerformanceCriteriaBased = IsRadioMinMaxButtonChecked();
 
             //Test if minimum one parent is selected
             if (ParentCount < 1 && !isPerformanceCriteriaBased)
@@ -2607,7 +2630,7 @@ namespace Biomorpher
         /// Finds out if one of the min or max radiobuttons is checked.
         /// </summary>
         /// <returns></returns>
-        public bool isRadioMinMaxButtonChecked()
+        public bool IsRadioMinMaxButtonChecked()
         {
             bool isOneChecked = false;
 
@@ -2637,7 +2660,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void tab3_ExportPNG_Click(object sender, RoutedEventArgs e)
+        public void Tab3_ExportPNG_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -2663,7 +2686,9 @@ namespace Biomorpher
         }
 
 
-        //INotifyPropertyChanged Implementation
+        /// <summary>
+        /// INotifyPropertyChanged Implementation
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string name)
         {
@@ -2674,7 +2699,12 @@ namespace Biomorpher
             }
         }
 
-        private void chartGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        /// <summary>
+        /// Handle when user resizes the window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ChartGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             PlotCanvas.Width = chartGrid.ActualWidth;
             PlotCanvas.Height = chartGrid.ActualHeight;
@@ -2684,7 +2714,7 @@ namespace Biomorpher
 
             // Only if evolution has started do we do this bit.
             if (GO)
-                tab4_plotcanvas();
+                Tab4_plotcanvas();
         }
 
         #endregion

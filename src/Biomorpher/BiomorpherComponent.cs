@@ -59,7 +59,7 @@ namespace Biomorpher
         {
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here. Surfaces, Meshes, Curves.", GH_ParamAccess.tree);
-            pm.AddNumberParameter("Performs", "Performs", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
+            pm.AddNumberParameter("Performas", "Performas", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
             
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;

@@ -62,7 +62,7 @@
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
 
-                            <Grid x:Name="chartGrid" SizeChanged="chartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
+                            <Grid x:Name="chartGrid" SizeChanged="ChartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
                                 <Border BorderThickness="1" BorderBrush="Black">
                                     <Canvas x:Name="PlotCanvas" ClipToBounds="True"/>
                                 </Border>
@@ -109,7 +109,7 @@
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
 
-                            <Grid x:Name="chartGrid2" SizeChanged="chartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
+                            <Grid x:Name="chartGrid2" SizeChanged="ChartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
                                 <Border BorderThickness="1" BorderBrush="Black">
                                     <Canvas x:Name="PlotCanvas2" ClipToBounds="True"/>
                                 </Border>
