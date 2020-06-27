@@ -474,7 +474,7 @@ namespace Biomorpher.IGA
                     pc = 0;
                 }
 
-                if (pc < performanceCount)
+                if (pc != performanceCount)
                 {
                     List<double> newPerforms = new List<double>();
                     List<string> newCrits = new List<string>();

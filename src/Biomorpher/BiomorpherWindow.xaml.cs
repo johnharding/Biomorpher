@@ -196,11 +196,8 @@ namespace Biomorpher
             PopSize = 48;
             CrossoverProbability = 0.10;
             MutateProbability = 0.01;
-            Generation = 0;
-            ParentCount = 0;
-            performanceCount = 0;
+
             GO = false;
-            HighlightedCluster = 0;
             fontsize = 18;
             fontsize2 = 12;
             margin_w = 20;
@@ -210,8 +207,8 @@ namespace Biomorpher
             controls = new Dictionary<string, FrameworkElement>();
 
             //Initialise Tab 1 Start settings (i.e. popsize and mutation sliders)
-            tab1_primary_initial();
-            tab1_secondary_settings();
+            Tab1_primary_initial();
+            Tab1_secondary_settings();
 
             // Make sure that tab 3 history graphics are clipped to bounds
             Tab3_primary.ClipToBounds = true;
@@ -222,15 +219,23 @@ namespace Biomorpher
         }
 
         #endregion
-        
+
         #region MAIN METHODS
-  
+
         /// <summary>
         /// Instantiate the population and intialise the window
         /// Runtype 0: Random, 1: Existing 2: Current
         /// </summary>
         public void RunInit(int runType)
         {
+            Generation = 0;
+            ParentCount = 0;
+            performanceCount = 0;
+            HighlightedCluster = 0;
+
+            _historycanvas.Children.Clear();
+            _historyY = 0;
+            pngHeight = 0;
 
             // 1. Initialise population history. Biobranches are only used for the history and plot bits.
             // Note that we won't actually add a population here yet, but we initialise it at the start.
@@ -251,20 +256,32 @@ namespace Biomorpher
             population.SetAveragePerformanceValues(performanceCount, true);
 
             // 6. Setup tab layouts
-            Tab12_primary_permanent(1); // 1 indicates tab 1
+            if (!GO)
+                Tab12_primary_permanent(1); // 1 indicates tab 1
             Tab1_primary_update();
 
-            Tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
+            if (!GO)
+                Tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
             Tab2_primary_update();
 
-            Tab2_secondary_settings();
+            if (!GO)
+            {
+                Tab2_secondary_settings();
+                Tab3_secondary_settings();
+                Tab4_secondary_settings();
+                Tab5_secondary_settings();
+            }
 
-            Tab3_secondary_settings();
-            Tab4_secondary_settings();
-            Tab5_secondary_settings();
+            // Reset plotcanvas if this isn't the first time.
+            if(GO)
+            {
+                Tab4_plotcanvas();
+            }
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
+
+            GO = true;
         }
 
 
@@ -561,7 +578,7 @@ namespace Biomorpher
             for (int i = 0; i < 12; i++)
             {
                 //Create canvas
-                Canvas canvas = createKMeansVisualisation(i);
+                Canvas canvas = CreateKMeansVisualisation(i);
 
                 //The name of the control to add the canvas to
                 string dp_name = "dp_tab1_" + i;
@@ -587,7 +604,7 @@ namespace Biomorpher
         /// </summary>
         /// <param name="clusterIndex"></param>
         /// <returns></returns>
-        public Canvas createKMeansVisualisation(int clusterIndex)
+        public Canvas CreateKMeansVisualisation(int clusterIndex)
         {
             int width = 150;
             int diameter = 8;
@@ -675,7 +692,7 @@ namespace Biomorpher
         /// <summary>
         /// An initial background for tab 1.
         /// </summary>
-        public void tab1_primary_initial()
+        public void Tab1_primary_initial()
         { 
             BitmapImage b = new BitmapImage();
             b.BeginInit();
@@ -698,7 +715,7 @@ namespace Biomorpher
         /// <summary>
         /// Create settings panel for Tab 1
         /// </summary>
-        public void tab1_secondary_settings()
+        public void Tab1_secondary_settings()
         {
             //Container for all the controls
             StackPanel sp = new StackPanel();
@@ -2175,7 +2192,7 @@ namespace Biomorpher
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
             txt_dcl2.FontSize = 12;
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
-            txt_dcl2.Inlines.Add("\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris.");
+            txt_dcl2.Inlines.Add("\n\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris.");
             txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
             txt_dcl2.Inlines.Add("\nCopyright:\t2020 John Harding");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
@@ -2184,7 +2201,7 @@ namespace Biomorpher
             txt_dcl2.Inlines.Add("\nGHgroup:\thttp://www.grasshopper3d.com/group/biomorpher");
             txt_dcl2.Inlines.Add("\n\nDependencies:\tHelixToolkit: https://github.com/helix-toolkit");
             txt_dcl2.Inlines.Add("\n\t\tMahapps.metro: http://mahapps.com/");
-            txt_dcl2.Inlines.Add("\n\nBiomorpher is completely free, but if you would like to make a small donation and leave a message you can do so here (launches browser):");
+            txt_dcl2.Inlines.Add("\n\nBiomorpher is completely free, but if you would like to make a small donation and leave a message you can do so at my ko-fi page (launches browser):");
             txt_dcl2.Inlines.Add("\n ");
 
             // Donate button
@@ -2439,18 +2456,11 @@ namespace Biomorpher
         /// <param name="e"></param>
         public void Tab1_Go_Click(object sender, RoutedEventArgs e)
         {
-
-            if (!GO)
-            {
-                RunInit(0);
-
-                //Disable sliders in tab 1
-                Slider s_popSize = (Slider)controls["s_tab1_popSize"];
-                s_popSize.IsEnabled = false;
-
-            }
-
-            GO = true;
+            RunInit(0);
+            Button b1 = (Button)controls["b_tab1_Go"];
+            b1.Content = "Restart";
+            Button b2 = (Button)controls["b_tab1_Go2"];
+            b2.Content = "Restart";
         }
 
 
@@ -2461,18 +2471,11 @@ namespace Biomorpher
         /// <param name="e"></param>
         public void Tab1_Go2_Click(object sender, RoutedEventArgs e)
         {
-
-            if (!GO)
-            {
-                RunInit(1);
-
-                //Disable sliders in tab 1
-                Slider s_popSize = (Slider)controls["s_tab1_popSize"];
-                s_popSize.IsEnabled = false;
-
-            }
-
-            GO = true;
+            RunInit(1);
+            Button b1 = (Button)controls["b_tab1_Go"];
+            b1.Content = "Restart";
+            Button b2 = (Button)controls["b_tab1_Go2"];
+            b2.Content = "Restart";
         }
 
 
@@ -2564,9 +2567,7 @@ namespace Biomorpher
                         }
                     }
                 }
-
             }
-
         }
 
 
