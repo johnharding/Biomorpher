@@ -1177,6 +1177,7 @@ namespace Biomorpher
             StackPanel sp = new StackPanel();
             controls.Add("SP", sp);
 
+
             //Header
             Border border_head = new Border();
             border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
@@ -1275,7 +1276,8 @@ namespace Biomorpher
             sp.Children.Add(border_dcl);
 
 
-            // Display the highlighted design label (i.e. "Design 0"). Add to controls so it can be updated using tab2_updateperforms
+            // Display the highlighted design label (i.e. "Design 0"). 
+            // Add to controls so it can be updated using tab2_updateperforms (see below)
             Border border_cluster = new Border();
             controls.Add("CLUSTER", border_cluster);
             sp.Children.Add(border_cluster);
@@ -1355,18 +1357,66 @@ namespace Biomorpher
 
         /// <summary>
         /// Updates the list of performance 'borders' on the right hand side of the main window (tab 2)
-        /// Called when a design is double clicked
+        /// Called again when a design is double clicked
         /// </summary>
         private void tab2_updatePerforms()
         {
             //Design info
-            Border border_clus = (Border) controls["CLUSTER"];
-            border_clus.Margin = new Thickness(margin_w, 20, margin_w, 10);
-            
+            Border border_clus = (Border)controls["CLUSTER"];
+            border_clus.Margin = new Thickness(margin_w, 16, margin_w, 4);
+
+            // Add root Grid
+            Grid myGrid = new Grid();
+            ColumnDefinition myColDef1 = new ColumnDefinition();
+            ColumnDefinition myColDef2 = new ColumnDefinition();
+            ColumnDefinition myColDef3 = new ColumnDefinition();
+            ColumnDefinition myColDef4 = new ColumnDefinition();
+
+            myGrid.Height = 56;
+
+            myColDef2.Width = new GridLength(24);
+            myColDef3.Width = new GridLength(24);
+            myColDef4.Width = new GridLength(23);
+
+            myGrid.ColumnDefinitions.Add(myColDef1);
+            myGrid.ColumnDefinitions.Add(myColDef2);
+            myGrid.ColumnDefinitions.Add(myColDef3);
+            myGrid.ColumnDefinitions.Add(myColDef4);
+
+            if (performanceCount > 0)
+            {
+                Label label_1 = new Label();
+                Label label_2 = new Label();
+                Label label_3 = new Label();
+
+                label_1.Content = "none";
+                label_2.Content = "minimise";
+                label_3.Content = "maximise";
+
+                label_1.FontSize = 11;
+                label_2.FontSize = 11;
+                label_3.FontSize = 11;
+
+                label_1.LayoutTransform = new RotateTransform(-90);
+                label_2.LayoutTransform = new RotateTransform(-90);
+                label_3.LayoutTransform = new RotateTransform(-90);
+
+                Grid.SetColumn(label_1, 1);
+                myGrid.Children.Add(label_1);
+                Grid.SetColumn(label_2, 2);
+                myGrid.Children.Add(label_2);
+                Grid.SetColumn(label_3, 3);
+                myGrid.Children.Add(label_3);
+            }
+
             Label label_gen = new Label();
-            label_gen.Content = "Design " + HighlightedCluster +":";
-            label_gen.FontSize = fontsize-2;
-            border_clus.Child = label_gen;
+            label_gen.Content = "Design " + HighlightedCluster;
+            label_gen.FontSize = fontsize;
+            label_gen.VerticalAlignment = VerticalAlignment.Bottom;
+            Grid.SetColumn(label_gen, 0);
+            myGrid.Children.Add(label_gen);
+
+            border_clus.Child = myGrid;
 
             // Get the performance borders from the dictionary
             // Note that these performance borders are for ONE design.
