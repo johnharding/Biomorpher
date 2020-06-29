@@ -54,12 +54,12 @@ namespace Biomorpher.IGA
             return new Color[8] 
             {
                 Color.FromArgb(255, 60, 60, 60),
-                Color.FromArgb(255, 120, 0, 0),
-                Color.FromArgb(255, 0, 120, 0),
-                Color.FromArgb(255, 0, 0, 120),
                 Color.FromArgb(255, 120, 120, 0),
+                Color.FromArgb(255, 120, 0, 0),
                 Color.FromArgb(255, 0, 120, 120),
+                Color.FromArgb(255, 0, 120, 0),
                 Color.FromArgb(255, 120, 0, 120),
+                Color.FromArgb(255, 0, 0, 120),
                 Color.FromArgb(255, 120, 120, 120)
             };
         }
@@ -239,7 +239,7 @@ namespace Biomorpher.IGA
 
             else
             {
-                material.Brush = new SolidColorBrush(Color.FromArgb((byte)220, (byte)51, (byte)188, (byte)188));
+                material.Brush = new SolidColorBrush(Color.FromArgb(220, 255, 255, 255));
             }
         }
 

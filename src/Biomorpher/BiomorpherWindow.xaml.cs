@@ -250,6 +250,7 @@ namespace Biomorpher
             population.KMeansClustering(12);
 
             // 4. Get geometry and performance for each chromosome
+            // First time boolean resets the performance count
             GetPhenotypes(true, true);
 
             // 5. Now get the average performance values (cluster reps only)
@@ -262,21 +263,23 @@ namespace Biomorpher
 
             if (!GO)
                 Tab12_primary_permanent(2); // 2 indicates tab 2 (but same method!)
+
             Tab2_primary_update();
 
             if (!GO)
-            {
                 Tab2_secondary_settings();
+
+            Tab2_updatePerforms();
+
+            if (!GO)
                 Tab3_secondary_settings();
-                Tab4_secondary_settings();
-                Tab5_secondary_settings();
-            }
+
+            Tab4_secondary_settings();
+            Tab5_secondary_settings();
 
             // Reset plotcanvas if this isn't the first time.
-            if(GO)
-            {
+            if (GO)
                 Tab4_plotcanvas();
-            }
 
             // 7. Set component outputs
             owner.SetComponentOut(population, BioBranches, performanceCount, biobranchID);
@@ -359,7 +362,7 @@ namespace Biomorpher
 
 
         /// <summary>
-        /// Runs when a new biobranch is spawned.
+        /// Runs when a new biobranch is spawned, when the reinstate button is clicked basically
         /// </summary>
         public void RunNewBranch()
         {
@@ -367,7 +370,7 @@ namespace Biomorpher
             Generation = 0;
 
             // Get geometry for each chromosome
-            GetPhenotypes(true, true);
+            GetPhenotypes(true, false);
 
             // 5. Now get the average performance values (cluster reps only)
             population.SetAveragePerformanceValues(performanceCount, true);
@@ -997,15 +1000,15 @@ namespace Biomorpher
             //Run through the design windows and add a viewport3d control and performance display to each
             for (int i = 0; i < 12; i++)
             {
-                //The name of the control to add to
+                // The name of the control to add to
                 string dp_name = "dp_tab2_" + i;
                 string dp_sub_name = "dp_sub_tab2_" + i;
 
-                //Get this control from the dictionary
+                // Get this control from the dictionary
                 DockPanel dp = (DockPanel)controls[dp_name];
                 DockPanel dp_sub = (DockPanel)controls[dp_sub_name];
 
-                //Viewport update
+                // Viewport update
                 if (dp.Children.Count > 1)
                 {
                     dp.Children.RemoveAt(dp.Children.Count - 1);
@@ -1014,7 +1017,7 @@ namespace Biomorpher
                 Viewport3d vp3d = new Viewport3d(meshes[i], polys[i], i, this, true);
                 dp.Children.Add(vp3d);
 
-                //Performance display update
+                // Performance display update
                 if (dp_sub.Children.Count > 2)
                 {
                     dp_sub.Children.RemoveAt(dp_sub.Children.Count - 1);
@@ -1029,10 +1032,10 @@ namespace Biomorpher
             // TODO: Is there a better way to do this?
             for (int i = 0; i < 12; i++)
             {
-                //The name of the control to add to
+                // The name of the control to add to
                 string dp_name = "dp_tab2_" + i;
 
-                //Get this control from the dictionary
+                // Get this control from the dictionary
                 DockPanel dp = (DockPanel)controls[dp_name];
                 Viewport3d vp3d = (Viewport3d)dp.Children[1];
                 vp3d.MatchCamera();
@@ -1182,7 +1185,6 @@ namespace Biomorpher
             StackPanel sp = new StackPanel();
             controls.Add("SP", sp);
 
-
             //Header
             Border border_head = new Border();
             border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
@@ -1230,13 +1232,13 @@ namespace Biomorpher
             spacer.Width = 4;
             dp_buttons.Children.Add(spacer);
 
+            // Up down text
             Label label_numeric = new Label();
             label_numeric.Content = "Iterations:";
             label_numeric.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
-            //DockPanel.SetDock(label_numeric, Dock.Left);
             dp_buttons.Children.Add(label_numeric);
 
-            //Numeric upDown
+            // Numeric upDown
             NumericUpDown myNumericUpDown = new NumericUpDown
             {
                 Width = 62,
@@ -1257,7 +1259,7 @@ namespace Biomorpher
             border_buttons.Child = dp_buttons;
             sp.Children.Add(border_buttons);
 
-            //Header 2
+            // Header 2
             Border border_data = new Border();
             border_data.Margin = new Thickness(margin_w, 24, margin_w, 0);
             Label label_data = new Label();
@@ -1272,8 +1274,8 @@ namespace Biomorpher
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
-            txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance data below. ");
-            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for criteria using the whole population (artificial selection can also be used concurrently).");
+            txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance below. ");
+            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for different criteria (uses the whole population). Artificial selection can also be used concurrently).");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
@@ -1287,65 +1289,10 @@ namespace Biomorpher
             controls.Add("CLUSTER", border_cluster);
             sp.Children.Add(border_cluster);
 
-
             // Now for the soupdragons...
             StackPanel soupdragonMaster = new StackPanel();
-            StackPanel soupdragon1 = new StackPanel();
-            StackPanel soupdragon2 = new StackPanel();
-
-
-            // Add the performance borders to soupdragon 1
-            for (int i = 0; i < performanceCount; i++)
-            {
-                Border border_p = new Border();
-                controls.Add("PERFBORDER" + i, border_p);
-                soupdragon1.Children.Add(border_p);
-            }
- 
-            // Add the radiobuttons
-            for (int i = 0; i < performanceCount; i++)
-            {
-                DockPanel radButtonPanel = new DockPanel();
-
-                RadioButton radButtonNon = new RadioButton();
-                RadioButton radButtonMin = new RadioButton();
-                RadioButton radButtonMax = new RadioButton();
-                
-                radButtonNon.IsChecked = true;
-
-                radButtonNon.ToolTip = "no optimisation";
-                radButtonMin.ToolTip = "minimise";
-                radButtonMax.ToolTip = "maximise";
-
-                radButtonNon.Background = Friends.RhinoGrey();
-                radButtonMin.Background = Friends.RhinoGrey();
-                radButtonMax.Background = Friends.RhinoGrey();
-
-                controls.Add("RADBUTTONMIN" + i, radButtonMin);
-                controls.Add("RADBUTTONMAX" + i, radButtonMax);
-                controls.Add("RADBUTTONNON" + i, radButtonNon);
-
-                radButtonPanel.Children.Add(radButtonNon);
-                radButtonPanel.Children.Add(radButtonMin);
-                radButtonPanel.Children.Add(radButtonMax);
-
-                radButtonPanel.Height = 26;
-
-                soupdragon2.Children.Add(radButtonPanel);
-            }
-
-            soupdragon1.Width = 214;
-            soupdragon1.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-            soupdragon2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-
-            // Bring the soupdragons together and add to the overall stackpanel
-            soupdragonMaster.Orientation = Orientation.Horizontal;
-            soupdragonMaster.Children.Add(soupdragon1);
-            soupdragonMaster.Children.Add(soupdragon2);
+            controls.Add("SOUPDRAGONMASTER", soupdragonMaster);
             sp.Children.Add(soupdragonMaster);
-
-            // Performance labels
-            Tab2_updatePerforms();
 
             // Add the stackpanels to the secondary area of Tab 2
             Tab2_secondary.Child = sp;
@@ -1416,14 +1363,105 @@ namespace Biomorpher
 
             border_clus.Child = myGrid;
 
-            // Get the performance borders from the dictionary
+            // 8 maximum performance count
+            // Try to get rid of anything we don't need.
+            List<bool?> radmincheckList = new List<bool?>();
+            List<bool?> radmaxcheckList = new List<bool?>();
+            List<bool?> radnoncheckList = new List<bool?>();
+
+            // Basically we need to get all the checked data before we remove the radio buttons.
+            // What a faff, just to enable the user to change the performance count when restarting!
+            for (int i = 0; i < 8; i++)
+            {
+                controls.Remove("PERFBORDER" + i);
+
+                if (controls.ContainsKey("RADBUTTONNON" + i))
+                {
+                    RadioButton radnon = (RadioButton)controls["RADBUTTONNON" + i];
+                    radnoncheckList.Add(radnon.IsChecked);
+                    controls.Remove("RADBUTTONNON" + i);
+                }
+
+                if (controls.ContainsKey("RADBUTTONMIN" + i))
+                {
+                    RadioButton radmin = (RadioButton)controls["RADBUTTONMIN" + i];
+                    radmincheckList.Add(radmin.IsChecked);
+                    controls.Remove("RADBUTTONMIN" + i);
+                }
+
+                if (controls.ContainsKey("RADBUTTONMAX" + i))
+                {
+                    RadioButton radmax = (RadioButton)controls["RADBUTTONMAX" + i];
+                    radmaxcheckList.Add(radmax.IsChecked);
+                    controls.Remove("RADBUTTONMAX" + i);
+                }
+            }
+
+            // Get the soupdragonmaster that has already been added to sp
+            StackPanel soupSP = (StackPanel)controls["SOUPDRAGONMASTER"];
+            soupSP.Children.Clear();
+            StackPanel soupdragon1 = new StackPanel();
+            StackPanel soupdragon2 = new StackPanel();
+
+            // Add the performance borders to soupdragon 1
             // Note that these performance borders are for ONE design.
             List<Border> myBorders = new List<Border>();
             for (int i = 0; i < performanceCount; i++)
             {
-                myBorders.Add((Border)controls["PERFBORDER" + i]);
+                Border border_p = new Border();
+                controls.Add("PERFBORDER" + i, border_p);
+                soupdragon1.Children.Add(border_p);
+                myBorders.Add(border_p);
             }
-            
+
+            // Add the radiobuttons
+            for (int i = 0; i < performanceCount; i++)
+            {
+                DockPanel radButtonPanel = new DockPanel();
+
+                RadioButton radButtonNon = new RadioButton();
+                RadioButton radButtonMin = new RadioButton();
+                RadioButton radButtonMax = new RadioButton();
+
+                radButtonNon.IsChecked = true;
+
+                if (i < radnoncheckList.Count)
+                    radButtonNon.IsChecked = radnoncheckList[i];
+                if (i < radmincheckList.Count)
+                    radButtonMin.IsChecked = radmincheckList[i];
+                if (i < radmaxcheckList.Count)
+                    radButtonMax.IsChecked = radmaxcheckList[i];
+
+                radButtonNon.ToolTip = "no optimisation";
+                radButtonMin.ToolTip = "minimise";
+                radButtonMax.ToolTip = "maximise";
+
+                radButtonNon.Background = Friends.RhinoGrey();
+                radButtonMin.Background = Friends.RhinoGrey();
+                radButtonMax.Background = Friends.RhinoGrey();
+
+                controls.Add("RADBUTTONNON" + i, radButtonNon);
+                controls.Add("RADBUTTONMIN" + i, radButtonMin);
+                controls.Add("RADBUTTONMAX" + i, radButtonMax);
+
+                radButtonPanel.Children.Add(radButtonNon);
+                radButtonPanel.Children.Add(radButtonMin);
+                radButtonPanel.Children.Add(radButtonMax);
+
+                radButtonPanel.Height = 26;
+
+                soupdragon2.Children.Add(radButtonPanel);
+            }
+
+            soupdragon1.Width = 214;
+            soupdragon1.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+            soupdragon2.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+
+            // Bring the soupdragons together and add to the overall stackpanel
+            soupSP.Orientation = Orientation.Horizontal;
+            soupSP.Children.Add(soupdragon1);
+            soupSP.Children.Add(soupdragon2);
+
             // A separate method is used due to the history tab also utilising this facility
             AddPerformanceInfo(population, myBorders, HighlightedCluster, false);
         }
@@ -2029,7 +2067,6 @@ namespace Biomorpher
         public void Tab4_secondary_settings()
         {
             StackPanel sp4 = new StackPanel();
-            controls.Add("SP4", sp4);
 
             //Header
             Border border_head = new Border();
@@ -2055,6 +2092,12 @@ namespace Biomorpher
             // Now for the soupdragons...
             StackPanel soupdragon = new StackPanel();
             string[][] criteria = getRepresentativeCriteria(population);
+
+            // Remove any checkboxes that might exist
+            for (int i=0; i < performanceCount; i++)
+            {
+                controls.Remove("PLOTCHECKBOX" + i);
+            }
 
             for (int i = 0; i < performanceCount; i++)
             {
@@ -2096,7 +2139,6 @@ namespace Biomorpher
         public void Tab5_secondary_settings()
         {
             StackPanel sp5 = new StackPanel();
-            //controls.Add("SP4", sp4);
 
             //Header
             Border border_head = new Border();
@@ -2122,6 +2164,11 @@ namespace Biomorpher
             // Dropdowns
             string[][] criteria = getRepresentativeCriteria(population);
 
+            // Remove any checkboxes that might exist already
+            controls.Remove("MYCOMBOX");
+            controls.Remove("MYCOMBOY");
+
+            // Now make the new ones
             Border menuBorder = new Border();
             menuBorder.Margin = new Thickness(margin_w, 0, margin_w, 12);
             Border menuBorder2 = new Border();
@@ -2141,7 +2188,6 @@ namespace Biomorpher
                 myComboX.Items.Add(criteria[0][i].ToString());
                 myComboY.Items.Add(criteria[0][i].ToString());
             }
-
 
             myComboX.SelectionChanged += new SelectionChangedEventHandler(Replot);
             myComboY.SelectionChanged += new SelectionChangedEventHandler(Replot);
