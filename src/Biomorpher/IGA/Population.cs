@@ -47,6 +47,16 @@ namespace Biomorpher.IGA
         public List<double> Performance_Averages { get; set; }
 
         /// <summary>
+        /// List containing average performance values for this population
+        /// </summary>
+        public List<double> Performance_Minimums { get; set; }
+
+        /// <summary>
+        /// List containing average performance values for this population
+        /// </summary>
+        public List<double> Performance_Maximums { get; set; }
+
+        /// <summary>
         /// Construct a new population of chromosomes using sliders and genepools
         /// </summary>
         /// <param name="popSize"></param>
@@ -104,6 +114,8 @@ namespace Biomorpher.IGA
             popSliders = new List<GH_NumberSlider>(pop.popSliders);
             popGenePools = new List<GalapagosGeneListObject>(pop.popGenePools);
             Performance_Averages = new List<double>(pop.Performance_Averages);
+            Performance_Minimums = new List<double>(pop.Performance_Minimums);
+            Performance_Maximums = new List<double>(pop.Performance_Maximums);
 
             // clone the owner
             owner = pop.owner;
@@ -326,10 +338,15 @@ namespace Biomorpher.IGA
         {
             // Declare a brand new list
             Performance_Averages = new List<double>();
+            Performance_Minimums = new List<double>();
+            Performance_Maximums = new List<double>();
 
             for (int p = 0; p < pCount; p++)
             {
                 Performance_Averages.Add(0.0);
+
+                double minValue = 9999999999;
+                double maxValue = -9999999999;
 
                 for (int i = 0; i < chromosomes.Length; i++)
                 {
@@ -338,12 +355,20 @@ namespace Biomorpher.IGA
                         if (chromosomes[i].isRepresentative)
                         {
                             Performance_Averages[p] += chromosomes[i].GetPerformas()[p];
+                            if (chromosomes[i].GetPerformas()[p] < minValue)
+                                minValue = chromosomes[i].GetPerformas()[p];
+                            if (chromosomes[i].GetPerformas()[p] > maxValue)
+                                maxValue = chromosomes[i].GetPerformas()[p];
                         }
                     }
 
                     else
                     {
                         Performance_Averages[p] += chromosomes[i].GetPerformas()[p];
+                        if (chromosomes[i].GetPerformas()[p] < minValue)
+                            minValue = chromosomes[i].GetPerformas()[p];
+                        if (chromosomes[i].GetPerformas()[p] > maxValue)
+                            maxValue = chromosomes[i].GetPerformas()[p];
                     }
                 }
 
@@ -351,6 +376,9 @@ namespace Biomorpher.IGA
                 else Performance_Averages[p] /= chromosomes.Length;
 
                 Performance_Averages[p] = Math.Round(Performance_Averages[p], 3);
+
+                Performance_Minimums.Add(minValue);
+                Performance_Maximums.Add(maxValue);
 
             }
         }

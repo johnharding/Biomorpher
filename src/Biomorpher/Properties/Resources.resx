@@ -124,6 +124,9 @@
   <data name="BiomorpherIcon2_240" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BiomorpherIcon2_240.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="biomorpherIcon_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\biomorpherIcon_16.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="BiomorpherReaderIcon_24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BiomorpherReaderIcon_24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

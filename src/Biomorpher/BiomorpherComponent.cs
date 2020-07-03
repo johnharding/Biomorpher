@@ -398,8 +398,6 @@ namespace Biomorpher
                 historicNumbers.AppendRange(myList, myPath);
             }
 
-
-
             // Get the Guids for the sliders and genepools to pass on
             genoGuids = new GH_Structure<GH_Guid>();
 

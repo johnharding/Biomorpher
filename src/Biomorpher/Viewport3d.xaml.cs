@@ -132,7 +132,7 @@ namespace Biomorpher
             //this.ContextMenu = myMenu;
             //myMenu.IsOpen = true;
             hVp3D.ContextMenu = myMenu;
-             */
+            */
 
         }
 
@@ -175,6 +175,7 @@ namespace Biomorpher
 
                     DockPanel dp = (DockPanel)W.GetControls()[dp_name];
    
+                    // Noting that the first child of dp is the performance bar, hence Children[1]
                     Viewport3d myViewport = (Viewport3d)dp.Children[1];
                     myViewport.SetCamera(this.GetCamera());
 

@@ -181,8 +181,12 @@ namespace Biomorpher
 
             // Initial Window things
             InitializeComponent();
-            Title = "Biomorpher " + Friends.VerionInfo();
+            Title = "  \u2009  " + Friends.VerionInfo();
             WindowTransitionsEnabled = false;
+            ShowIconOnTitleBar = true;
+            // Uri iconUri = new Uri("pack://application:,,,/Biomorpher;component/Resources/biomorpherIcon_16.ico");
+            // Icon = BitmapFrame.Create(iconUri);
+            // this.TitlebarHeight = 20;
 
             // Initialise history canvas
             _historycanvas = new Canvas();
@@ -835,7 +839,7 @@ namespace Biomorpher
             DockPanel dp_showall12 = new DockPanel();
             Label label_showall12 = new Label();
             label_showall12.HorizontalContentAlignment = HorizontalAlignment.Left;
-            label_showall12.Content = "Show all 12 cluster centroids in history?";
+            label_showall12.Content = "Show all 12 cluster centroids in history";
             DockPanel.SetDock(label_showall12, Dock.Left);
             dp_showall12.Children.Add(label_showall12);
 
@@ -924,7 +928,7 @@ namespace Biomorpher
                 // Border
                 Border border = new Border();
                 border.BorderBrush = Brushes.Black;
-                border.BorderThickness = new Thickness(0.5);
+                border.BorderThickness = new Thickness(1);
                 border.Padding = new Thickness(2);
 
                 // Master Dock panel
@@ -953,6 +957,9 @@ namespace Biomorpher
                     string cb_name = "cb_tab2_" + i;
                     CheckBox cb = CreateCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
                     cb.Background = Friends.RhinoGrey();
+                    cb.BorderBrush = Brushes.Black;
+                    cb.BorderThickness = new Thickness(1);
+
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
                     DockPanel.SetDock(cb, Dock.Right);
                     dp_sub.Children.Add(cb);
@@ -1932,6 +1939,7 @@ namespace Biomorpher
                                 CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
                                 if ((bool)checkBox.IsChecked)
                                 {
+                                    
                                     // Get min and max values for this performance criteria
                                     double minP = BioBranches[biobranchID].minPerformanceValues[p];
                                     double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
@@ -2580,6 +2588,7 @@ namespace Biomorpher
             if (checkbox.IsChecked == true)
             {
                 ParentCount++;
+                checkbox.BorderBrush = Brushes.White;
 
                 if (checkbox.Tag != null)
                 {
@@ -2599,6 +2608,7 @@ namespace Biomorpher
             else
             {
                 ParentCount--;
+                checkbox.BorderBrush = Brushes.Black;
 
                 if (checkbox.Tag != null)
                 {
