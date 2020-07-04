@@ -1877,7 +1877,32 @@ namespace Biomorpher
             PlotCanvas.Children.Clear();
             PlotCanvas2.Children.Clear();
 
-            int totalGenerations = BioBranches[biobranchID].PopTwigs.Count;
+            // Include existing population
+            int totalGenerations = BioBranches[biobranchID].PopTwigs.Count + 1;
+
+
+            // Find the min and maximums from both current and historic populations
+            List<double> miniP = new List<double>();
+            List<double> maxiP = new List<double>();
+
+            for (int p = 0; p < performanceCount; p++)
+            {
+                miniP.Add(population.Performance_Minimums[p]);
+                maxiP.Add(population.Performance_Maximums[p]);
+
+                if (BioBranches[biobranchID].PopTwigs.Count > 0)
+                {
+                    if (BioBranches[biobranchID].minPerformanceValues[p] < miniP[p])
+                        miniP[p] = BioBranches[biobranchID].minPerformanceValues[p];
+                    if (BioBranches[biobranchID].maxPerformanceValues[p] > maxiP[p])
+                        maxiP[p] = BioBranches[biobranchID].maxPerformanceValues[p];
+
+                }
+
+                // Avoid division by zero
+                if (miniP[p] == maxiP[p]) maxiP[p]++;
+            }
+
 
             // Set up IDs for performance count
             ComboBox myComboX = (ComboBox)controls["MYCOMBOX"];
@@ -1892,16 +1917,13 @@ namespace Biomorpher
                 this.Plot2XName.Text = myComboX.SelectedItem.ToString();
                 this.Plot2YName.Text = myComboY.SelectedItem.ToString();
 
-                // Check there is anything in there. If this is generation 0 there will not be anything.
-                if (BioBranches[biobranchID].PopTwigs.Count > 0)
-                {
-                    this.MinXName.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[ParetoXID]);
-                    this.MaxXName.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[ParetoXID]);
+                this.MinXName.Text = Friends.AxisLabelText(miniP[ParetoXID]);
+                this.MaxXName.Text = Friends.AxisLabelText(maxiP[ParetoXID]);
 
-                    this.MinYName.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[ParetoYID]);
-                    this.MaxYName.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[ParetoYID]);
-                }
+                this.MinYName.Text = Friends.AxisLabelText(miniP[ParetoYID]);
+                this.MaxYName.Text = Friends.AxisLabelText(maxiP[ParetoYID]);
             }
+
 
             // Could be an array, but potentially more risky in case of early events.
             // Set up points for a polyline for each performance measure
@@ -1914,41 +1936,34 @@ namespace Biomorpher
                     PlotCanvas.Children.Add(myPoly[p]);
             }
 
+
+            // 1. Add the historic populations first. 
             // j indicates generation
             for (int j = 0; j < BioBranches[biobranchID].PopTwigs.Count; j++)
             {
 
-                double xPos = (Convert.ToDouble(j) / totalGenerations) * PlotCanvas.Width + 5;
+                double xPos = (Convert.ToDouble(j) / (totalGenerations)) * (PlotCanvas.Width-10) + 5;
 
                 // k indicates chromosome (design)
                 for (int k = 0; k < BioBranches[biobranchID].PopTwigs[j].chromosomes.Length; k++)
                 {
                     Chromosome thisDesign = BioBranches[biobranchID].PopTwigs[j].chromosomes[k];
-
-                    List<double> myPerforms = thisDesign.GetPerformas();
-
-                    // Let's keep this for the time being
+                    
                     if (thisDesign.isRepresentative || thisDesign.isMinimum || thisDesign.isMaximum || thisDesign.isOptimal)
                     {
+                        List<double> myPerforms = thisDesign.GetPerformas();
+
                         // Note that manual selection does not run performance measures for all population, so we have to avoid this
                         if (myPerforms != null)
                         {
-                            for (int p = 0; p < myPerforms.Count; p++)
+                            for (int p = 0; p < performanceCount; p++)
                             {
-
                                 CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
                                 if ((bool)checkBox.IsChecked)
                                 {
-                                    
-                                    // Get min and max values for this performance criteria
-                                    double minP = BioBranches[biobranchID].minPerformanceValues[p];
-                                    double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
-
-                                    // Avoid division by zero
-                                    if (minP == maxP) maxP++;
 
                                     // Includes some margins
-                                    double yPos = PlotCanvas.Height - ((myPerforms[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
+                                    double yPos = PlotCanvas.Height - ((myPerforms[p] - miniP[p]) * Math.Abs((PlotCanvas.Height - 10)) / (maxiP[p] - miniP[p]) + 5);
 
                                     // Draw the circle
                                     System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
@@ -1963,17 +1978,14 @@ namespace Biomorpher
 
                             // Now for the Pareto graph, which has to have minimum 2 performance values to work
                             // If index is -1, then combobox has not been selected yet
-                            if (myPerforms.Count > 1 && ParetoXID !=-1 && ParetoYID !=-1)
+                            if (performanceCount > 1 && ParetoXID !=-1 && ParetoYID !=-1)
                             {
 
-                                double minXP = BioBranches[biobranchID].minPerformanceValues[ParetoXID];
-                                double maxXP = BioBranches[biobranchID].maxPerformanceValues[ParetoXID];
-                                double minYP = BioBranches[biobranchID].minPerformanceValues[ParetoYID];
-                                double maxYP = BioBranches[biobranchID].maxPerformanceValues[ParetoYID];
-
-                                // Avoid division by zero
-                                if (minXP == maxXP) maxXP++;
-                                if (minYP == maxYP) maxYP++;
+                                // Avoidance of division by zero has already been circumnavigated
+                                double minXP = miniP[ParetoXID];
+                                double maxXP = maxiP[ParetoXID];
+                                double minYP = miniP[ParetoYID];
+                                double maxYP = maxiP[ParetoYID];
 
                                 // Includes margin
                                 double paretoX = (myPerforms[ParetoXID] - minXP) * Math.Abs(PlotCanvas2.Width-10) / (maxXP - minXP) +5;
@@ -1983,25 +1995,9 @@ namespace Biomorpher
                                 System.Windows.Shapes.Path myCircle2 = new System.Windows.Shapes.Path();
                                 double alpha = (double)(j + 1) / BioBranches[biobranchID].PopTwigs.Count;
 
-                                double radius = 0;
-
-                                if (j == BioBranches[biobranchID].PopTwigs.Count - 1)
-                                {
-                                    radius = 4;
-                                    myCircle2.StrokeThickness = 1;
-                                    myCircle2.Stroke = Brushes.White;
-                                    myCircle2.Fill = Brushes.Black;
-                                    myCircle2.ToolTip = thisDesign.clusterId;
-                                }
-
-                                else
-                                {
-                                    myCircle2.Fill = new SolidColorBrush(Color.FromArgb((byte)(int)(255 * alpha), 0, 0, 0));
-                                    radius = 3;
-                                }
-                                
-                                myCircle2.Data = new EllipseGeometry(new System.Windows.Point(paretoX, paretoY), radius, radius);
-                                myCircle2.MouseDown += new MouseButtonEventHandler(ScatterCircleClick);
+                                myCircle2.Fill = new SolidColorBrush(Color.FromArgb((byte)(int)(255 * alpha), 0, 0, 0));
+                                myCircle2.Data = new EllipseGeometry(new System.Windows.Point(paretoX, paretoY), 3, 3);
+                                //myCircle2.MouseDown += new MouseButtonEventHandler(ScatterCircleClick);
                                 
                                 PlotCanvas2.Children.Add(myCircle2);
                             }
@@ -2017,55 +2013,142 @@ namespace Biomorpher
                     CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
                     if ((bool)checkBox.IsChecked)
                     {
-                        double minP = BioBranches[biobranchID].minPerformanceValues[p];
-                        double maxP = BioBranches[biobranchID].maxPerformanceValues[p];
 
-                        // Avoid division by zero
-                        if (minP == maxP) maxP++;
-
-                        double yPos = PlotCanvas.Height - ((BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p] - minP) * Math.Abs((PlotCanvas.Height - 10)) / (maxP - minP) + 5);
+                        double yPos = PlotCanvas.Height - ((BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p] - miniP[p]) * Math.Abs((PlotCanvas.Height - 10)) / (maxiP[p] - miniP[p]) + 5);
 
                         myPoly[p].Points.Add(new System.Windows.Point(xPos, yPos));
 
-                        System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
-                        myCircle.Fill = Brushes.White;
-                        myCircle.StrokeThickness = 1.5;
-                        myCircle.Stroke = new SolidColorBrush(rgb_performance[p % 8]);// 8 colours max
-                        myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 4, 4);
-                        myCircle.ToolTip = "pop average = " + BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p];
+                        System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path
+                        {
+                            Fill = Brushes.White,
+                            StrokeThickness = 1.5,
+                            Stroke = new SolidColorBrush(rgb_performance[p % 8]),// 8 colours max
+                            Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 4, 4),
+                            ToolTip = "pop average = " + BioBranches[biobranchID].PopTwigs[j].Performance_Averages[p]
+                        };
+
                         PlotCanvas.Children.Add(myCircle);
 
                     }
                 }
 
-                MinGraphLabels.Children.Clear();
-                MaxGraphLabels.Children.Clear();
+            }
 
-                // Now for the legend
-                for (int p = 0; p < performanceCount; p++)
+
+            // 2. Add the current population
+            for (int p = 0; p < performanceCount; p++)
+            {
+                CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
+                if ((bool)checkBox.IsChecked)
                 {
-                    CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
-                    if ((bool)checkBox.IsChecked)
+
+                    double xPos = ((totalGenerations - 1) * (PlotCanvas.Width - 10) / totalGenerations) + 5;
+
+                    for (int j = 0; j < population.chromosomes.Length; j++)
                     {
+                        if (population.chromosomes[j].isRepresentative)
+                        {
 
-                        TextBlock myTextBlock = new TextBlock();
-                        myTextBlock.Foreground = new SolidColorBrush(rgb_performance[p % 8]);
-                        myTextBlock.Text = Friends.AxisLabelText(BioBranches[biobranchID].maxPerformanceValues[p]);
-                        myTextBlock.UseLayoutRounding = true;
-                        myTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-                        MaxGraphLabels.Children.Add(myTextBlock);
+                            // Includes some margins
+                            double yPos = PlotCanvas.Height - ((population.chromosomes[j].GetPerformas()[p] - miniP[p]) * Math.Abs((PlotCanvas.Height - 10)) / (maxiP[p] - miniP[p]) + 5);
 
-                        TextBlock myTextBlock2 = new TextBlock();
-                        myTextBlock2.Foreground = new SolidColorBrush(rgb_performance[p % 8]);
-                        myTextBlock2.Text = Friends.AxisLabelText(BioBranches[biobranchID].minPerformanceValues[p]);
-                        myTextBlock2.UseLayoutRounding = true;
-                        myTextBlock2.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-                        MinGraphLabels.Children.Add(myTextBlock2);
+                            // Draw the circle
+                            System.Windows.Shapes.Path myCircle = new System.Windows.Shapes.Path();
+                            myCircle.Fill = new SolidColorBrush(rgb_performance[p % 8]); // 8 colours max
+                            myCircle.Data = new EllipseGeometry(new System.Windows.Point(xPos, yPos), 3, 3);
+
+                            PlotCanvas.Children.Add(myCircle);
+
+                        }
+                    }
+
+
+                    double yAve = PlotCanvas.Height - ((population.Performance_Averages[p] - miniP[p]) * Math.Abs((PlotCanvas.Height - 10)) / (maxiP[p] - miniP[p]) + 5);
+
+                    myPoly[p].Points.Add(new System.Windows.Point(xPos, yAve));
+
+                    System.Windows.Shapes.Path aveCircle = new System.Windows.Shapes.Path
+                    {
+                        Fill = Brushes.White,
+                        StrokeThickness = 1.5,
+                        Stroke = new SolidColorBrush(rgb_performance[p % 8]),// 8 colours max
+                        Data = new EllipseGeometry(new System.Windows.Point(xPos, yAve), 4, 4),
+                        ToolTip = "pop average = " + population.Performance_Averages[p]
+                    };
+
+                    PlotCanvas.Children.Add(aveCircle);
+
+                }
+            }
+
+            // This is essentially the same but with the current population
+            if (performanceCount > 1 && ParetoXID != -1 && ParetoYID != -1)
+            {
+
+                // Avoidance of division by zero has already been circumnavigated
+                double minXP = miniP[ParetoXID];
+                double maxXP = maxiP[ParetoXID];
+                double minYP = miniP[ParetoYID];
+                double maxYP = maxiP[ParetoYID];
+
+                // Includes margin
+                for (int j = 0; j < population.chromosomes.Length; j++)
+                {
+                    if (population.chromosomes[j].isRepresentative)
+                    {
+                        double xx = population.chromosomes[j].GetPerformas()[ParetoXID];
+                        double yy = population.chromosomes[j].GetPerformas()[ParetoYID];
+
+                        double paretoX = (xx - minXP) * Math.Abs(PlotCanvas2.Width - 10) / (maxXP - minXP) + 5;
+                        double paretoY = PlotCanvas2.Height - ((yy - minYP) * Math.Abs((PlotCanvas2.Height - 10)) / (maxYP - minYP) + 5);
+
+                        // Draw the circle
+                        System.Windows.Shapes.Path myCircle2 = new System.Windows.Shapes.Path
+                        {
+                            StrokeThickness = 1,
+                            Stroke = Brushes.White,
+                            Fill = Brushes.Black,
+                            ToolTip = population.chromosomes[j].clusterId,
+                            Data = new EllipseGeometry(new System.Windows.Point(paretoX, paretoY), 4, 4)
+                        };
+                        //myCircle2.MouseDown += new MouseButtonEventHandler(ScatterCircleClick);
+
+                        PlotCanvas2.Children.Add(myCircle2);
                     }
                 }
-
-
             }
+
+
+            // 3. Finally the legend
+            MinGraphLabels.Children.Clear();
+            MaxGraphLabels.Children.Clear();
+            
+            for (int p = 0; p < performanceCount; p++)
+            {
+                CheckBox checkBox = (CheckBox)controls["PLOTCHECKBOX" + p];
+                if ((bool)checkBox.IsChecked)
+                {
+
+                    TextBlock myTextBlock = new TextBlock
+                    {
+                        Foreground = new SolidColorBrush(rgb_performance[p % 8]),
+                        Text = Friends.AxisLabelText(maxiP[p]),
+                        UseLayoutRounding = true,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Right
+                    };
+                    MaxGraphLabels.Children.Add(myTextBlock);
+
+                    TextBlock myTextBlock2 = new TextBlock
+                    {
+                        Foreground = new SolidColorBrush(rgb_performance[p % 8]),
+                        Text = Friends.AxisLabelText(miniP[p]),
+                        UseLayoutRounding = true,
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Right
+                    };
+                    MinGraphLabels.Children.Add(myTextBlock2);
+                }
+            }
+
         }
 
 
@@ -2246,7 +2329,7 @@ namespace Biomorpher
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
             txt_dcl2.FontSize = 12;
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
-            txt_dcl2.Inlines.Add("\n\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris.");
+            txt_dcl2.Inlines.Add("\n\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris. Everything you do is a balloon.");
             txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
             txt_dcl2.Inlines.Add("\nCopyright:\t2020 John Harding");
             txt_dcl2.Inlines.Add("\nContact:\t\tjohnharding@fastmail.fm");
