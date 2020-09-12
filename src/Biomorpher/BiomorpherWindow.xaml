@@ -13,12 +13,10 @@
         WindowTransitionsEnabled="True"
         BorderBrush="Gray"
         BorderThickness="1" 
-        
         WindowStartupLocation="CenterScreen"
-                      >
+        >
 
-    <Grid Background="#a7adb4">
-        <Border Background="#9DA3AA" BorderThickness="0" Width="300" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+    <Grid Background="#A7ADB4" x:Name="MainGrid">
         <TabControl x:Name="tabControl">
             <TabItem Header="Population" x:Name="Tab1" Margin="21,0,-21,0">
                 <DockPanel LastChildFill="True">
@@ -64,7 +62,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Grid x:Name="chartGrid" SizeChanged="ChartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
-                                <Border BorderThickness="1" BorderBrush="Black">
+                                <Border BorderThickness="1" BorderBrush="Gray">
                                     <Canvas x:Name="PlotCanvas" ClipToBounds="True"/>
                                 </Border>
                             </Grid>
@@ -75,7 +73,7 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    
+
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="5" />
@@ -111,7 +109,7 @@
                             </Grid.ColumnDefinitions>
 
                             <Grid x:Name="chartGrid2" SizeChanged="ChartGrid_SizeChanged" Grid.Column="1" Grid.Row="1">
-                                <Border BorderThickness="1" BorderBrush="Black">
+                                <Border BorderThickness="1" BorderBrush="Gray">
                                     <Canvas x:Name="PlotCanvas2" ClipToBounds="True"/>
                                 </Border>
                             </Grid>
@@ -149,7 +147,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="5"/>
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
@@ -190,10 +188,7 @@
                     <Border BorderThickness="0" Padding ="50" Width="Auto" Height="Auto" x:Name="Tab6_primary"/>
                 </DockPanel>
             </TabItem>
-
-
         </TabControl>
-
     </Grid>
 
     <controls:MetroWindow.Resources>
@@ -210,17 +205,12 @@
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     mc:Ignorable="options">
 
-                    <Color x:Key="HighlightColor">#FFFFFF</Color>
-
-                    <Color x:Key="AccentBaseColor">#FFFFFF</Color>
-                    <!--  80%  -->
-                    <Color x:Key="AccentColor">#FFFFFF</Color>
-                    <!--  60%  -->
-                    <Color x:Key="AccentColor2">#4e00ff</Color>
-                    <!--  40%  -->
-                    <Color x:Key="AccentColor3">#00ff41</Color>
-                    <!--  20%  -->
-                    <Color x:Key="AccentColor4">#666666</Color>
+                    <Color x:Key="HighlightColor">#555555</Color>
+                    <Color x:Key="AccentBaseColor">#555555</Color>
+                    <Color x:Key="AccentColor">#555555</Color>
+                    <Color x:Key="AccentColor2">#555555</Color>
+                    <Color x:Key="AccentColor3">#555555</Color>
+                    <Color x:Key="AccentColor4">#555555</Color>
 
                     <!--  re-set brushes too  -->
                     <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" options:Freeze="True" />
@@ -229,7 +219,6 @@
                     <SolidColorBrush x:Key="AccentColorBrush2" Color="{StaticResource AccentColor2}" options:Freeze="True" />
                     <SolidColorBrush x:Key="AccentColorBrush3" Color="{StaticResource AccentColor3}" options:Freeze="True" />
                     <SolidColorBrush x:Key="AccentColorBrush4" Color="{StaticResource AccentColor4}" options:Freeze="True" />
-
                     <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{StaticResource AccentColor4}" options:Freeze="True" />
 
                     <LinearGradientBrush x:Key="ProgressBrush" StartPoint="1.002,0.5" EndPoint="0.001,0.5" options:Freeze="True">
@@ -245,7 +234,6 @@
                     <SolidColorBrush x:Key="IdealForegroundDisabledBrush" Opacity="0.4" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
                     <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
 
-                    
                     <Style TargetType="ScrollBar">
                         <Setter Property="Background" Value="#f0f0f0"/>
                         <Setter Property="Foreground" Value="Red"/>

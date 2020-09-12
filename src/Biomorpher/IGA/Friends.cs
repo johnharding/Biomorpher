@@ -33,16 +33,32 @@ namespace Biomorpher.IGA
         /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
-            return "0.7.0";
+            return "0.7.1";
         }
 
         /// <summary>
         /// Colour of Rhino Viewport Grey.
         /// </summary>
         /// <returns></returns>
-        public static Brush RhinoGrey()
+        public static Brush RhinoGrey(double brightness)
         {
-            return new SolidColorBrush(Color.FromArgb(255, 167, 173, 180));
+            if (brightness > 1.0) brightness = 1.0;
+            if (brightness < 0.0) brightness = 0.0;
+
+            byte r = (byte)(167 + brightness * (255 - 167));
+            byte g = (byte)(173 + brightness * (255 - 173));
+            byte b = (byte)(180 + brightness * (255 - 180));
+
+            return new SolidColorBrush(Color.FromArgb(255, r, g, b));
+        }
+
+        /// <summary>
+        /// Colour of Rhino Viewport Grey.
+        /// </summary>
+        /// <returns></returns>
+        public static Brush AlphaShade()
+        {
+            return new SolidColorBrush(Color.FromArgb(0, 255, 255, 255));
         }
 
         /// <summary>
