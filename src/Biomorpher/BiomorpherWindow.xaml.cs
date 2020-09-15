@@ -184,9 +184,6 @@ namespace Biomorpher
             Title = "  \u2009  " + Friends.VerionInfo();
             WindowTransitionsEnabled = false;
             ShowIconOnTitleBar = true;
-            // Uri iconUri = new Uri("pack://application:,,,/Biomorpher;component/Resources/biomorpherIcon_16.ico");
-            // Icon = BitmapFrame.Create(iconUri);
-            // this.TitlebarHeight = 20;
 
             // Initialise history canvas
             _historycanvas = new Canvas();
@@ -2599,7 +2596,8 @@ namespace Biomorpher
         {
             Slider s = (Slider)sender;
             double val = s.Value;
-            MainGrid.Background = Friends.RhinoGrey(val);
+            //MainGrid.Background = Friends.RhinoGrey(val);
+            Timmy.Background = Friends.RhinoGrey(val);
         }
 
         /// <summary>
@@ -2714,7 +2712,7 @@ namespace Biomorpher
             else
             {
                 ParentCount--;
-                checkbox.BorderBrush = Brushes.Black;
+                //checkbox.BorderBrush = Brushes.Black;
 
                 if (checkbox.Tag != null)
                 {

@@ -1,11 +1,5 @@
-﻿using ControlzEx.Theming;
-using MahApps.Metro;
+﻿using MahApps.Metro;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Biomorpher
@@ -17,7 +11,7 @@ namespace Biomorpher
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            
+
             // add custom accent and theme resource dictionaries to the ThemeManager
             // you should replace MahAppsMetroThemesSample with your application name
             // and correct place where your custom accent lives
@@ -31,11 +25,7 @@ namespace Biomorpher
                                         ThemeManager.GetAccent("CustomAccent1"),
                                         appStyle.Item1);
 
-            
-            
             base.OnStartup(e);
-
-            //ThemeManager.Current.ChangeTheme(this, "Dark.Green");
 
         }
     }
