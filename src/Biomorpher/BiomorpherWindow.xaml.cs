@@ -967,6 +967,7 @@ namespace Biomorpher
                     string cb_name = "cb_tab2_" + i;
                     CheckBox cb = CreateCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
                     cb.Background = Friends.AlphaShade();
+                    
                     cb.BorderBrush = Brushes.Black;
                     cb.BorderThickness = new Thickness(1);
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
@@ -2596,8 +2597,14 @@ namespace Biomorpher
         {
             Slider s = (Slider)sender;
             double val = s.Value;
-            //MainGrid.Background = Friends.RhinoGrey(val);
-            Timmy.Background = Friends.RhinoGrey(val);
+            MainGrid.Background = Friends.RhinoGrey(val);
+            tabControl.Background = Friends.RhinoGrey(val);
+            Timmy1.Background = Friends.RhinoGrey(val);
+            Timmy2.Background = Friends.RhinoGrey(val);
+            Timmy3.Background = Friends.RhinoGrey(val);
+            Timmy4.Background = Friends.RhinoGrey(val);
+            Timmy5.Background = Friends.RhinoGrey(val);
+            Timmy6.Background = Friends.RhinoGrey(val);
         }
 
         /// <summary>
