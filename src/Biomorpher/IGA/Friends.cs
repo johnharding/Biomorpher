@@ -1,23 +1,17 @@
 ﻿using HelixToolkit.Wpf;
 using Rhino.Geometry;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Shapes;
 
 namespace Biomorpher.IGA
 {
     /// <summary>
     /// Some static things to help us out
-    /// </summary>
+    /// </summary>    
     public static class Friends
     {
 
@@ -80,16 +74,10 @@ namespace Biomorpher.IGA
             };
         }
 
-
         /// <summary>
         /// Master random number generator
         /// </summary>
         private static readonly Random getrandom = new Random(21);
-
-        /// <summary>
-        /// Synclock for single threading
-        /// </summary>
-        private static readonly object syncLock = new object();
         
         /// <summary>
         /// Returns a random integer within a domain
@@ -99,11 +87,8 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public static int GetRandomInt(int min, int max)
         {
-            lock (syncLock)
-            {
-                int value = getrandom.Next(min, max);
-                return value;
-            }
+            int value = getrandom.Next(min, max);
+            return value;
         }
 
         /// <summary>
@@ -112,11 +97,8 @@ namespace Biomorpher.IGA
         /// <returns></returns>
         public static double GetRandomDouble()
         {
-            lock (syncLock)
-            {
-                double value = getrandom.NextDouble();
-                return value;
-            }
+            double value = getrandom.NextDouble();
+            return value;
         }
 
         /// <summary>
@@ -153,6 +135,7 @@ namespace Biomorpher.IGA
             return sampleMesh;
         }
 
+
         /// <summary>
         /// Exports a canvas to an image png file
         /// </summary>
@@ -175,6 +158,7 @@ namespace Biomorpher.IGA
 
         }
 
+
         /// <summary>
         /// Calculate Euclidean distance
         /// </summary>
@@ -194,7 +178,6 @@ namespace Biomorpher.IGA
         }
 
 
-
         /// <summary>
         /// Copies the rhinoMesh data to a new wpf mesh
         /// </summary>
@@ -203,21 +186,9 @@ namespace Biomorpher.IGA
         /// <param name="material"></param>
         public static void ConvertRhinotoWpfMesh(Mesh rhinoMesh, MeshGeometry3D wpfMesh, DiffuseMaterial material)
         {
-            // Make sure to start afresh
-            //wpfMesh = new MeshGeometry3D();
-            //material = new DiffuseMaterial();
-
             //define vertices
             for (int i = 0; i < rhinoMesh.Vertices.Count; i++)
             {
-                /* TODO SharpDX update
-                SharpDX.Vector3 me;
-                me.X = rhinoMesh.Vertices[i].X;
-                me.Y = rhinoMesh.Vertices[i].Y;
-                me.Z = rhinoMesh.Vertices[i].Z;
-                wpfMesh.Positions.Add(me);
-                */
-                 
                 wpfMesh.Positions.Add(new Point3D(rhinoMesh.Vertices[i].X, rhinoMesh.Vertices[i].Y, rhinoMesh.Vertices[i].Z));
             }
 
@@ -309,11 +280,11 @@ namespace Biomorpher.IGA
             {
                 if (theValue < 1.0 && theValue > -1.0)
                 {
-                    theText = Friends.TruncateToSignificantDigits(theValue, 7).ToString();
+                    theText = TruncateToSignificantDigits(theValue, 7).ToString();
                 }
                 else
                 {
-                    theText = Friends.RoundToSignificantDigits(theValue, 8).ToString();
+                    theText = RoundToSignificantDigits(theValue, 8).ToString();
                 }
             }
 

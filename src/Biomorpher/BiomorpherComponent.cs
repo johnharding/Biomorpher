@@ -32,7 +32,7 @@ namespace Biomorpher
         private GH_Structure<GH_Guid> genoGuids;
         private int popCount = 0;
 
-        private static readonly object syncLock = new object();
+        //private static readonly object syncLock = new object();
         private BiomorpherDataParam myParam;
 
         private List<GH_NumberSlider> cSliders = new List<GH_NumberSlider>();
@@ -109,8 +109,8 @@ namespace Biomorpher
         {
             bool hasData = false;
 
-            lock (syncLock)
-            { // synchronize
+            //lock (syncLock)
+            //{ // synchronize
 
                 foreach (IGH_Param param in this.Params.Input[0].Sources)
                 {
@@ -129,7 +129,7 @@ namespace Biomorpher
                     }
                     
                 }
-            }
+            //}
 
             // Store info within Component
             cSliders = sliders;

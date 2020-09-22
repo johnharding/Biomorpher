@@ -23,7 +23,7 @@ namespace Biomorpher
     public class BiomorpherReader: GH_Component
     {
         public Grasshopper.GUI.Canvas.GH_Canvas canvas;
-        private static readonly object syncLock = new object();
+        //private static readonly object syncLock = new object();
 
         //private List<GH_NumberSlider> sliders = new List<GH_NumberSlider>();
         //private List<GalapagosGeneListObject> genepools = new List<GalapagosGeneListObject>();

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Biomorpher.IGA;
@@ -33,7 +32,7 @@ namespace Biomorpher
         private List<GalapagosGeneListObject> genePools;
         private int performanceCount;
         private int biobranchID;
-        private static readonly object syncLock = new object();
+        //private static readonly object syncLock = new object();
         private int fontsize;
         private int fontsize2;
         private int margin_w;
