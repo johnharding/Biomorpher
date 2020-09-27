@@ -23,7 +23,7 @@ namespace Biomorpher
         }
         public override string Version
         {
-            get { return "0.7.1"; }
+            get { return Friends.VerionInfo(); }
         }
         public override Guid Id
         {

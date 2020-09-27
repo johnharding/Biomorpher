@@ -15,10 +15,6 @@ namespace Biomorpher.IGA
     public static class Friends
     {
 
-        /// <summary>
-        /// A dummy helix viewport, used to share the camera settings
-        /// </summary>
-        public static HelixViewport3D dummyHelix = new HelixViewport3D();
         private static System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-us");
 
         /// <summary>
