@@ -743,7 +743,7 @@ namespace Biomorpher
             _border.Child = _label;
             sp.Children.Add(_border);
 
-            // Initial population can be random, from a previous run or based on the current parameter state.
+            // Initial population can be random or based on the current parameter state.
 
             // Create sliders with labels
             Border border_popSize = new Border();
@@ -843,7 +843,7 @@ namespace Biomorpher
             cb_showall12.IsChecked = false;
             cb_showall12.Background = Friends.AlphaShade();
             cb_showall12.BorderBrush = Brushes.Black;
-            cb_showall12.BorderThickness = new Thickness(1);
+            cb_showall12.BorderThickness = new Thickness(0.5);
             controls.Add(cb_showall12.Name, cb_showall12);
             cb_showall12.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_showall12, Dock.Right);
@@ -867,7 +867,7 @@ namespace Biomorpher
             cb_disablepreview.IsChecked = false;
             cb_disablepreview.Background = Friends.AlphaShade();
             cb_disablepreview.BorderBrush = Brushes.Black;
-            cb_disablepreview.BorderThickness = new Thickness(1);
+            cb_disablepreview.BorderThickness = new Thickness(0.5);
             controls.Add(cb_disablepreview.Name, cb_disablepreview);
             cb_disablepreview.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_disablepreview, Dock.Right);
@@ -891,7 +891,7 @@ namespace Biomorpher
             cb_mutateElites.IsChecked = false;
             cb_mutateElites.Background = Friends.AlphaShade();
             cb_mutateElites.BorderBrush = Brushes.Black;
-            cb_mutateElites.BorderThickness = new Thickness(1);
+            cb_mutateElites.BorderThickness = new Thickness(0.5);
             controls.Add(cb_mutateElites.Name, cb_mutateElites);
             cb_mutateElites.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_mutateElites, Dock.Right);
@@ -936,8 +936,8 @@ namespace Biomorpher
 
                 // Border
                 Border border = new Border();
-                border.BorderBrush = Brushes.Gray;
-                border.BorderThickness = new Thickness(1);
+                border.BorderBrush = Brushes.Black;
+                border.BorderThickness = new Thickness(0.5);
                 border.Padding = new Thickness(2);
 
                 // Master Dock panel
@@ -955,7 +955,7 @@ namespace Biomorpher
                 int index = i;
                 l.Content = " " + index.ToString();
                 l.FontSize = fontsize2;
-                l.Foreground = Brushes.DarkSlateGray;
+                l.Foreground = Brushes.White;
                 l.HorizontalAlignment = HorizontalAlignment.Left;
                 DockPanel.SetDock(l, Dock.Left);
                 dp_sub.Children.Add(l);
@@ -966,9 +966,8 @@ namespace Biomorpher
                     string cb_name = "cb_tab2_" + i;
                     CheckBox cb = CreateCheckBox(cb_name, new RoutedEventHandler(Tab2_SelectParents_Check), i);
                     cb.Background = Friends.AlphaShade();
-                    
                     cb.BorderBrush = Brushes.Black;
-                    cb.BorderThickness = new Thickness(1);
+                    cb.BorderThickness = new Thickness(0.5);
                     cb.HorizontalAlignment = HorizontalAlignment.Right;
                     DockPanel.SetDock(cb, Dock.Right);
                     dp_sub.Children.Add(cb);
@@ -1167,7 +1166,7 @@ namespace Biomorpher
                 extremaCircle.Height = dOuter;
                 extremaCircle.Width = dOuter;
                 extremaCircle.StrokeThickness = 0.5;
-                extremaCircle.Stroke = Brushes.Gray;
+                extremaCircle.Stroke = Brushes.Black;
 
                 Canvas.SetLeft(extremaCircle, distFromLeft);
                 Canvas.SetTop(extremaCircle, topOffset);
@@ -2221,6 +2220,7 @@ namespace Biomorpher
                 myCheck.IsChecked = true;
                 myCheck.Background = Friends.AlphaShade();
                 myCheck.BorderBrush = Brushes.Black;
+                myCheck.BorderThickness = new Thickness(0.5);
                 myCheck.Click += new RoutedEventHandler(Replot);
                 controls.Add("PLOTCHECKBOX" + i, myCheck);
 
@@ -2289,6 +2289,13 @@ namespace Biomorpher
 
             myComboX.Background = Friends.AlphaShade();
             myComboY.Background = Friends.AlphaShade();
+
+            myComboX.BorderThickness = new Thickness(0.5);
+            myComboY.BorderThickness = new Thickness(0.5);
+
+            myComboX.BorderBrush = Brushes.Black;
+            myComboY.BorderBrush = Brushes.Black;
+
 
             for (int i = 0; i < performanceCount; i++)
             {
@@ -2412,6 +2419,7 @@ namespace Biomorpher
             CheckBox cb = new CheckBox();
             cb.Name = name;
             cb.IsChecked = false;
+            cb.BorderThickness = new Thickness(0.5);
             cb.Checked += handler;
             cb.Unchecked += handler;
             cb.Tag = chromoID;
@@ -2440,7 +2448,7 @@ namespace Biomorpher
             b.Background = Friends.AlphaShade();
             b.BorderBrush = Brushes.Black;
             b.Padding = new Thickness(3);
-            b.BorderThickness = new Thickness(1);
+            b.BorderThickness = new Thickness(0.5);
             controls.Add(name, b);
             return b;
         }

@@ -18,22 +18,23 @@
         >
 
     <Grid Background="#A7ADB4" x:Name="MainGrid" >
-        <TabControl x:Name="tabControl" Background="#A7ADB4">
-            <TabItem Header="Population" x:Name="Tab1" Margin="21,0,-21,0" Background="Transparent" Foreground="#2f4f4f">
+        <TabControl x:Name="tabControl" Background="#A7ADB4" >
+            <TabItem Header="Population" x:Name="Tab1" Margin="21,0,-21,0" Background="Transparent" >
                 <DockPanel LastChildFill="True" x:Name="Timmy1">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab1_secondary" Margin="0,10,0,0"  />
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary" Margin="0,10,5,5" />
                 </DockPanel>
+                
             </TabItem>
 
-            <TabItem Header="Designs" x:Name="Tab2" Margin="26,0,-26,0" Background="Transparent" Foreground="#2f4f4f">
+            <TabItem Header="Designs" x:Name="Tab2" Margin="26,0,-26,0" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy2">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab2_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary" Margin="0,10,5,5" />
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="History" x:Name="Tab3" Margin="31,0,-31,0" Background="Transparent" Foreground="#2f4f4f">
+            <TabItem Header="History" x:Name="Tab3" Margin="31,0,-31,0" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy3">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
@@ -45,7 +46,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Performance" x:Name="Tab4" Margin="36,0,-36,0" Background="Transparent" Foreground="#2f4f4f">
+            <TabItem Header="Performance" x:Name="Tab4" Margin="36,0,-36,0" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy4">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab4_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab4_primary" >
@@ -92,7 +93,7 @@
             </TabItem>
 
 
-            <TabItem Header="Scatter" x:Name="Tab5" Margin="41,0,-41,0" Background="Transparent" Foreground="#2f4f4f">
+            <TabItem Header="Scatter" x:Name="Tab5" Margin="41,0,-41,0" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy5">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab5_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab5_primary" >
@@ -184,7 +185,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="About" x:Name="Tab6" Margin="0,0,-46,0" HorizontalAlignment="Right" Width="85" Background="Transparent" Foreground="#2f4f4f">
+            <TabItem Header="About" x:Name="Tab6" Margin="0,0,-46,0" HorizontalAlignment="Right" Width="85" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy6">
                     <Border BorderThickness="0" Padding ="50" Width="Auto" Height="Auto" x:Name="Tab6_primary"/>
                 </DockPanel>
@@ -205,12 +206,12 @@
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     mc:Ignorable="options">
 
-                    <Color x:Key="HighlightColor">#000000</Color>
-                    <Color x:Key="AccentBaseColor">#000000</Color>
-                    <Color x:Key="AccentColor">#000000</Color>
-                    <Color x:Key="AccentColor2">#000000</Color>
-                    <Color x:Key="AccentColor3">#000000</Color>
-                    <Color x:Key="AccentColor4">#000000</Color>
+                    <Color x:Key="HighlightColor">#FFFFFF</Color>
+                    <Color x:Key="AccentBaseColor">#FFFFFF</Color>
+                    <Color x:Key="AccentColor">#FFFFFF</Color>
+                    <Color x:Key="AccentColor2">#FFFFFF</Color>
+                    <Color x:Key="AccentColor3">#FFFFFF</Color>
+                    <Color x:Key="AccentColor4">#FFFFFF</Color>
                     <Color x:Key="MyTitleBrush">#2f4f4f</Color>
 
                     <!--  re-set brushes too  -->
@@ -222,6 +223,14 @@
                     <SolidColorBrush x:Key="AccentColorBrush4" Color="{StaticResource AccentColor4}" options:Freeze="True" />
                     <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{StaticResource MyTitleBrush}" options:Freeze="True" />
 
+                    <Style x:Key="Tab1" TargetType="mah:Tile">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
