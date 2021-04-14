@@ -26,6 +26,9 @@ namespace Biomorpher
                                         ThemeManager.GetAccent("CustomAccent1"),
                                         appStyle.Item1);
 
+
+
+
             base.OnStartup(e);
 
             

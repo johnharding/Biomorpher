@@ -681,9 +681,8 @@ namespace Biomorpher
             System.Windows.Shapes.Ellipse circle2 = new System.Windows.Shapes.Ellipse();
             circle2.Height = diameter;
             circle2.Width = diameter;
-            circle2.Fill = Friends.RhinoGrey(0.0);
-            circle2.Stroke = Brushes.DarkSlateGray;
-            circle2.StrokeThickness = 1;
+            circle2.Fill = Brushes.DarkSlateGray;
+            circle2.StrokeThickness = 0;
             Canvas.SetLeft(circle2, (width / 2.0) - (diameter / 2.0)+0);
             Canvas.SetTop(circle2, (width / 2.0) - (diameter / 2.0) -12);
             canvas.Children.Add(circle2);
@@ -729,7 +728,7 @@ namespace Biomorpher
             Label label_head = new Label();
             label_head.FontSize = fontsize;
             label_head.Content = "Initial Settings";
-            label_head.FontWeight = FontWeights.Light;
+            label_head.FontWeight = FontWeights.Regular;
             border_head.Child = label_head;
             sp.Children.Add(border_head);
 
@@ -740,7 +739,7 @@ namespace Biomorpher
             _txt.TextWrapping = TextWrapping.Wrap;
             _txt.FontSize = fontsize2;
             _txt.FontWeight = FontWeights.Light;
-            _txt.Inlines.Add("Choose the initial population size and mutation rate. During evolution, mutation rate can be altered whereas population size cannot.");
+            _txt.Inlines.Add("Choose the initial population size, crossover and mutation rate. The latter two can be adjusted during evolution.");
             Label _label = new Label();
             _label.Content = _txt;
             _border.Child = _label;
@@ -778,6 +777,7 @@ namespace Biomorpher
             DockPanel.SetDock(button_go, Dock.Top);
             Label label_go = new Label();
             label_go.Content = "Random";
+            label_go.FontWeight = FontWeights.Light;
             label_go.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
             DockPanel.SetDock(label_go, Dock.Bottom);
             dock_go.Children.Add(button_go);
@@ -798,6 +798,7 @@ namespace Biomorpher
             DockPanel.SetDock(button_go2, Dock.Top);
             Label label_go2 = new Label();
             label_go2.Content = "Current";
+            label_go2.FontWeight = FontWeights.Light;
             label_go2.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
             DockPanel.SetDock(label_go2, Dock.Bottom);
             dock_go2.Children.Add(button_go2);
@@ -815,6 +816,7 @@ namespace Biomorpher
             border_kmeans.Margin = new Thickness(margin_w, 20, margin_w, 0);
             Label label_kmeans = new Label();
             label_kmeans.FontSize = fontsize;
+            label_kmeans.FontWeight = FontWeights.Regular;
             label_kmeans.Content = "K-means Clusters";
             border_kmeans.Child = label_kmeans;
             sp.Children.Add(border_kmeans);
@@ -825,6 +827,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
+            txt.FontWeight = FontWeights.Light;
             txt.Inlines.Add("Designs are clustered into 12 groups based on parameter similarity. Click on the 'design' tab to see representative closest to each group centroid.");
             Label label = new Label();
             label.Content = txt;
@@ -838,15 +841,16 @@ namespace Biomorpher
             Label label_showall12 = new Label();
             label_showall12.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_showall12.Content = "Show all 12 cluster centroids in history";
+            label_showall12.FontWeight = FontWeights.Light;
             DockPanel.SetDock(label_showall12, Dock.Left);
             dp_showall12.Children.Add(label_showall12);
-
             CheckBox cb_showall12 = new CheckBox();
             cb_showall12.Name = "cb_showall12";
             cb_showall12.IsChecked = false;
             cb_showall12.Background = Friends.AlphaShade();
             cb_showall12.BorderBrush = Brushes.Black;
             cb_showall12.BorderThickness = new Thickness(0.5);
+            cb_showall12.Foreground = Brushes.Black;
             controls.Add(cb_showall12.Name, cb_showall12);
             cb_showall12.HorizontalAlignment = HorizontalAlignment.Right;
             DockPanel.SetDock(cb_showall12, Dock.Right);
@@ -862,9 +866,9 @@ namespace Biomorpher
             Label label_disablepreview = new Label();
             label_disablepreview.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_disablepreview.Content = "Disable Grasshopper preview (faster)";
+            label_disablepreview.FontWeight = FontWeights.Light;
             DockPanel.SetDock(label_disablepreview, Dock.Left);
             dp_disablepreview.Children.Add(label_disablepreview);
-           
             CheckBox cb_disablepreview = new CheckBox();
             cb_disablepreview.Name = "cb_disablepreview";
             cb_disablepreview.IsChecked = false;
@@ -886,9 +890,9 @@ namespace Biomorpher
             Label label_mutateElites = new Label();
             label_mutateElites.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_mutateElites.Content = "Mutate elite (fittest) designs";
+            label_mutateElites.FontWeight = FontWeights.Light;
             DockPanel.SetDock(label_mutateElites, Dock.Left);
             dp_mutateElites.Children.Add(label_mutateElites);
-
             CheckBox cb_mutateElites = new CheckBox();
             cb_mutateElites.Name = "cb_mutateElites";
             cb_mutateElites.IsChecked = false;
@@ -1211,6 +1215,7 @@ namespace Biomorpher
 
             Label label_head = new Label();
             label_head.FontSize = fontsize;
+            label_head.FontWeight = FontWeights.Regular;
             label_head.SetBinding(ContentProperty, new Binding("Generation"));
             label_head.DataContext = this;
             label_head.ContentStringFormat = "Generation {0}";
@@ -1226,7 +1231,8 @@ namespace Biomorpher
             TextBlock txt_sel = new TextBlock();
             txt_sel.TextWrapping = TextWrapping.Wrap;
             txt_sel.FontSize = fontsize2;
-            txt_sel.Inlines.Add("Select parents whose genes will be used to create the next design generation via the checkboxes");
+            txt_sel.FontWeight = FontWeights.Light;
+            txt_sel.Inlines.Add("Select parents whose genes will be used to create the next design generation via the checkboxes, then click evolve.");
 
             Label label_sel = new Label();
             label_sel.Content = txt_sel;
@@ -1255,6 +1261,7 @@ namespace Biomorpher
             // Up down text
             Label label_numeric = new Label();
             label_numeric.Content = "Iterations:";
+            label_numeric.FontWeight = FontWeights.Light;
             label_numeric.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
             dp_buttons.Children.Add(label_numeric);
 
@@ -1284,6 +1291,7 @@ namespace Biomorpher
             border_data.Margin = new Thickness(margin_w, 24, margin_w, 0);
             Label label_data = new Label();
             label_data.FontSize = fontsize;
+            label_data.FontWeight = FontWeights.Regular;
             label_data.Content = "Performance Optimisation";
             border_data.Child = label_data;
             sp.Children.Add(border_data);
@@ -1294,8 +1302,9 @@ namespace Biomorpher
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
-            txt_dcl.Inlines.Add("Double click a design to diplay its Rhino/Grasshopper instance and review performance below. ");
-            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for different criteria (uses the whole population). Artificial selection can also be used concurrently).");
+            txt_dcl.FontWeight = FontWeights.Light;
+            txt_dcl.Inlines.Add("Double click on a design to diplay its Rhino/Grasshopper instance and review performance values below. ");
+            txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for different criteria (uses the whole population). Artificial selection can also be used concurrently.");
 
             Label label_dcl = new Label();
             label_dcl.Content = txt_dcl;
@@ -1362,6 +1371,10 @@ namespace Biomorpher
                 label_2.FontSize = 11;
                 label_3.FontSize = 11;
 
+                label_1.FontWeight = FontWeights.Light;
+                label_2.FontWeight = FontWeights.Light;
+                label_3.FontWeight = FontWeights.Light;
+
                 label_1.LayoutTransform = new RotateTransform(-90);
                 label_2.LayoutTransform = new RotateTransform(-90);
                 label_3.LayoutTransform = new RotateTransform(-90);
@@ -1377,6 +1390,7 @@ namespace Biomorpher
             Label label_gen = new Label();
             label_gen.Content = "Design " + HighlightedCluster;
             label_gen.FontSize = fontsize;
+            label_gen.FontWeight = FontWeights.Regular;
             label_gen.VerticalAlignment = VerticalAlignment.Bottom;
             Grid.SetColumn(label_gen, 0);
             myGrid.Children.Add(label_gen);
@@ -1460,9 +1474,9 @@ namespace Biomorpher
                 radButtonMin.Background = Friends.AlphaShade();
                 radButtonMax.Background = Friends.AlphaShade();
 
-                radButtonNon.BorderBrush = Brushes.Black;
-                radButtonMin.BorderBrush = Brushes.Black;
-                radButtonMax.BorderBrush = Brushes.Black;
+                radButtonNon.BorderBrush = Brushes.SlateGray;
+                radButtonMin.BorderBrush = Brushes.SlateGray;
+                radButtonMax.BorderBrush = Brushes.SlateGray;
 
                 radButtonNon.BorderThickness = new Thickness(0.5);
                 radButtonMin.BorderThickness = new Thickness(0.5);
@@ -1542,6 +1556,7 @@ namespace Biomorpher
                     Label l = new Label();
                     l.Content = "No performance data available!";
                     l.FontSize = fontsize2;
+                    l.FontWeight = FontWeights.Light;
                     dp_p.Children.Add(l);
                     yourBorders[i].Child = dp_p;
                 }
@@ -1609,6 +1624,7 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = text;
             l.FontSize = fSize;
+            l.FontWeight = FontWeights.Light;
             dp.Children.Add(l);
 
             dp.ToolTip = tooltiptext;
@@ -1669,6 +1685,7 @@ namespace Biomorpher
             myButton.Tag = myTag;
             myButton.BorderBrush = Brushes.Black;
             myButton.Content = "Reinstate";
+            myButton.FontWeight = FontWeights.Light;
             myButton.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             myButton.Click += new RoutedEventHandler(ReinstatePopClick);
 
@@ -1851,6 +1868,7 @@ namespace Biomorpher
             border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
             Label label_head = new Label();
             label_head.FontSize = fontsize;
+            label_head.FontWeight = FontWeights.Regular;
             label_head.Content = "Evolution History";
             border_head.Child = label_head;
             sp3.Children.Add(border_head);
@@ -1861,6 +1879,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
+            txt.FontWeight = FontWeights.Light;
             txt.Inlines.Add("Recorded history of selected designs, with results of a 'performance optimisation' run shown in red. \n\nDouble click a design to diplay the instance in the Rhino viewport.");
             Label label = new Label();
             label.Content = txt;
@@ -2185,6 +2204,7 @@ namespace Biomorpher
             border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
             Label label_head = new Label();
             label_head.FontSize = fontsize;
+            label_head.FontWeight = FontWeights.Regular;
             label_head.Content = "Performance History";
             border_head.Child = label_head;
             sp4.Children.Add(border_head);
@@ -2195,6 +2215,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
+            txt.FontWeight = FontWeights.Light;
             txt.Inlines.Add("A history of quantitative performance (if applicable) on this evolutionary branch. \n\nShows data for the 12 cluster representatives and performance optimals, with an average shown for the whole population.");
             Label label = new Label();
             label.Content = txt;
@@ -2259,6 +2280,7 @@ namespace Biomorpher
             border_head.Margin = new Thickness(margin_w, 0, margin_w, 0);
             Label label_head = new Label();
             label_head.FontSize = fontsize;
+            label_head.FontWeight = FontWeights.Regular;
             label_head.Content = "Scatter Plot";
             border_head.Child = label_head;
             sp5.Children.Add(border_head);
@@ -2269,6 +2291,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
+            txt.FontWeight = FontWeights.Light;
             txt.Inlines.Add("Plots two performance criteria against each other on a scatter graph. \n\nAll generations for the current evolutionary branch are displayed, with those in the past the faded the most and the latest generation outlined.");
             Label label = new Label();
             label.Content = txt;
@@ -2296,6 +2319,9 @@ namespace Biomorpher
 
             myComboX.Background = Friends.AlphaShade();
             myComboY.Background = Friends.AlphaShade();
+
+            myComboX.BorderBrush = Brushes.Black;
+            myComboY.BorderBrush = Brushes.Black;
 
             myComboX.BorderThickness = new Thickness(0.5);
             myComboY.BorderThickness = new Thickness(0.5);
@@ -2344,6 +2370,7 @@ namespace Biomorpher
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             txt_dcl.FontSize = 24;
+            txt_dcl.FontWeight = FontWeights.Regular;
             txt_dcl.Inlines.Add("\nBiomorpher  v"+Friends.VerionInfo());
             sp.Children.Add(txt_dcl);
 
@@ -2354,6 +2381,7 @@ namespace Biomorpher
             TextBlock txt_dcl2 = new TextBlock();
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
             txt_dcl2.FontSize = 12;
+            txt_dcl2.FontWeight = FontWeights.Light;
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
             txt_dcl2.Inlines.Add("\n\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris. Everything you do is a balloon.");
             txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
@@ -2370,7 +2398,7 @@ namespace Biomorpher
             // Donate button
             Button donate = CreateButton("donate", "donate", 75, new RoutedEventHandler(ClickDonate));
             donate.BorderThickness = new Thickness(0);
-            donate.Background = Brushes.LightGray;
+            donate.Background = Brushes.White;
 
             sp.Children.Add(txt_dcl2);
             sp.Children.Add(donate);
@@ -2427,6 +2455,8 @@ namespace Biomorpher
             cb.Unchecked += handler;
             cb.Tag = chromoID;
             cb.Background = Friends.AlphaShade();
+            cb.Foreground = Brushes.Black;
+            cb.FontWeight = FontWeights.Light;
             controls.Add(name, cb);
             return cb;
         }
@@ -2452,6 +2482,7 @@ namespace Biomorpher
             b.BorderBrush = Brushes.Black;
             b.Padding = new Thickness(3);
             b.BorderThickness = new Thickness(0.5);
+            b.FontWeight = FontWeights.Light;
             controls.Add(name, b);
             return b;
         }
@@ -2481,6 +2512,7 @@ namespace Biomorpher
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
+            slider.FontWeight = FontWeights.Light; // Won't override Mahapps for some reason
 
             string format = "{0:0.00}";
             if (isIntSlider)
@@ -2497,6 +2529,7 @@ namespace Biomorpher
             Label label_name = new Label();
             label_name.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_name.Content = labelName;
+            label_name.FontWeight = FontWeights.Light;
 
             DockPanel.SetDock(label_name, Dock.Top);
             dp.Children.Add(label_name);
@@ -2505,10 +2538,12 @@ namespace Biomorpher
             Label label_val = new Label();
             Binding binding_val = new Binding("Value");
             label_val.ContentStringFormat = format;
+            label_val.FontWeight = FontWeights.Light;
             binding_val.Source = slider;
             label_val.SetBinding(Label.ContentProperty, binding_val);
-
+            label_val.VerticalAlignment = VerticalAlignment.Center;
             DockPanel.SetDock(label_val, Dock.Right);
+
             dp.Children.Add(label_val);
             dp.Children.Add(slider);
 
@@ -2532,6 +2567,7 @@ namespace Biomorpher
             DockPanel dp = CreateSlider(labelName, controlName, minVal, maxVal, val, isIntSlider);
             
             Slider slider = (Slider)controls[controlName];
+
             slider.ValueChanged += handler;
      
             return dp;
@@ -2561,6 +2597,7 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = label;
             l.FontSize = fontsize;
+            l.FontWeight = FontWeights.Light;
 
             DockPanel.SetDock(l, Dock.Top);
             dp.Children.Add(l);

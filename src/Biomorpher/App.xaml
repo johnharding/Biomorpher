@@ -4,6 +4,18 @@
              xmlns:local="clr-namespace:Biomorpher"
              StartupUri="BiomorpherWindow.xaml">
     <Application.Resources>
-        
+
+        <Style TargetType="Label">
+        <Setter Property="FontFamily" Value="Segoe UI Light"/>
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+        </Style>
+    
     </Application.Resources>
 </Application>
