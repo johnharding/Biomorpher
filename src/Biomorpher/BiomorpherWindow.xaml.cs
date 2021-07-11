@@ -181,7 +181,7 @@ namespace Biomorpher
             // Initial Window things
             InitializeComponent();
             Title = "  \u2009  " + Friends.VerionInfo();
-            this.TitleForeground = Brushes.White;
+            TitleForeground = Brushes.White;
             WindowTransitionsEnabled = false;
             ShowIconOnTitleBar = true;
 
