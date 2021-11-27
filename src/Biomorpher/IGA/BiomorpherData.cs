@@ -25,12 +25,14 @@ namespace Biomorpher.IGA
         /// Slider and genepool guids
         /// </summary>
         public GH_Structure<GH_Guid> genoGuids;
-      
+
+
         /// <summary>
         /// Standard constructor
         /// </summary>
         public BiomorpherData()
         {
+
         }
 
         /// <summary>
