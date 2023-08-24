@@ -6,15 +6,15 @@
     <Application.Resources>
 
         <Style TargetType="Label">
-        <Setter Property="FontFamily" Value="Segoe UI Light"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
 
         <Style TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
 
         <Style TargetType="TextBox">
-            <Setter Property="FontFamily" Value="Segoe UI Light"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
         </Style>
     
     </Application.Resources>

@@ -738,7 +738,7 @@ namespace Biomorpher
             TextBlock _txt = new TextBlock();
             _txt.TextWrapping = TextWrapping.Wrap;
             _txt.FontSize = fontsize2;
-            _txt.FontWeight = FontWeights.Light;
+            _txt.FontWeight = FontWeights.Regular;
             _txt.Inlines.Add("Choose the initial population size, crossover and mutation rate. The latter two can be adjusted during evolution.");
             Label _label = new Label();
             _label.Content = _txt;
@@ -777,7 +777,7 @@ namespace Biomorpher
             DockPanel.SetDock(button_go, Dock.Top);
             Label label_go = new Label();
             label_go.Content = "Random";
-            label_go.FontWeight = FontWeights.Light;
+            label_go.FontWeight = FontWeights.Regular;
             label_go.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
             DockPanel.SetDock(label_go, Dock.Bottom);
             dock_go.Children.Add(button_go);
@@ -798,7 +798,7 @@ namespace Biomorpher
             DockPanel.SetDock(button_go2, Dock.Top);
             Label label_go2 = new Label();
             label_go2.Content = "Current";
-            label_go2.FontWeight = FontWeights.Light;
+            label_go2.FontWeight = FontWeights.Regular;
             label_go2.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
             DockPanel.SetDock(label_go2, Dock.Bottom);
             dock_go2.Children.Add(button_go2);
@@ -827,7 +827,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.FontWeight = FontWeights.Light;
+            txt.FontWeight = FontWeights.Regular;
             txt.Inlines.Add("Designs are clustered into 12 groups based on parameter similarity. Click on the 'design' tab to see representative closest to each group centroid.");
             Label label = new Label();
             label.Content = txt;
@@ -841,7 +841,7 @@ namespace Biomorpher
             Label label_showall12 = new Label();
             label_showall12.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_showall12.Content = "Show all 12 cluster centroids in history";
-            label_showall12.FontWeight = FontWeights.Light;
+            label_showall12.FontWeight = FontWeights.Regular;
             DockPanel.SetDock(label_showall12, Dock.Left);
             dp_showall12.Children.Add(label_showall12);
             CheckBox cb_showall12 = new CheckBox();
@@ -866,7 +866,7 @@ namespace Biomorpher
             Label label_disablepreview = new Label();
             label_disablepreview.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_disablepreview.Content = "Disable Grasshopper preview (faster)";
-            label_disablepreview.FontWeight = FontWeights.Light;
+            label_disablepreview.FontWeight = FontWeights.Regular;
             DockPanel.SetDock(label_disablepreview, Dock.Left);
             dp_disablepreview.Children.Add(label_disablepreview);
             CheckBox cb_disablepreview = new CheckBox();
@@ -890,7 +890,7 @@ namespace Biomorpher
             Label label_mutateElites = new Label();
             label_mutateElites.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_mutateElites.Content = "Mutate elite (fittest) designs";
-            label_mutateElites.FontWeight = FontWeights.Light;
+            label_mutateElites.FontWeight = FontWeights.Regular;
             DockPanel.SetDock(label_mutateElites, Dock.Left);
             dp_mutateElites.Children.Add(label_mutateElites);
             CheckBox cb_mutateElites = new CheckBox();
@@ -909,10 +909,9 @@ namespace Biomorpher
             // Create backgroundSlider
             Border border_backgroundSlider = new Border();
             border_backgroundSlider.Margin = new Thickness(margin_w, 10, margin_w, 0);
-            DockPanel dp_backgroundSlider = CreateSlider("Brightness", "backgroundSlider", 0.00, 1.00, 0.35, false, new RoutedPropertyChangedEventHandler<double>(backgroundSlider_ValueChanged));
+            DockPanel dp_backgroundSlider = CreateSlider("Brightness", "backgroundSlider", 0.00, 1.00, 0.00, false, new RoutedPropertyChangedEventHandler<double>(backgroundSlider_ValueChanged));
             border_backgroundSlider.Child = dp_backgroundSlider;
             sp.Children.Add(border_backgroundSlider);
-
 
             //Add the stackpanel to the secondary area of Tab 0
             Tab1_secondary.Child = sp;
@@ -1231,7 +1230,7 @@ namespace Biomorpher
             TextBlock txt_sel = new TextBlock();
             txt_sel.TextWrapping = TextWrapping.Wrap;
             txt_sel.FontSize = fontsize2;
-            txt_sel.FontWeight = FontWeights.Light;
+            txt_sel.FontWeight = FontWeights.Regular;
             txt_sel.Inlines.Add("Select parents whose genes will be used to create the next design generation via the checkboxes, then click evolve.");
 
             Label label_sel = new Label();
@@ -1261,7 +1260,7 @@ namespace Biomorpher
             // Up down text
             Label label_numeric = new Label();
             label_numeric.Content = "Iterations:";
-            label_numeric.FontWeight = FontWeights.Light;
+            label_numeric.FontWeight = FontWeights.Regular;
             label_numeric.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Left;
             dp_buttons.Children.Add(label_numeric);
 
@@ -1302,7 +1301,7 @@ namespace Biomorpher
             TextBlock txt_dcl = new TextBlock();
             txt_dcl.TextWrapping = TextWrapping.Wrap;
             txt_dcl.FontSize = fontsize2;
-            txt_dcl.FontWeight = FontWeights.Light;
+            txt_dcl.FontWeight = FontWeights.Regular;
             txt_dcl.Inlines.Add("Double click on a design to diplay its Rhino/Grasshopper instance and review performance values below. ");
             txt_dcl.Inlines.Add("\n\nUse the radio buttons below to optimise for different criteria (uses the whole population). Artificial selection can also be used concurrently.");
 
@@ -1371,9 +1370,9 @@ namespace Biomorpher
                 label_2.FontSize = 11;
                 label_3.FontSize = 11;
 
-                label_1.FontWeight = FontWeights.Light;
-                label_2.FontWeight = FontWeights.Light;
-                label_3.FontWeight = FontWeights.Light;
+                label_1.FontWeight = FontWeights.Regular;
+                label_2.FontWeight = FontWeights.Regular;
+                label_3.FontWeight = FontWeights.Regular;
 
                 label_1.LayoutTransform = new RotateTransform(-90);
                 label_2.LayoutTransform = new RotateTransform(-90);
@@ -1556,7 +1555,7 @@ namespace Biomorpher
                     Label l = new Label();
                     l.Content = "No performance data available!";
                     l.FontSize = fontsize2;
-                    l.FontWeight = FontWeights.Light;
+                    l.FontWeight = FontWeights.Regular;
                     dp_p.Children.Add(l);
                     yourBorders[i].Child = dp_p;
                 }
@@ -1624,7 +1623,7 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = text;
             l.FontSize = fSize;
-            l.FontWeight = FontWeights.Light;
+            l.FontWeight = FontWeights.Regular;
             dp.Children.Add(l);
 
             dp.ToolTip = tooltiptext;
@@ -1685,7 +1684,7 @@ namespace Biomorpher
             myButton.Tag = myTag;
             myButton.BorderBrush = Brushes.Black;
             myButton.Content = "Reinstate";
-            myButton.FontWeight = FontWeights.Light;
+            myButton.FontWeight = FontWeights.Regular;
             myButton.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             myButton.Click += new RoutedEventHandler(ReinstatePopClick);
 
@@ -1879,7 +1878,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.FontWeight = FontWeights.Light;
+            txt.FontWeight = FontWeights.Regular;
             txt.Inlines.Add("Recorded history of selected designs, with results of a 'performance optimisation' run shown in red. \n\nDouble click a design to diplay the instance in the Rhino viewport.");
             Label label = new Label();
             label.Content = txt;
@@ -2215,7 +2214,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.FontWeight = FontWeights.Light;
+            txt.FontWeight = FontWeights.Regular;
             txt.Inlines.Add("A history of quantitative performance (if applicable) on this evolutionary branch. \n\nShows data for the 12 cluster representatives and performance optimals, with an average shown for the whole population.");
             Label label = new Label();
             label.Content = txt;
@@ -2291,7 +2290,7 @@ namespace Biomorpher
             TextBlock txt = new TextBlock();
             txt.TextWrapping = TextWrapping.Wrap;
             txt.FontSize = fontsize2;
-            txt.FontWeight = FontWeights.Light;
+            txt.FontWeight = FontWeights.Regular;
             txt.Inlines.Add("Plots two performance criteria against each other on a scatter graph. \n\nAll generations for the current evolutionary branch are displayed, with those in the past the faded the most and the latest generation outlined.");
             Label label = new Label();
             label.Content = txt;
@@ -2381,7 +2380,7 @@ namespace Biomorpher
             TextBlock txt_dcl2 = new TextBlock();
             txt_dcl2.TextWrapping = TextWrapping.Wrap;
             txt_dcl2.FontSize = 12;
-            txt_dcl2.FontWeight = FontWeights.Light;
+            txt_dcl2.FontWeight = FontWeights.Regular;
             txt_dcl2.Inlines.Add("\nInteractive Evolutionary Algorithms (IEAs) allow designers to engage with the process of evolutionary development. This gives rise to an involved experience, helping to explore the wide combinatorial space of parametric models without always knowing where you are headed. ");
             txt_dcl2.Inlines.Add("\n\nInspired by Richard Dawkins' Biomorphs from 1986, who borrowed the term from the surrealist painter Desmond Morris. Everything you do is a balloon.");
             txt_dcl2.Inlines.Add("\n\nDevelopment:\tJohn Harding & Cecilie Brandt-Olsen");
@@ -2456,7 +2455,7 @@ namespace Biomorpher
             cb.Tag = chromoID;
             cb.Background = Friends.AlphaShade();
             cb.Foreground = Brushes.Black;
-            cb.FontWeight = FontWeights.Light;
+            cb.FontWeight = FontWeights.Regular;
             controls.Add(name, cb);
             return cb;
         }
@@ -2482,7 +2481,7 @@ namespace Biomorpher
             b.BorderBrush = Brushes.Black;
             b.Padding = new Thickness(3);
             b.BorderThickness = new Thickness(0.5);
-            b.FontWeight = FontWeights.Light;
+            b.FontWeight = FontWeights.Regular;
             controls.Add(name, b);
             return b;
         }
@@ -2512,7 +2511,7 @@ namespace Biomorpher
             slider.Focusable = false;
             slider.TickFrequency = 0.01;
             slider.IsSnapToTickEnabled = true;
-            slider.FontWeight = FontWeights.Light; // Won't override Mahapps for some reason
+            slider.FontWeight = FontWeights.Regular; // Won't override Mahapps for some reason
 
             string format = "{0:0.00}";
             if (isIntSlider)
@@ -2529,7 +2528,7 @@ namespace Biomorpher
             Label label_name = new Label();
             label_name.HorizontalContentAlignment = HorizontalAlignment.Left;
             label_name.Content = labelName;
-            label_name.FontWeight = FontWeights.Light;
+            label_name.FontWeight = FontWeights.Regular;
 
             DockPanel.SetDock(label_name, Dock.Top);
             dp.Children.Add(label_name);
@@ -2538,7 +2537,7 @@ namespace Biomorpher
             Label label_val = new Label();
             Binding binding_val = new Binding("Value");
             label_val.ContentStringFormat = format;
-            label_val.FontWeight = FontWeights.Light;
+            label_val.FontWeight = FontWeights.Regular;
             binding_val.Source = slider;
             label_val.SetBinding(Label.ContentProperty, binding_val);
             label_val.VerticalAlignment = VerticalAlignment.Center;
@@ -2597,7 +2596,7 @@ namespace Biomorpher
             Label l = new Label();
             l.Content = label;
             l.FontSize = fontsize;
-            l.FontWeight = FontWeights.Light;
+            l.FontWeight = FontWeights.Regular;
 
             DockPanel.SetDock(l, Dock.Top);
             dp.Children.Add(l);
