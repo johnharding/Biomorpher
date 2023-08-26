@@ -25,7 +25,7 @@ namespace Biomorpher
         #region FIELDS & PROPERTIES
 
         // Fields
-        private bool GO;
+        private bool GO; // The GO parameter is set to true after the initial population has been established.
         private Population population;
         private List<BioBranch> BioBranches;
         private List<GH_NumberSlider> sliders;
@@ -91,7 +91,7 @@ namespace Biomorpher
                 }
             }
         }
-
+        
         /// <summary>
         /// Mutatation probability
         /// </summary>
@@ -313,6 +313,10 @@ namespace Biomorpher
 
             //////////////////////////////////////////////////////////////////////////
 
+            // 0. Check the mathias selection input and increase fitnesses accordingly
+            population.MathiasSelection();
+
+
             // 1. Create a new population using fitness values (also resets fitnesses)
             Generation++;
             population.SelectPop();
@@ -479,6 +483,15 @@ namespace Biomorpher
         public Population GetPopulation()
         {
             return population;
+        }
+
+        /// <summary>
+        /// Returns the Go state, i.e. has the initial population been set up?
+        /// </summary>
+        /// <returns></returns>
+        public bool GetGoState()
+        {
+            return GO;
         }
 
 
@@ -1199,6 +1212,8 @@ namespace Biomorpher
             return canvas;
         }
 
+
+        
 
         /// <summary>
         /// Create settings panel for Tab 2
@@ -2792,10 +2807,28 @@ namespace Biomorpher
         public void Tab2_Evolve_Click(object sender, RoutedEventArgs e)
         {
             Button b_clicked = (Button)sender;
+            NewEpoch();
+
+        }
+
+
+        public void NewEpoch()
+        {
             bool isPerformanceCriteriaBased = IsRadioMinMaxButtonChecked();
 
             //Test if minimum one parent is selected
-            if (ParentCount < 1 && !isPerformanceCriteriaBased)
+
+            // Check the mathias clusters first (used for VR selection). These have to be between 0 and 11.
+            int mathiasCounter = 0;
+            for (int i = 0; i < owner.mathiasClusters.Count; i++)
+            {
+                if (owner.mathiasClusters[i] >= 0 && owner.mathiasClusters[i] <= 11)
+                {
+                    mathiasCounter++;
+                }
+            }
+
+            if (ParentCount < 1 && !isPerformanceCriteriaBased && mathiasCounter == 0)
             {
                 MessageBoxResult message = MessageBox.Show(this, "Manually select designs and/or performance criteria to evolve.");
             }
@@ -2836,8 +2869,8 @@ namespace Biomorpher
                 //Set parent count to zero
                 ParentCount = 0;
             }
-
         }
+
 
 
         /// <summary>

@@ -133,6 +133,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BiomorpherTriggerAttributes.cs" />
+    <Compile Include="BiomorpherTrigger.cs" />
     <Compile Include="BiomorpherReaderAttributes.cs" />
     <Compile Include="BiomorpherReader.cs" />
     <Compile Include="BiomorpherWindow.xaml.cs">

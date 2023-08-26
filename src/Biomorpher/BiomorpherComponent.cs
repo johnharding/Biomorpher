@@ -9,7 +9,8 @@ using Biomorpher.IGA;
 using Grasshopper.Kernel.Special;
 using GalapagosComponents;
 using Grasshopper.Kernel.Data;
-
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Biomorpher
 {
@@ -18,10 +19,17 @@ namespace Biomorpher
     /// </summary>
     public class BiomorpherComponent : GH_Component
     {
+
+        /// <summary>
+        /// Declare main window as part of component
+        /// </summary>
+        public BiomorpherWindow myMainWindow; // changed from private
+
         public Grasshopper.GUI.Canvas.GH_Canvas canvas; 
         public bool GO = false;
         private IGH_DataAccess deej;
         public int solveinstanceCounter;
+        public bool hasbeenDoubleClicked = false;
 
         // For the outputs
         private GH_Structure<GH_Number> historicNumbers;
@@ -34,7 +42,13 @@ namespace Biomorpher
         private List<GH_NumberSlider> cSliders = new List<GH_NumberSlider>();
         private List<GalapagosGeneListObject> cGenePools = new List<GalapagosGeneListObject>();
 
+        public List<int> mathiasClusters = new List<int>();
+
         private BiomorpherData myOutputData = new BiomorpherData();
+
+        int clusterShowID = -1;
+        int clusterShowIDLimbo = -1;
+
 
         /// <summary>
         /// Main constructor
@@ -56,12 +70,17 @@ namespace Biomorpher
             pm.AddNumberParameter("Genome", "Genome", "(genotype) Connect sliders and genepools here", GH_ParamAccess.tree);
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here. Surfaces, Meshes, Curves.", GH_ParamAccess.tree);
             pm.AddNumberParameter("Performs", "Performs", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
-            
+            pm.AddIntegerParameter("ClusterSelect", "ClusterSelect", "(Optional) List of selected phenotypes at each generation", GH_ParamAccess.list, -1);
+            pm.AddIntegerParameter("ClusterShow", "ClusterShow", "(Optional) Show one of the cluster centroids", GH_ParamAccess.item, -1);
+
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
             pm[2].WireDisplay = GH_ParamWireDisplay.faint;
 
             pm[2].Optional = true;
+            pm[3].Optional = true;
+            pm[4].Optional = true;
+
         }
         
         /// <summary>
@@ -80,6 +99,57 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            // Refresh these to make sure
+            mathiasClusters.Clear();
+
+            DA.GetDataList<int>("ClusterSelect", mathiasClusters);
+            DA.GetData<int>("ClusterShow", ref clusterShowID);
+
+
+            
+
+            //DA.GetData<bool>("EvolveTrigger", ref eTrigger);
+            //DA.GetData<bool>("RestartTrigger", ref rTrigger);
+
+            /*
+            if(eTrigger)
+            {
+                canvas.Document.Enabled = false;                              // Disable the solver before tweaking sliders
+                System.Console.Beep(10000, 50);
+                    myMainWindow.NewEpoch();
+                    canvas.Document.Enabled = true;
+
+            }
+
+            
+            if (eTrigger != eTriggerLimbo)
+            {
+                if (eTrigger)
+                {
+                    if (myMainWindow != null)
+                    {
+                        System.Console.Beep(10000, 50);
+
+                        /*
+                        try
+                        {
+                            canvas.Document.SolutionEnd -= new GH_Document.SolutionEndEventHandler(ModifyComponents);
+                        }
+                        catch
+                        {
+                            AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "oops");
+                        }
+
+                        canvas.Document.SolutionEnd += new GH_Document.SolutionEndEventHandler(ModifyComponents);
+
+                        eTriggerLimbo = eTrigger;
+
+                    }
+                }
+            }
+            */
+
+
 
             // Make the DA global
             if (solveinstanceCounter == 0)
@@ -97,6 +167,42 @@ namespace Biomorpher
             solveinstanceCounter++;
 
         }
+
+        protected override void AfterSolveInstance()
+        {
+
+            Chromosome thisChromo = null;
+
+            // If the initial population has been set up, the go state will be true
+            // We have this clustershowIDLimbo because when the sliders change, the component is expired. This avoids a neverending loop - or should do.
+            if(hasbeenDoubleClicked)
+            {
+                if (clusterShowID >= 0 && clusterShowID <= 11 && myMainWindow.GetGoState() && clusterShowID!=clusterShowIDLimbo && myMainWindow.IsVisible)
+                {
+                    for (int i = 0; i < myMainWindow.GetPopulation().chromosomes.Length; i++)
+                    {
+                        if (myMainWindow.GetPopulation().chromosomes[i].isRepresentative && myMainWindow.GetPopulation().chromosomes[i].clusterId == clusterShowID)
+                            thisChromo = myMainWindow.GetPopulation().chromosomes[i];
+                    }
+
+                    if (thisChromo != null)
+                    {
+                        myMainWindow.SetInstance(thisChromo);
+                        clusterShowIDLimbo = clusterShowID;
+                    }
+                }
+            }
+        }
+
+        /*
+        /// <summary> 
+        /// This method is called at the end of the normal Grasshopper solution.
+        /// </summary> 
+        public void ModifyComponents(object sender, GH_SolutionEventArgs e)
+        {
+            myMainWindow.button_evo.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        }
+        */
 
         /// <summary>
         /// Gets the current sliders in Input[0]

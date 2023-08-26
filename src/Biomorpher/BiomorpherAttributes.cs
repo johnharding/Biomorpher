@@ -17,10 +17,7 @@ namespace Biomorpher
     /// </summary>
     public class BiomorpherAttributes : GH_ComponentAttributes
     {
-        /// <summary>
-        /// Declare main window as part of component attributes
-        /// </summary>
-        private BiomorpherWindow myMainWindow;
+        
 
         /// <summary>
         /// Component attributes constructor
@@ -40,6 +37,7 @@ namespace Biomorpher
             this.MyOwner = owner;
             
         }
+
 
         /// <summary>
         /// Layout component
@@ -62,9 +60,10 @@ namespace Biomorpher
             {
                 if(Owner.Params.Input[0].SourceCount != 0 && Owner.Params.Input[1].SourceCount !=0)
                 {
-                    myMainWindow = new BiomorpherWindow(MyOwner);
-                    myMainWindow.Show();
-
+                    MyOwner.myMainWindow = new BiomorpherWindow(MyOwner);
+                    MyOwner.myMainWindow.Show();
+                    MyOwner.hasbeenDoubleClicked = true;
+                   
                     return GH_ObjectResponse.Handled;
                 }
             }
@@ -72,7 +71,7 @@ namespace Biomorpher
             return GH_ObjectResponse.Ignore;
         }
 
-
+        
         /// <summary>
         /// Render the component
         /// </summary>
@@ -88,8 +87,8 @@ namespace Biomorpher
             {
 
                 // Cache the current styles.
-                styleStandard = GH_Skin.palette_normal_standard;
-                GH_Skin.palette_normal_standard = new GH_PaletteStyle(Color.FromArgb(255,13,138), Color.Black, Color.Black);
+                styleStandard = GH_Skin.palette_normal_standard; 
+                GH_Skin.palette_normal_standard = new GH_PaletteStyle(Color.FromArgb(255,255,0), Color.Black, Color.Black); //255,13,138 (original colour)
 
                 Pen myPen = new Pen(Brushes.Black, 1);
 
@@ -120,6 +119,8 @@ namespace Biomorpher
 
             }
         }
+
+       
 
     }
 }

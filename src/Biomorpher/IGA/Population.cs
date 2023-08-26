@@ -210,6 +210,20 @@ namespace Biomorpher.IGA
         }
 
         /// <summary>
+        /// Uses the added component input to give a high fitness to anything in that list. For Biomorpher ++
+        /// </summary>
+        public void MathiasSelection()
+        {
+            for (int i = 0; i < chromosomes.Length; i++)
+            {
+                if (owner.mathiasClusters.Contains(chromosomes[i].clusterId))
+                {
+                    chromosomes[i].SetFitness(1.0);
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the fittest design there is (or at least one of them if there are several the same).
         /// </summary>
         /// <returns></returns>
