@@ -1213,7 +1213,7 @@ namespace Biomorpher
         }
 
 
-        
+        public Button button_evo;
 
         /// <summary>
         /// Create settings panel for Tab 2
@@ -1262,7 +1262,7 @@ namespace Biomorpher
 
 
             //Evolve button
-            Button button_evo = CreateButton("b_tab2_Evolve", "Evolve", 125, new RoutedEventHandler(Tab2_Evolve_Click));
+            button_evo = CreateButton("b_tab2_Evolve", "Evolve", 125, new RoutedEventHandler(Tab2_Evolve_Click));
             button_evo.ToolTip = "Advance to next generation(s)";
             DockPanel.SetDock(button_evo, Dock.Left);
             dp_buttons.Children.Add(button_evo);

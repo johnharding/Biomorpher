@@ -46,8 +46,7 @@ namespace Biomorpher
 
         private BiomorpherData myOutputData = new BiomorpherData();
 
-        int clusterShowID = -1;
-        int clusterShowIDLimbo = -1;
+
 
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace Biomorpher
             pm.AddGeometryParameter("Geometry", "Geometry", "(phenotype) Connect geometry here. Surfaces, Meshes, Curves.", GH_ParamAccess.tree);
             pm.AddNumberParameter("Performs", "Performs", "(Optional) List of performance criteria for the design. One per output parameter only", GH_ParamAccess.tree);
             pm.AddIntegerParameter("ClusterSelect", "ClusterSelect", "(Optional) List of selected phenotypes at each generation", GH_ParamAccess.list, -1);
-            pm.AddIntegerParameter("ClusterShow", "ClusterShow", "(Optional) Show one of the cluster centroids", GH_ParamAccess.item, -1);
+
 
             pm[0].WireDisplay = GH_ParamWireDisplay.faint;
             pm[1].WireDisplay = GH_ParamWireDisplay.faint;
@@ -79,7 +78,7 @@ namespace Biomorpher
 
             pm[2].Optional = true;
             pm[3].Optional = true;
-            pm[4].Optional = true;
+
 
         }
         
@@ -103,13 +102,8 @@ namespace Biomorpher
             mathiasClusters.Clear();
 
             DA.GetDataList<int>("ClusterSelect", mathiasClusters);
-            DA.GetData<int>("ClusterShow", ref clusterShowID);
-
 
             
-
-            //DA.GetData<bool>("EvolveTrigger", ref eTrigger);
-            //DA.GetData<bool>("RestartTrigger", ref rTrigger);
 
             /*
             if(eTrigger)
@@ -168,31 +162,15 @@ namespace Biomorpher
 
         }
 
+        /*
+        /// <summary>
+        /// Runs after the solve instance method
+        /// </summary>
         protected override void AfterSolveInstance()
         {
 
-            Chromosome thisChromo = null;
-
-            // If the initial population has been set up, the go state will be true
-            // We have this clustershowIDLimbo because when the sliders change, the component is expired. This avoids a neverending loop - or should do.
-            if(hasbeenDoubleClicked)
-            {
-                if (clusterShowID >= 0 && clusterShowID <= 11 && myMainWindow.GetGoState() && clusterShowID!=clusterShowIDLimbo && myMainWindow.IsVisible)
-                {
-                    for (int i = 0; i < myMainWindow.GetPopulation().chromosomes.Length; i++)
-                    {
-                        if (myMainWindow.GetPopulation().chromosomes[i].isRepresentative && myMainWindow.GetPopulation().chromosomes[i].clusterId == clusterShowID)
-                            thisChromo = myMainWindow.GetPopulation().chromosomes[i];
-                    }
-
-                    if (thisChromo != null)
-                    {
-                        myMainWindow.SetInstance(thisChromo);
-                        clusterShowIDLimbo = clusterShowID;
-                    }
-                }
-            }
         }
+        */
 
         /*
         /// <summary> 

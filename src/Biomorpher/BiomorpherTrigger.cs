@@ -22,9 +22,15 @@ namespace Biomorpher
     /// </summary>
     public class BiomorpherTrigger: GH_Component
     {
+        int clusterShowID = -1;
+        int clusterShowIDLimbo = -1;
+
+        int newEpochID = -1;
+        int newEpochIDLimbo = -1;
+
         public Grasshopper.GUI.Canvas.GH_Canvas canvas;
-        BiomorpherComponent BioComp;
-        List<int> generation;
+        BiomorpherComponent BioComp = null;
+
 
         /// <summary>
         /// Main constructor
@@ -34,7 +40,7 @@ namespace Biomorpher
         {
             canvas = Instances.ActiveCanvas;
             this.IconDisplayMode = GH_IconDisplayMode.icon;
-            generation = new List<int>();
+
         }
 
         /// <summary>
@@ -43,8 +49,8 @@ namespace Biomorpher
         /// <param name="pm"></param>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pm)
         {
-            pm.AddBooleanParameter("EvolveTrigger", "EvolveTrigger", "(Optional) Triggers the next epoch via the component itself", GH_ParamAccess.item, false);
-            pm.AddBooleanParameter("RestartTrigger", "RestartTrigger", "(Optional) Restarts with a new random population of designs", GH_ParamAccess.item, false);
+            pm.AddIntegerParameter("ClusterShow", "ClusterShow", "(Optional) Show one of the cluster centroids", GH_ParamAccess.item, -1);
+            pm.AddIntegerParameter("NewEpoch", "NewEpoch", "Trigger evolution from the component", GH_ParamAccess.item, -1);
 
             pm[0].Optional = true;
             pm[1].Optional = true;
@@ -65,11 +71,9 @@ namespace Biomorpher
         /// <param name="DA"></param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            bool eTrigger = false;
-            bool rTrigger = false;
 
-            DA.GetData<bool>("EvolveTrigger", ref eTrigger);
-            DA.GetData<bool>("RestartTrigger", ref rTrigger);
+            DA.GetData<int>("ClusterShow", ref clusterShowID);
+            DA.GetData<int>("NewEpoch", ref newEpochID);
 
             //OnPingDocument().FindObject<GH_Component>()
 
@@ -78,41 +82,79 @@ namespace Biomorpher
             // Check for Embryo Components on the canvas
             for (int i = 0; i < canvasObject.Count; i++)
             {
-                
                 string george = canvasObject[i].ComponentGuid.ToString();
 
                 if (george == "87264cc5-8461-4003-8ff7-7584b13baf06")
                 {
-                    System.Console.Beep(10000, 100);
                     BioComp = (BiomorpherComponent)canvasObject[i];
-
                     //willingOutput.Add((IGH_Param)willingThing.Params.Input[0].Sources[n]);
-
                 }
             }
 
 
-            int currentGeneration = BioComp.myMainWindow.Generation;
-
-
-            if (eTrigger && !generation.Contains(currentGeneration) && BioComp.myMainWindow.IsActive)
+            /*
+            if (hasbeenDoubleClicked)
             {
-
-                //this.Locked = true;
-
-                BioComp.myMainWindow.NewEpoch();
-                generation.Add(currentGeneration);
-
-                //canvas.Document.ExpireSolution();
-
-                //this.Locked = false;
-                //BioComp.myMainWindow.button_evo.RaiseEvent(new RoutedEventArgs(Button.ClickEvent);
+                if (newEpochID >= 0 && myMainWindow.GetGoState() && newEpochID != newEpochIDLimbo && myMainWindow.IsVisible)
+                {
+                    myMainWindow.NewEpoch();
+                    newEpochIDLimbo = newEpochID;
+                }
             }
-
+            */
 
         }
 
+       
 
+        //public void ScheduleSolution(0.001, GH_Document.GH_ScheduleDelegate(canvas.Document){
+
+        //}
+
+
+        /// <summary>
+        /// Runs after the solve instance method
+        /// </summary>
+        protected override void AfterSolveInstance()
+        {
+            Chromosome thisChromo = null;
+
+            if (BioComp != null)
+            {
+                // If the initial population has been set up, the go state will be true
+                // We have this clustershowIDLimbo because when the sliders change, the component is expired. This avoids a neverending loop - or should do.
+                if (BioComp.hasbeenDoubleClicked)
+                {
+                    if (clusterShowID >= 0 && clusterShowID <= 11 && BioComp.myMainWindow.GetGoState() && clusterShowID != clusterShowIDLimbo && BioComp.myMainWindow.IsVisible)
+                    {
+                        for (int i = 0; i < BioComp.myMainWindow.GetPopulation().chromosomes.Length; i++)
+                        {
+                            if (BioComp.myMainWindow.GetPopulation().chromosomes[i].isRepresentative && BioComp.myMainWindow.GetPopulation().chromosomes[i].clusterId == clusterShowID)
+                                thisChromo = BioComp.myMainWindow.GetPopulation().chromosomes[i];
+                        }
+
+                        if (thisChromo != null)
+                        {
+                            BioComp.myMainWindow.SetInstance(thisChromo);
+                            clusterShowIDLimbo = clusterShowID;
+                        }
+                    }
+                }
+
+
+                // Now with the evolution button pressing. Why does this expire Biomorpher if we schedule the button event!!
+                if (BioComp.myMainWindow.GetGoState() && newEpochID != newEpochIDLimbo && BioComp.myMainWindow.IsVisible)
+                {
+                    BioComp.myMainWindow.button_evo.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Button.ClickEvent));
+                    newEpochIDLimbo = newEpochID;
+                }
+            }
+            else
+            {
+                Message = "Can't find the Biomorpher Component";
+            }
+
+        }
 
         /// <summary>
         /// Gets the component guid
@@ -148,7 +190,7 @@ namespace Biomorpher
         {
             get
             {
-                return Properties.Resources.BiomorpherReaderIcon_24;
+                return Properties.Resources.BiomorpherTriggerIcon;
             }
         }
 
