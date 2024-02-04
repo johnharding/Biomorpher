@@ -69,9 +69,6 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.4.3.2\lib\net45\ControlzEx.dll</HintPath>
-    </Reference>
     <Reference Include="Galapagos">
       <HintPath>C:\Program Files\Rhino 7\Plug-ins\Grasshopper\Components\Galapagos.dll</HintPath>
       <Private>False</Private>

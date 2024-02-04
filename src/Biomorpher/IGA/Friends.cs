@@ -23,7 +23,7 @@ namespace Biomorpher.IGA
         /// <returns>returns the version number</returns>
         public static string VerionInfo()
         {
-            return "0.7.2";
+            return "0.8.0";
         }
 
         /// <summary>
