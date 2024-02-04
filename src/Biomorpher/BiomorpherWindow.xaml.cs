@@ -2893,8 +2893,8 @@ namespace Biomorpher
             }
             catch
             {
-                System.Console.Beep(10000, 50);
-                System.Console.Beep(20000, 100);
+                //System.Console.Beep(10000, 50);
+                //System.Console.Beep(20000, 100);
             }
             
         }

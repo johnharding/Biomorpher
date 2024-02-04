@@ -18,7 +18,7 @@
 
     <Grid Background="#a7adb4" x:Name="MainGrid" >
         <TabControl x:Name="tabControl" Background="#a7adb4"  >
-            <TabItem Header="Population" x:Name="Tab1" Margin="21,2,-20.6,-1.8" Background="Transparent" controls:ControlsHelper.HeaderFontWeight="Regular" >
+            <TabItem Header="Population" x:Name="Tab1" Margin="21,2,-20.6,-1.8" Background="Transparent" >
                 <DockPanel LastChildFill="True" x:Name="Timmy1">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab1_secondary" Margin="0,10,0,0"  />
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab1_primary" Margin="0,10,5,5" />
@@ -26,14 +26,14 @@
 
             </TabItem>
 
-            <TabItem Header="Designs" x:Name="Tab2" Margin="25.6,2,-25.8,-1.8" Background="Transparent" Foreground="Black" controls:ControlsHelper.HeaderFontWeight="Regular">
+            <TabItem Header="Designs" x:Name="Tab2" Margin="25.6,2,-25.8,-1.8" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy2">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab2_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab2_primary" Margin="0,10,5,5" />
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="History" x:Name="Tab3" Margin="30.8,2,-30.6,-1.8" Background="Transparent" Foreground="Black" controls:ControlsHelper.HeaderFontWeight="Regular">
+            <TabItem Header="History" x:Name="Tab3" Margin="30.8,2,-30.6,-1.8" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy3">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab3_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab3_primary">
@@ -45,7 +45,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="Performance" x:Name="Tab4" Margin="35.6,2,-35.6,-1.8" Background="Transparent" Foreground="Black" controls:ControlsHelper.HeaderFontWeight="Regular">
+            <TabItem Header="Performance" x:Name="Tab4" Margin="35.6,2,-35.6,-1.8" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy4">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab4_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab4_primary" >
@@ -92,7 +92,7 @@
             </TabItem>
 
 
-            <TabItem Header="Scatter" x:Name="Tab5" Margin="40.6,2,-41,-1.8" Background="Transparent" Foreground="Black" controls:ControlsHelper.HeaderFontWeight="Regular">
+            <TabItem Header="Scatter" x:Name="Tab5" Margin="40.6,2,-41,-1.8" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy5">
                     <Border BorderThickness="0" DockPanel.Dock="Left" Width="300" x:Name="Tab5_secondary" Margin="0,10,0,0"/>
                     <Border BorderThickness="0" Padding ="0" Width="Auto" Height="Auto" x:Name="Tab5_primary" >
@@ -184,7 +184,7 @@
                 </DockPanel>
             </TabItem>
 
-            <TabItem Header="About" x:Name="Tab6" Margin="0,2,-46.2,-1.8" HorizontalAlignment="Right" Width="85" Background="Transparent" Foreground="Black" controls:ControlsHelper.HeaderFontWeight="Regular">
+            <TabItem Header="About" x:Name="Tab6" Margin="0,2,-46.2,-1.8" HorizontalAlignment="Right" Width="85" Background="Transparent" Foreground="Black">
                 <DockPanel LastChildFill="True" x:Name="Timmy6">
                     <Border BorderThickness="0" Padding ="50" Width="Auto" Height="Auto" x:Name="Tab6_primary"/>
                 </DockPanel>
@@ -197,7 +197,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
 
                 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -221,10 +221,10 @@
                     <SolidColorBrush x:Key="AccentColorBrush3" Color="{StaticResource AccentColor3}" options:Freeze="True" />
                     <SolidColorBrush x:Key="AccentColorBrush4" Color="{StaticResource AccentColor4}" options:Freeze="True" />
                     <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{StaticResource MyTitleBrush}" options:Freeze="True" />
-                    
-                    <SolidColorBrush x:Key="IdealForegroundColorBrush" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
-                    <SolidColorBrush x:Key="IdealForegroundDisabledBrush" Opacity="0.4" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
-                    <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{StaticResource IdealForegroundColor}" options:Freeze="True" />
+
+                    <SolidColorBrush x:Key="MahApps.Brushes.IdealForeground" Color="{StaticResource MahApps.Colors.IdealForeground}" options:Freeze="True" />
+                    <SolidColorBrush x:Key="IdealForegroundDisabledBrush" Opacity="0.4" Color="{StaticResource MahApps.Colors.IdealForeground}" options:Freeze="True" />
+                    <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{StaticResource MahApps.Colors.IdealForeground}" options:Freeze="True" />
 
                     
                      

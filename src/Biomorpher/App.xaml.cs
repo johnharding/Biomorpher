@@ -1,4 +1,5 @@
-﻿using MahApps.Metro;
+﻿using ControlzEx.Theming;
+using MahApps.Metro;
 using System;
 using System.Windows;
 
@@ -16,17 +17,17 @@ namespace Biomorpher
             // add custom accent and theme resource dictionaries to the ThemeManager
             // you should replace MahAppsMetroThemesSample with your application name
             // and correct place where your custom accent lives
-            ThemeManager.AddAccent("CustomAccent1", new Uri("pack://application:,,,/MahAppsMetroThemesSample;component/CustomAccents/CustomAccent1.xaml"));
+            //ThemeManager.AddAccent("CustomAccent1", new Uri("pack://application:,,,/MahAppsMetroThemesSample;component/CustomAccents/CustomAccent1.xaml"));
 
             // get the current app style (theme and accent) from the application
-            Tuple<AppTheme, Accent> appStyle = ThemeManager.DetectAppStyle(Application.Current);
+            //Tuple<AppTheme, Accent> appStyle = ThemeManager.DetectAppStyle(Application.Current);
 
             // now change app style to the custom accent and current theme
-            ThemeManager.ChangeAppStyle(Application.Current,
-                                        ThemeManager.GetAccent("CustomAccent1"),
-                                        appStyle.Item1);
+            //ThemeManager.ChangeAppStyle(Application.Current,
+                                        //ThemeManager.GetAccent("CustomAccent1"),
+                                        //appStyle.Item1);
 
-
+            ThemeManager.Current.ChangeTheme(this, "Dark.Green");
 
 
             base.OnStartup(e);

@@ -1,0 +1,2 @@
+Copy "$(TargetPath)" "$(TargetDir)Biomorpher.gha"
+Copy "$(TargetPath)" "%25appdata%25\Grasshopper\Libraries\Biomorpher.gha"
