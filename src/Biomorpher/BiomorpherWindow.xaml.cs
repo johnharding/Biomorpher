@@ -909,7 +909,7 @@ namespace Biomorpher
             // Create backgroundSlider
             Border border_backgroundSlider = new Border();
             border_backgroundSlider.Margin = new Thickness(margin_w, 10, margin_w, 0);
-            DockPanel dp_backgroundSlider = CreateSlider("Brightness", "backgroundSlider", 0.00, 1.00, 0.00, false, new RoutedPropertyChangedEventHandler<double>(backgroundSlider_ValueChanged));
+            DockPanel dp_backgroundSlider = CreateSlider("Brightness", "backgroundSlider", 0.00, 1.00, 1.00, false, new RoutedPropertyChangedEventHandler<double>(backgroundSlider_ValueChanged));
             border_backgroundSlider.Child = dp_backgroundSlider;
             sp.Children.Add(border_backgroundSlider);
 
@@ -1473,13 +1473,13 @@ namespace Biomorpher
                 radButtonMin.Background = Friends.AlphaShade();
                 radButtonMax.Background = Friends.AlphaShade();
 
-                radButtonNon.BorderBrush = Brushes.SlateGray;
-                radButtonMin.BorderBrush = Brushes.SlateGray;
-                radButtonMax.BorderBrush = Brushes.SlateGray;
+                //radButtonNon.BorderBrush = Brushes.SlateGray;
+                //radButtonMin.BorderBrush = Brushes.SlateGray;
+                //radButtonMax.BorderBrush = Brushes.SlateGray;
 
-                radButtonNon.BorderThickness = new Thickness(0.5);
-                radButtonMin.BorderThickness = new Thickness(0.5);
-                radButtonMax.BorderThickness = new Thickness(0.5);
+                //radButtonNon.BorderThickness = new Thickness(0.5);
+                //radButtonMin.BorderThickness = new Thickness(0.5);
+                //radButtonMax.BorderThickness = new Thickness(0.5);
 
                 controls.Add("RADBUTTONNON" + i, radButtonNon);
                 controls.Add("RADBUTTONMIN" + i, radButtonMin);
